@@ -24,7 +24,7 @@ class Main:
         self.deleteOnDiskLow = bool(__settings__.getSetting('delete_on_low_disk') == "true")
         self.lowDiskPercentage = float(__settings__.getSetting('low_disk_percentage'))
         self.lowDiskPath = __settings__.getSetting('low_disk_path')
-        self.updateLibrary = bool(__settings__.getSetting('update_library') == "true")
+        self.cleanLibrary = bool(__settings__.getSetting('clean_library') == "true")
         self.deleteMovies = bool(__settings__.getSetting('delete_movies') == "true")
         self.deleteTVShows = bool(__settings__.getSetting('delete_tvshows') == "true")
 
@@ -53,9 +53,9 @@ class Main:
                     for file in episodes:
                         self.deleteFile(file)
              
-            # Finally update the library to account for any deleted videos
-            if self.updateLibrary == True:
-                xbmc.executebuiltin("XBMC.UpdateLibrary(video)")
+            # Finally clean the library to account for any deleted videos
+            if self.cleanLibrary == True:
+                xbmc.executebuiltin("XBMC.CleanLibrary(video)")
         else:
             self.notify(__settings__.getLocalizedString(30015))
             
@@ -65,7 +65,7 @@ class Main:
             con = sqlite.connect(xbmc.translatePath('special://database/MyVideos34.db'))
             cur = con.cursor()
             
-            sql = "SELECT files.strFilename FROM files, %s WHERE %s.idFile = files.idFile AND files.lastPlayed < datetime('now', '-%d days')" % (option, option, self.expireAfter)
+            sql = "SELECT path.strPath || files.strFilename FROM files, path, %s WHERE %s.idFile = files.idFile AND files.idPath = path.idPath AND files.lastPlayed < datetime('now', '-%d days')" % (option, option, self.expireAfter)
             
             # If set, only query 'watched' files
             if self.deleteWatched == True:
@@ -97,7 +97,8 @@ class Main:
         xbmc.log('::' + __title__ + '::' + message)
         if self.showNotifications == True:
             xbmc.executebuiltin('XBMC.Notification(%s, %s)' % (__title__, message))
-            
+
+    # Sets or removes autostart line in special://home/userdata/autoexec.py
     def autoStart(self, option):
 	    # See if the autoexec.py file exists
 	    if (os.path.exists(AUTOEXEC_PATH)):

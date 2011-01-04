@@ -1,7 +1,7 @@
 <strings>
     <string id="30001">Enable service</string>
     <string id="30002">How often in days we should check for expired videos</string>
-    <string id="30003">Update library when finished</string>
+    <string id="30003">Clean library when finished</string>
     <string id="30004">Show notifications</string>
     <string id="30005">Only delete files which have already been watched</string>
     <string id="30006">Only delete videos if low on disk space</string>
