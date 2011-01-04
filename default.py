@@ -43,12 +43,12 @@ class Main:
             
             if (self.deleteOnDiskLow == True and self.isDiskSpaceLow() == True) or self.deleteOnDiskLow == False:
                 if self.deleteMovies == True:
-                    # Delete all returned movies
+                    # Delete all expired movies
                     movies = self.getExpired('movie')
-                    for file in files:
+                    for file in movies:
                         self.deleteFile(file)
                 if self.deleteTVShows == True:    
-                    # Delete all returned TV shows
+                    # Delete all expired TV shows
                     episodes = self.getExpired('episode')
                     for file in episodes:
                         self.deleteFile(file)
