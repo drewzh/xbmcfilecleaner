@@ -90,7 +90,9 @@ class Main:
 
     # Delete file from the OS
     def deleteFile(self, file):
-        self.notify(__settings__.getLocalizedString(30014) + ' ' + file)
+        if os.path.exists(file):
+            os.remove(file):
+            self.notify(__settings__.getLocalizedString(30014) + ' ' + file)
 
     # Display notification on screen and send to log
     def notify(self, message):
