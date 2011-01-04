@@ -65,7 +65,7 @@ class Main:
             con = sqlite.connect(xbmc.translatePath('special://database/MyVideos34.db'))
             cur = con.cursor()
             
-            sql = "SELECT files.strFilename FROM files, %s WHERE %s.idFile = files.idFile AND files.lastPlayed < date('now', '-%d days')" % (option, option, self.expireAfter)
+            sql = "SELECT files.strFilename FROM files, %s WHERE %s.idFile = files.idFile AND files.lastPlayed < datetime('now', '-%d days')" % (option, option, self.expireAfter)
             
             # If set, only query 'watched' files
             if self.deleteWatched == True:
