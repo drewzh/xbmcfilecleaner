@@ -25,6 +25,8 @@ class Main:
         self.lowDiskPercentage = float(__settings__.getSetting('low_disk_percentage'))
         self.lowDiskPath = __settings__.getSetting('low_disk_path')
         self.updateLibrary = bool(__settings__.getSetting('update_library') == "true")
+        self.deleteMovies = bool(__settings__.getSetting('delete_movies') == "true")
+        self.deleteTVShows = bool(__settings__.getSetting('delete_tvshows') == "true")
 
         # Set or remove auto startup
         self.autoStart(self.serviceEnabled)
@@ -40,12 +42,16 @@ class Main:
                 xbmc.executebuiltin('XBMC.AlarmClock(%s, XBMC.RunScript(%s), %d, true)' % (__addonID__, __addonID__, self.checkInterval * 60 * 24))
             
             if (self.deleteOnDiskLow == True and self.isDiskSpaceLow() == True) or self.deleteOnDiskLow == False:
-                # Get expired videos and delete from file system
-                files = self.getExpired()
-                
-                # Delete all returned files
-                for file in files:
-                    self.deleteFile(file)
+                if self.deleteMovies == True:
+                    # Delete all returned movies
+                    movies = self.getExpired('movie')
+                    for file in files:
+                        self.deleteFile(file)
+                if self.deleteTVShows == True:    
+                    # Delete all returned TV shows
+                    episodes = self.getExpired('episode')
+                    for file in episodes:
+                        self.deleteFile(file)
              
             # Finally update the library to account for any deleted videos
             if self.updateLibrary == True:
@@ -54,16 +60,17 @@ class Main:
             self.notify(__settings__.getLocalizedString(30015))
             
     # Get all expired videos from the library database
-    def getExpired(self):
+    def getExpired(self, option):
         try:
             con = sqlite.connect(xbmc.translatePath('special://database/MyVideos34.db'))
             cur = con.cursor()
-            sql = "SELECT strFilename FROM files, episode WHERE episode.idFile = files.idFile AND lastPlayed < date('now', '-%d days')" % (self.expireAfter)
+            
+            sql = "SELECT files.strFilename FROM files, %s WHERE %s.idFile = files.idFile AND files.lastPlayed < date('now', '-%d days')" % (option, self.expireAfter)
             
             # If set, only query 'watched' files
             if self.deleteWatched == True:
                 sql = sql + " AND playCount > 0"
-                
+            
             cur.execute(sql)
             
             # Return list of files to delete

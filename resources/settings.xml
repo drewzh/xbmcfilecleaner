@@ -3,6 +3,8 @@
         <setting id="service_enabled" type="bool" label="30001" default="false"/>
         <setting id="check_interval" type="text" label="30002" default="1"/>
         <setting id="show_notifications" type="bool" label="30004" default="true" />
+        <setting id="delete_movies" type="bool" label="30016" default="false" />
+        <setting id="delete_tvshows" type="bool" label="30017" default="true" />
         <setting id="update_library" type="bool" label="30003" default="true"/>
         <setting id="expire_after" type="text" label="30010" default="14"/>
         <setting id="delete_watched" type="bool" label="30005" default="true"/>
