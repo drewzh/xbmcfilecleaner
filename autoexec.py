@@ -1,3 +1,3 @@
 import xbmc
 
-xbmc.executebuiltin('RunScript(script.springclean)')
+xbmc.executebuiltin('RunScript(script.filecleaner)')
