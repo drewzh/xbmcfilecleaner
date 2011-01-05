@@ -85,7 +85,8 @@ class Main:
         self.cleanLibrary = bool(__settings__.getSetting('clean_library') == "true")
         self.deleteMovies = bool(__settings__.getSetting('delete_movies') == "true")
         self.deleteTVShows = bool(__settings__.getSetting('delete_tvshows') == "true")
-        
+        # Set or remove autoexec.py line
+        autoStart(self.serviceEnabled)
         return True
 
     # Returns true if running out of disk space
