@@ -24,7 +24,7 @@ class Main:
         # Main service loop
         while self.refreshSettings() and self.serviceEnabled:
             self.cleanup()
-            time.sleep(5)
+            time.sleep(60)
 
         # Service disabled
         self.notify(__settings__.getLocalizedString(30015))
