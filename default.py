@@ -4,7 +4,7 @@ from pysqlite2 import dbapi2 as sqlite
 # Addon info
 __title__ = 'XBMC File Cleaner'
 __author__ = 'Andrew Higginson <azhigginson@gmail.com>'
-__addonID__	= "script.filecleaner"
+__addonID__ = "script.filecleaner"
 __settings__ = xbmcaddon.Addon(__addonID__)
 
 # Autoexec info

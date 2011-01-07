@@ -9,9 +9,9 @@
   </extension>
   <extension point="xbmc.addon.metadata">
     <summary lang="en">Regularly deletes old movie and tv files</summary>
-    <description lang="en">DISCLAIMER
+    <description lang="en">DANGER WILL ROBINSON!!!
 =====================================
-Service is disabled in options by default, please make sure that you fully understand what this plugin is intended to do and that you've configured the options to your requirements before enabling.  Once enabled, please run once to intialize the service.  I will not be held responsible for loss of data due to user error.
+This script has the potential to wipe your entire video collection!  Please make sure you understand exactly what this script is designed to do before running.  I will not be held responsible for loss of data due to user error.
 
 DESCRIPTION
 =====================================    
@@ -19,8 +19,8 @@ This plugin will automatically scan your library for watched TV shows and Movies
 
 QUESTIONS/COMMENTS/SUGGESTIONS
 =====================================
-email: azhigginson@gmail.com
-twitter: drewzh
+web: http://drewzh.com
+email: me@drewzh.com
     </description>
     <platform>all</platform>
   </extension>
