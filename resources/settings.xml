@@ -1,13 +1,17 @@
 <settings>
     <category label="00008">
         <setting id="service_enabled" type="bool" label="30001" default="false"/>
-        <setting id="show_notifications" type="bool" label="30004" default="true" />
-        <setting id="delete_movies" type="bool" label="30016" default="false" />
-        <setting id="delete_tvshows" type="bool" label="30017" default="true" />
-        <setting id="clean_library" type="bool" label="30003" default="true"/>
-        <setting id="expire_after" type="text" label="30010" default="14"/>
-        <setting id="delete_on_low_disk" type="bool" label="30006" default="true"/>
-        <setting id="low_disk_percentage" type="text" label="30007" default="10"/>
-        <setting id="low_disk_path" type="text" label="30011" default="special://home"/>
+        <setting id="show_notifications" type="bool" label="30004" default="true" enable="IsTrue(Addon.Setting(service_enabled))" />
+        <setting id="delete_movies" type="bool" label="30016" default="false" enable="IsTrue(Addon.Setting(service_enabled))" />
+        <setting id="delete_tvshows" type="bool" label="30017" default="true" enable="IsTrue(Addon.Setting(service_enabled))" />
+        <setting id="clean_library" type="bool" label="30003" default="true" enable="IsTrue(Addon.Setting(service_enabled))" />
+        <setting id="enable_expire" type="bool" label="30004" default="true" enable="IsTrue(Addon.Setting(service_enabled))" />
+        <setting id="expire_after" type="text" label="30010" default="14" enable="IsTrue(Addon.Setting(service_enabled))" />
+        <setting id="delete_low_rating" type="bool" label="30018" default="true" enable="IsTrue(Addon.Setting(service_enabled))" />
+        <setting id="low_rating_figure" type="enum" label="30019" values="1|2|3|4|5" default="3" enable="IsTrue(Addon.Setting(delete_low_rating)) + IsTrue(Addon.Setting(service_enabled))" />
+        <setting id="ignore_no_rating" type="bool" label="30020" default="true" enable="IsTrue(Addon.Setting(delete_low_rating)) + IsTrue(Addon.Setting(service_enabled))" />
+        <setting id="delete_on_low_disk" type="bool" label="30006" default="true" enable="IsTrue(Addon.Setting(service_enabled))" />
+        <setting id="low_disk_percentage" type="text" label="30007" default="10" enable="IsTrue(Addon.Setting(delete_on_low_disk)) + IsTrue(Addon.Setting(service_enabled))" />
+        <setting id="low_disk_path" type="text" label="30011" default="special://home" enable="IsTrue(Addon.Setting(delete_on_low_disk)) + IsTrue(Addon.Setting(service_enabled))" />
     </category>
 </settings>

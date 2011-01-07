@@ -61,7 +61,22 @@ class Main:
             con = sqlite.connect(xbmc.translatePath('special://database/MyVideos34.db'))
             cur = con.cursor()
             
-            sql = "SELECT path.strPath || files.strFilename FROM files, path, %s WHERE %s.idFile = files.idFile AND files.idPath = path.idPath AND files.lastPlayed < datetime('now', '-%d days') AND playCount > 0" % (option, option, self.expireAfter)
+            if option == 'movie':
+                sql = "SELECT files.strFilename as filename,\
+                              path.strPath || files.strFilename as full_path\
+                         FROM files, path, %s\
+                        WHERE %s.idFile = files.idFile\
+                          AND files.idPath = path.idPath\
+                          AND files.lastPlayed < datetime('now', '-%d days')\
+                          AND playCount > 0 %s" % (option, option, self.expireAfter, if self.deleteLowRating: 'AND ' + (if self.ignoreNoRating: 'ifnull(c05, 0)' else: 'c05') + ' < ' + lowRatingFigure )
+            elif option == 'episode':
+                sql = "SELECT files.strFilename as filename,\
+                              path.strPath || files.strFilename as full_path\
+                         FROM files, path, %s\
+                        WHERE %s.idFile = files.idFile\
+                          AND files.idPath = path.idPath\
+                          AND files.lastPlayed < datetime('now', '-%d days')\
+                          AND playCount > 0 %s" % (option, option, self.expireAfter, if self.deleteLowRating: 'AND ' + (if self.ignoreNoRating: 'ifnull(c03, 0)' else: 'c03') + ' < ' + lowRatingFigure )
             
             cur.execute(sql)
             
@@ -85,6 +100,9 @@ class Main:
         self.cleanLibrary = bool(__settings__.getSetting('clean_library') == "true")
         self.deleteMovies = bool(__settings__.getSetting('delete_movies') == "true")
         self.deleteTVShows = bool(__settings__.getSetting('delete_tvshows') == "true")
+        self.deleteLowRating = bool(__settings__.getSetting('delete_low_rating') == "true")
+        self.lowRatingFigure = int(__settings__.getSetting('low_rating_figure'))
+        self.ignoreNoRating = bool(__settings__.getSetting('ignore_no_rating') == "true")
         # Set or remove autoexec.py line
         self.autoStart(self.serviceEnabled)
         return True
