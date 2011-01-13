@@ -21,4 +21,6 @@
     <string id="30021">Enable holding folder</string>
     <string id="30022">Holding folder location</string>
     <string id="30023">How many days to hold files before deletion</string>
+    <string id="30024">Enable debug messages</string>
+    <string id="30025">Moved %s to holding folder</string>
 </strings>

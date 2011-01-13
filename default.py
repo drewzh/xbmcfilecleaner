@@ -32,7 +32,7 @@ class Main:
             
     """ Run cleanup routine """
     def cleanup(self):
-        self.log(__settings__.getLocalizedString(30009))
+        self.debug(__settings__.getLocalizedString(30009))
         if not self.deleteOnDiskLow or (self.deleteOnDiskLow and self.disk_space_low()):
             doClean = False
             
@@ -40,23 +40,29 @@ class Main:
             if self.deleteMovies:
                 movies = self.get_expired('movie')
                 if movies:
-                    doClean = True
-                    for file in movies:
+                    for file, path in movies:
+                        if os.path.exists(path):
+                            doClean = True
                         if self.enableHolding:
-                            self.move_file(file, self.holdingFolder)
+                            self.debug("Moving %s to %s..." % (file, self.holdingFolder))
+                            self.move_file(path, self.holdingFolder)
                         else:
-                            self.delete_file(file)
+                            self.debug("Deleting %s..." % (file))
+                            self.delete_file(path)
                     
             """ Delete any expired TV shows """
             if self.deleteTVShows:
                 episodes = self.get_expired('episode')
                 if episodes:
-                    doClean = True
-                    for file in episodes:
+                    for file, path in episodes:
+                        if os.path.exists(path):
+                            doClean = True
                         if self.enableHolding:
-                            self.move_file(file, self.holdingFolder)
+                            self.debug("Moving %s to %s..." % (file, self.holdingFolder))
+                            self.move_file(path, self.holdingFolder)
                         else:
-                            self.delete_file(file)                    
+                            self.debug("Deleting %s..." % (file))
+                            self.delete_file(path)                    
                         
             """ Finally clean the library to account for any deleted videos """
             if doClean and self.cleanLibrary:
@@ -75,15 +81,12 @@ class Main:
                          FROM files, path, %s\
                         WHERE %s.idFile = files.idFile\
                           AND files.idPath = path.idPath\
-                          AND files.lastPlayed < datetime('now', '-%d days')\
-                          AND playCount > 0 %s" % (option, option, self.expireAfter)
+                          AND files.lastPlayed < datetime('now', '-%f days')\
+                          AND playCount > 0" % (option, option, self.expireAfter)
                 if self.deleteLowRating:
-                    sql += ' AND '
+                    sql += ' AND c05+0 < %f' % (self.lowRatingFigure)
                     if self.ignoreNoRating:
-                        sql += 'c05'
-                    else:
-                        sql += 'ifnull(c05, 0)'
-                    sql += ' < ' + lowRatingFigure
+                      sql += ' AND c05 > 0'
 
             elif option == 'episode':
                 sql = "SELECT files.strFilename as filename,\
@@ -91,20 +94,19 @@ class Main:
                          FROM files, path, %s\
                         WHERE %s.idFile = files.idFile\
                           AND files.idPath = path.idPath\
-                          AND files.lastPlayed < datetime('now', '-%d days')\
-                          AND playCount > 0 %s" % (option, option, self.expireAfter)
+                          AND files.lastPlayed < datetime('now', '-%f days')\
+                          AND playCount > 0" % (option, option, self.expireAfter)
                 if self.deleteLowRating:
-                    sql += ' AND '
+                    sql += ' AND c03+0 < %f' % (self.lowRatingFigure)
                     if self.ignoreNoRating:
-                        sql += 'c03'
-                    else:
-                        sql += 'ifnull(c03, 0)'
-                    sql += ' < ' + lowRatingFigure
+                      sql += ' AND c03 > 0'
             
+            self.debug('Executing ' + str(sql))
+                
             cur.execute(sql)
             
             """ Return list of files to delete """
-            return [element[0] for element in cur.fetchall()]
+            return cur.fetchall()
         except:
             """ Error opening video library database """
             self.notify(__settings__.getLocalizedString(30012))
@@ -120,16 +122,17 @@ class Main:
         self.expireAfter = float(__settings__.getSetting('expire_after'))
         self.deleteOnDiskLow = bool(__settings__.getSetting('delete_on_low_disk') == "true")
         self.lowDiskPercentage = float(__settings__.getSetting('low_disk_percentage'))
-        self.lowDiskPath = __settings__.getSetting('low_disk_path')
+        self.lowDiskPath = xbmc.translatePath(__settings__.getSetting('low_disk_path'))
         self.cleanLibrary = bool(__settings__.getSetting('clean_library') == "true")
         self.deleteMovies = bool(__settings__.getSetting('delete_movies') == "true")
         self.deleteTVShows = bool(__settings__.getSetting('delete_tvshows') == "true")
         self.deleteLowRating = bool(__settings__.getSetting('delete_low_rating') == "true")
-        self.lowRatingFigure = int(__settings__.getSetting('low_rating_figure'))
+        self.lowRatingFigure = float(__settings__.getSetting('low_rating_figure'))
         self.ignoreNoRating = bool(__settings__.getSetting('ignore_no_rating') == "true")
         self.enableHolding = bool(__settings__.getSetting('enable_holding') == "true")
-        self.holdingFolder = __settings__.getSetting('holding_folder')
+        self.holdingFolder = xbmc.translatePath(__settings__.getSetting('holding_folder'))
         #self.holdingExpire = int(__settings__.getSetting('holding_expire'))
+        self.enableDebug = bool(xbmc.translatePath(__settings__.getSetting('enable_debug')) == "true")
         
         """ Set or remove autoexec.py line """
         self.toggle_auto_start(self.serviceEnabled)
@@ -138,7 +141,7 @@ class Main:
 
     """ Returns true if running out of disk space """
     def disk_space_low(self):
-        diskStats = os.statvfs(xbmc.translatePath(self.lowDiskPath))
+        diskStats = os.statvfs(self.lowDiskPath)
         diskCapacity = diskStats.f_frsize * diskStats.f_blocks
         diskFree = diskStats.f_frsize * diskStats.f_bavail
         diskFreePercent = math.ceil(float(100) / float(diskCapacity) * float(diskFree))
@@ -158,18 +161,19 @@ class Main:
         if os.path.exists(file):
             shutil.move(file, destination)
             """ Deleted """
-            self.notify(__settings__.getLocalizedString(30014) + ' ' + file)
+            self.notify(__settings__.getLocalizedString(30025) % (file))
 
     """ Display notification on screen and send to log """
     def notify(self, message):
-        self.log(message)
+        self.debug(message)
         if self.showNotifications:
             xbmc.executebuiltin('XBMC.Notification(%s, %s)' % (__title__, message))
     
     
-    """ Log message """
-    def log(self, message):
-        xbmc.log('::' + __title__ + '::' + message)
+    """ Log debug message """
+    def debug(self, message):
+        if self.enableDebug:
+            xbmc.log('::' + __title__ + '::' + message)
 
 
     """ Sets or removes auto start line in special://home/userdata/autoexec.py """
