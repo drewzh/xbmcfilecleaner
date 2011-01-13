@@ -6,7 +6,7 @@
         <setting id="delete_tvshows" type="bool" label="30017" default="true" visible="eq(-3,true)" />
         <setting id="clean_library" type="bool" label="30003" default="true" visible="eq(-4,true)" />
         <setting id="enable_expire" type="bool" label="30004" default="true" visible="eq(-5,true)" />
-        <setting id="expire_after" type="labelenum" label="30010" values="0|1|2|3|4|5|7|14|21|28" default="9" visible="eq(-6,true)" />
+        <setting id="expire_after" type="labelenum" label="30010" values="0|1|2|3|4|5|7|14|21|28" default="7" visible="eq(-6,true)" />
         <setting id="delete_low_rating" type="bool" label="30018" default="true" visible="eq(-7,true)" />
         <setting id="low_rating_figure" type="labelenum" label="30019" values="1|2|3|4|5|6|7|8|9|10" default="7" visible="eq(-8,true) + eq(-1,true)" />
         <setting id="ignore_no_rating" type="bool" label="30020" default="true" visible="eq(-9,true) + eq(-2,true)" />
