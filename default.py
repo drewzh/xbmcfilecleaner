@@ -1,62 +1,70 @@
-import xbmc, xbmcgui, xbmcaddon, os, math, time
+import xbmc, xbmcgui, xbmcaddon, os, shutil, math, time
 from pysqlite2 import dbapi2 as sqlite
 
-# Addon info
+""" Addon info """
 __title__ = 'XBMC File Cleaner'
 __author__ = 'Andrew Higginson <azhigginson@gmail.com>'
 __addonID__ = "script.filecleaner"
 __settings__ = xbmcaddon.Addon(__addonID__)
 
-# Autoexec info
+""" Autoexec info """
 AUTOEXEC_PATH = xbmc.translatePath('special://home/userdata/autoexec.py')
 AUTOEXEC_FOLDER_PATH = xbmc.translatePath('special://home/userdata/')
 AUTOEXEC_SCRIPT = '\nimport time;time.sleep(5);xbmc.executebuiltin("XBMC.RunScript(special://home/addons/script.filecleaner/default.py,-startup)")\n'
 
 class Main:
     def __init__(self):
-        # Refreh settings
-        self.refreshSettings()
+        """ Refreh settings """
+        self.refresh_settings()
         
         if self.serviceEnabled:
-            # Monitoring library
+            """ Monitoring library """
             self.notify(__settings__.getLocalizedString(30013))
             
-        # Main service loop
-        while self.refreshSettings() and self.serviceEnabled:
+        """ Main service loop """
+        while self.refresh_settings() and self.serviceEnabled:
             self.cleanup()
             time.sleep(60)
 
-        # Service disabled
+        """ Service disabled """
         self.notify(__settings__.getLocalizedString(30015))
             
-    # Run cleanup routine
+            
+    """ Run cleanup routine """
     def cleanup(self):
         self.log(__settings__.getLocalizedString(30009))
-        if not self.deleteOnDiskLow or (self.deleteOnDiskLow and self.isDiskSpaceLow()):
+        if not self.deleteOnDiskLow or (self.deleteOnDiskLow and self.disk_space_low()):
             doClean = False
             
-            # Delete any expired movies
+            """ Delete any expired movies """
             if self.deleteMovies:
-                movies = self.getExpired('movie')
+                movies = self.get_expired('movie')
                 if movies:
                     doClean = True
                     for file in movies:
-                        self.deleteFile(file)
+                        if self.enableHolding:
+                            self.move_file(file, self.holdingFolder)
+                        else:
+                            self.delete_file(file)
                     
-            # Delete any expired TV shows
+            """ Delete any expired TV shows """
             if self.deleteTVShows:
-                episodes = self.getExpired('episode')
+                episodes = self.get_expired('episode')
                 if episodes:
                     doClean = True
                     for file in episodes:
-                        self.deleteFile(file)                    
+                        if self.enableHolding:
+                            self.move_file(file, self.holdingFolder)
+                        else:
+                            self.delete_file(file)                    
                         
-            # Finally clean the library to account for any deleted videos
+            """ Finally clean the library to account for any deleted videos """
             if doClean and self.cleanLibrary:
                 xbmc.executebuiltin("XBMC.CleanLibrary(video)")
             
-    # Get all expired videos from the library database
-    def getExpired(self, option):
+            
+    """ Get all expired videos from the library database """
+    def get_expired(self, option):
         try:
             con = sqlite.connect(xbmc.translatePath('special://database/MyVideos34.db'))
             cur = con.cursor()
@@ -68,7 +76,15 @@ class Main:
                         WHERE %s.idFile = files.idFile\
                           AND files.idPath = path.idPath\
                           AND files.lastPlayed < datetime('now', '-%d days')\
-                          AND playCount > 0 %s" % (option, option, self.expireAfter, if self.deleteLowRating: 'AND ' + (if self.ignoreNoRating: 'ifnull(c05, 0)' else: 'c05') + ' < ' + lowRatingFigure )
+                          AND playCount > 0 %s" % (option, option, self.expireAfter)
+                if self.deleteLowRating:
+                    sql += ' AND '
+                    if self.ignoreNoRating:
+                        sql += 'c05'
+                    else:
+                        sql += 'ifnull(c05, 0)'
+                    sql += ' < ' + lowRatingFigure
+
             elif option == 'episode':
                 sql = "SELECT files.strFilename as filename,\
                               path.strPath || files.strFilename as full_path\
@@ -76,19 +92,27 @@ class Main:
                         WHERE %s.idFile = files.idFile\
                           AND files.idPath = path.idPath\
                           AND files.lastPlayed < datetime('now', '-%d days')\
-                          AND playCount > 0 %s" % (option, option, self.expireAfter, if self.deleteLowRating: 'AND ' + (if self.ignoreNoRating: 'ifnull(c03, 0)' else: 'c03') + ' < ' + lowRatingFigure )
+                          AND playCount > 0 %s" % (option, option, self.expireAfter)
+                if self.deleteLowRating:
+                    sql += ' AND '
+                    if self.ignoreNoRating:
+                        sql += 'c03'
+                    else:
+                        sql += 'ifnull(c03, 0)'
+                    sql += ' < ' + lowRatingFigure
             
             cur.execute(sql)
             
-            # Return list of files to delete
+            """ Return list of files to delete """
             return [element[0] for element in cur.fetchall()]
         except:
-            # Error opening video library database
+            """ Error opening video library database """
             self.notify(__settings__.getLocalizedString(30012))
             raise
 
-    # Refreshes current settings
-    def refreshSettings(self):
+
+    """ Refreshes current settings """
+    def refresh_settings(self):
         __settings__ = xbmcaddon.Addon(__addonID__)
         
         self.serviceEnabled = bool(__settings__.getSetting('service_enabled') == "true")
@@ -103,12 +127,17 @@ class Main:
         self.deleteLowRating = bool(__settings__.getSetting('delete_low_rating') == "true")
         self.lowRatingFigure = int(__settings__.getSetting('low_rating_figure'))
         self.ignoreNoRating = bool(__settings__.getSetting('ignore_no_rating') == "true")
-        # Set or remove autoexec.py line
-        self.autoStart(self.serviceEnabled)
+        self.enableHolding = bool(__settings__.getSetting('enable_holding') == "true")
+        self.holdingFolder = __settings__.getSetting('holding_folder')
+        #self.holdingExpire = int(__settings__.getSetting('holding_expire'))
+        
+        """ Set or remove autoexec.py line """
+        self.toggle_auto_start(self.serviceEnabled)
         return True
 
-    # Returns true if running out of disk space
-    def isDiskSpaceLow(self):
+
+    """ Returns true if running out of disk space """
+    def disk_space_low(self):
         diskStats = os.statvfs(xbmc.translatePath(self.lowDiskPath))
         diskCapacity = diskStats.f_frsize * diskStats.f_blocks
         diskFree = diskStats.f_frsize * diskStats.f_bavail
@@ -116,46 +145,56 @@ class Main:
 
         return (float(diskFreePercent) < float(self.lowDiskPercentage))
 
-    # Delete file from the OS
-    def deleteFile(self, file):
+
+    """ Delete file from the OS """
+    def delete_file(self, file):
         if os.path.exists(file):
             os.remove(file)
-            # Deleted
+            """ Deleted """
             self.notify(__settings__.getLocalizedString(30014) + ' ' + file)
 
-    # Display notification on screen and send to log
+    """ Move file """
+    def move_file(self, file, destination):
+        if os.path.exists(file):
+            shutil.move(file, destination)
+            """ Deleted """
+            self.notify(__settings__.getLocalizedString(30014) + ' ' + file)
+
+    """ Display notification on screen and send to log """
     def notify(self, message):
         self.log(message)
         if self.showNotifications:
             xbmc.executebuiltin('XBMC.Notification(%s, %s)' % (__title__, message))
     
-    # Log message
+    
+    """ Log message """
     def log(self, message):
         xbmc.log('::' + __title__ + '::' + message)
 
-    # Sets or removes autostart line in special://home/userdata/autoexec.py
-    def autoStart(self, option):
-        # See if the autoexec.py file exists
+
+    """ Sets or removes auto start line in special://home/userdata/autoexec.py """
+    def toggle_auto_start(self, option):
+        """ See if the autoexec.py file exists """
         if (os.path.exists(AUTOEXEC_PATH)):
-	        # Var to check if we're in autoexec.py
+	        """ Var to check if we're in autoexec.py """
 	        found = False
 	        autoexecfile = file(AUTOEXEC_PATH, 'r')
 	        filecontents = autoexecfile.readlines()
 	        autoexecfile.close()
 
-	        # Check if we're in it
+	        """ Check if we're in it """
 	        for line in filecontents:
 		        if line.find(__addonID__) > 0:
 			        found = True
 
-	        # If the autoexec.py file is found and we're not in it,
+	        """ If the autoexec.py file is found and we're not in it """
 	        if (not found and option):
 		        autoexecfile = file(AUTOEXEC_PATH, 'w')
 		        filecontents.append(AUTOEXEC_SCRIPT)
 		        autoexecfile.writelines(filecontents)            
 		        autoexecfile.close()
 
-	        # Found that we're in it and it's time to remove ourselves
+	        """ Found that we're in it and it's time to remove ourselves """
 	        if (found and not option):
 		        autoexecfile = file(AUTOEXEC_PATH, 'w')
 		        for line in filecontents:

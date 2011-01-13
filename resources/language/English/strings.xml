@@ -17,5 +17,8 @@
     <string id="30017">Delete TV shows</string>
     <string id="30018">Only delete when rating has a low rating</string>
     <string id="30019">Delete when rating lower than</string>
-    <string id="30019">Ignore files with no rating</string>
+    <string id="30020">Ignore files with no rating</string>
+    <string id="30021">Enable holding folder</string>
+    <string id="30022">Holding folder location</string>
+    <string id="30023">How many days to hold files before deletion</string>
 </strings>
