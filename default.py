@@ -135,6 +135,8 @@ class Main:
         self.holdingFolder = xbmc.translatePath(__settings__.getSetting('holding_folder'))
         #self.holdingExpire = int(__settings__.getSetting('holding_expire'))
         self.enableDebug = bool(xbmc.translatePath(__settings__.getSetting('enable_debug')) == "true")
+        self.createSeriesSeasonDirs = bool(xbmc.translatePath(__settings__.getSetting('create_series_season_dirs')) == "true")
+        self.updatePathReference = bool(xbmc.translatePath(__settings__.getSetting('update_path_reference')) == "true")
         
         """ Set or remove autoexec.py line """
         self.toggle_auto_start(self.serviceEnabled)
