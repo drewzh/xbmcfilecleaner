@@ -1,4 +1,4 @@
-import xbmc, xbmcgui, xbmcaddon, os, shutil, math, time
+import xbmc, xbmcgui, xbmcaddon, os, shutil, math, time, sys
 from pysqlite2 import dbapi2 as sqlite
 
 """ Addon info """
@@ -14,7 +14,9 @@ AUTOEXEC_SCRIPT = '\nimport time;time.sleep(5);xbmc.executebuiltin("XBMC.RunScri
 
 class Main:
     def __init__(self):
-        """ Refreh settings """
+        reload(sys)
+        sys.setdefaultencoding('utf-8')
+        """ Refresh settings """
         self.refresh_settings()
         
         if self.serviceEnabled:
