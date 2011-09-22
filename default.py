@@ -56,12 +56,21 @@ class Main:
             if self.deleteTVShows:
                 episodes = self.get_expired('episode')
                 if episodes:
-                    for file, path in episodes:
+                    for file, path, show, season, idFile in episodes:
                         if os.path.exists(path):
                             doClean = True
                         if self.enableHolding:
-                            self.debug("Moving %s to %s..." % (file, self.holdingFolder))
-                            self.move_file(path, self.holdingFolder)
+                            if self.createSeriesSeasonDirs:
+                                newpath = os.path.join(
+                                    self.holdingFolder,
+                                    show,
+                                    "Season " + season
+                                )
+                                self.createseasondirs(newpath)  
+                            else:
+                                newpath = self.holdingFolder
+                            self.debug("Moving %s to %s..." % (file, newpath))
+                            self.move_file(path, newpath)
                         else:
                             self.debug("Deleting %s..." % (file))
                             self.delete_file(path)                    
@@ -93,11 +102,16 @@ class Main:
 
             elif option == 'episode':
                 sql = "SELECT files.strFilename as filename,\
-                              path.strPath || files.strFilename as full_path\
-                         FROM files, path, %s\
+                              path.strPath || files.strFilename as full_path,\
+                              tvshow.c00 as showname,\
+                              episode.c12 as episodeno,\
+                              files.idFile\
+                         FROM files, path, %s, tvshow, tvshowlinkepisode\
                         WHERE %s.idFile = files.idFile\
                           AND NOT path.strPath like '%s%%'\
                           AND files.idPath = path.idPath\
+                          AND tvshowlinkepisode.idEpisode = episode.idEpisode\
+                          AND tvshowlinkepisode.idShow = tvshow.idShow\
                           AND files.lastPlayed < datetime('now', '-%f days', 'localtime')\
                           AND playCount > 0" % (option, option, self.holdingFolder, self.expireAfter)
                 if self.deleteLowRating:
@@ -172,6 +186,24 @@ class Main:
             shutil.move(file, newfile)
             """ Deleted """
             self.notify(__settings__.getLocalizedString(30025) % (file))
+
+    """ Create series and season based dirs """
+    def createseasondirs(self, seasondir):
+        seriesdir=os.path.dirname(seasondir)
+        # Create series-based dir if not exists
+        self.debug("Creating dir %s..." % (seriesdir))
+        try:
+            os.mkdir(seriesdir)
+            self.debug("..done")
+        except:
+            self.debug("..dir already exists")
+        # Create season-based if not exists
+        self.debug("Creating dir %s..." % (seasondir))
+        try:
+            os.mkdir(seasondir)
+            self.debug("..done")
+        except:
+            self.debug("..dir already exists") 
 
     """ Display notification on screen and send to log """
     def notify(self, message):
