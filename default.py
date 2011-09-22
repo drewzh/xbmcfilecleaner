@@ -82,9 +82,10 @@ class Main:
                               path.strPath || files.strFilename as full_path\
                          FROM files, path, %s\
                         WHERE %s.idFile = files.idFile\
+                          AND NOT path.strPath like '%s%%'\
                           AND files.idPath = path.idPath\
                           AND files.lastPlayed < datetime('now', '-%f days', 'localtime')\
-                          AND playCount > 0" % (option, option, self.expireAfter)
+                          AND playCount > 0" % (option, option, self.holdingFolder, self.expireAfter)
                 if self.deleteLowRating:
                     sql += ' AND c05+0 < %f' % (self.lowRatingFigure)
                     if self.ignoreNoRating:
@@ -95,9 +96,10 @@ class Main:
                               path.strPath || files.strFilename as full_path\
                          FROM files, path, %s\
                         WHERE %s.idFile = files.idFile\
+                          AND NOT path.strPath like '%s%%'\
                           AND files.idPath = path.idPath\
                           AND files.lastPlayed < datetime('now', '-%f days', 'localtime')\
-                          AND playCount > 0" % (option, option, self.expireAfter)
+                          AND playCount > 0" % (option, option, self.holdingFolder, self.expireAfter)
                 if self.deleteLowRating:
                     sql += ' AND c03+0 < %f' % (self.lowRatingFigure)
                     if self.ignoreNoRating:
