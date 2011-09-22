@@ -71,6 +71,8 @@ class Main:
                                 newpath = self.holdingFolder
                             self.debug("Moving %s to %s..." % (file, newpath))
                             self.move_file(path, newpath)
+                            if self.doupdatePathReference:
+                                self.updatePathReference(idFile, newpath)
                         else:
                             self.debug("Deleting %s..." % (file))
                             self.delete_file(path)                    
@@ -130,6 +132,38 @@ class Main:
             self.notify(__settings__.getLocalizedString(30012))
             raise
 
+    """ updates file reference for a file """
+    def updatePathReference(self, idFile, newpath):
+        try:
+            con = sqlite.connect(xbmc.translatePath('special://database/MyVideos34.db'))
+            cur = con.cursor()
+            
+            # Insert path if it doesn't exist
+            sql = "INSERT OR IGNORE INTO\
+                    path(strPath)\
+                    values('%s/')" % (newpath)
+            self.debug('Executing ' + str(sql))    
+            cur.execute(sql)
+            
+            # Look up the id of the new path
+            sql = "SELECT idPath\
+                    FROM path\
+                    WHERE strPath = ('%s/')" % (newpath)
+            self.debug('Executing ' + str(sql))    
+            cur.execute(sql)
+            idPath = cur.fetchone()[0]
+            
+            # Update path reference for the file
+            sql = "UPDATE files\
+                     SET idPath = %d\
+                    WHERE idFile = %d" % (idPath, idFile)
+            self.debug('Executing ' + str(sql))
+            cur.execute(sql)
+            con.commit()
+        except:
+            """ Error opening video library database """
+            self.notify(__settings__.getLocalizedString(30012))
+            raise
 
     """ Refreshes current settings """
     def refresh_settings(self):
