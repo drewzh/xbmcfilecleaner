@@ -163,7 +163,11 @@ class Main:
     """ Move file """
     def move_file(self, file, destination):
         if os.path.exists(file):
-            shutil.move(file, destination)
+            newfile = os.path.join(
+                destination,
+                os.path.basename(file)
+            ) 
+            shutil.move(file, newfile)
             """ Deleted """
             self.notify(__settings__.getLocalizedString(30025) % (file))
 
