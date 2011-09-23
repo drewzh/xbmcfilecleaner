@@ -15,9 +15,9 @@
         <setting id="low_disk_path" type="folder" label="30011" default="special://home" visible="eq(-12,true) + eq(-2,true)" />
         <setting id="enable_holding" type="bool" label="30021" default="false" visible="eq(-13,true)" />
         <setting id="holding_folder" type="folder" label="30022" default="special://temp" visible="eq(-14,true) + eq(-1,true)" />
-        <setting id="holding_expire" type="labelenum" label="30023" values="1|2|3|4|5|7|14|21|28" default="5" enable="false" visible="eq(-15,true) + eq(-2,true)" />
-        <setting id="enable_debug" type="bool" label="30024" default="false" visible="eq(-16,true)" />
-        <setting id="create_series_season_dirs" type="bool" label="30026" default="false" />
-        <setting id="update_path_reference" type="bool" label="30027" default="false" />
+        <setting id="create_series_season_dirs" type="bool" label="30026" default="false" visible="eq(-15,true) + eq(-2,true)" />
+        <setting id="update_path_reference" type="bool" label="30027" default="false" visible="eq(-16,true) + eq(-3,true)" />
+        <setting id="holding_expire" type="labelenum" label="30023" values="1|2|3|4|5|7|14|21|28" default="5" enable="false" visible="eq(-17,true) + eq(-4,true)" />
+        <setting id="enable_debug" type="bool" label="30024" default="false" visible="eq(-18,true)" />
     </category>
 </settings>
