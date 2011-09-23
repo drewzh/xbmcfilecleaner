@@ -23,7 +23,8 @@ DETAILS
 * Added local timezone adjustments to queries
   - Neccessary to get correct calculations for systems not using UTC
 * Use full path when moving files
-  - Makes the move function use the much quicker rename functionality when moving files on same partition instead of copy/delete.
+  - Makes the move function use the much quicker rename functionality when moving files on same partition, 
+    instead of copy/delete.
 * Do not select files that's already in the holdingfolder
   - No need to move files that's already in the holdingfolder. This also opens for keeping the files available after moving.
 * Optionally create series and season based dirs when moving series files
