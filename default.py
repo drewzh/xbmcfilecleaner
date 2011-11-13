@@ -139,24 +139,24 @@ class Main:
             cur = con.cursor()
             
             # Insert path if it doesn't exist
-            sql = "INSERT OR IGNORE INTO\
+            sql = 'INSERT OR IGNORE INTO\
                     path(strPath)\
-                    values('%s/')" % (newpath)
+                    values("%s/")' % (newpath)
             self.debug('Executing ' + str(sql))    
             cur.execute(sql)
             
             # Look up the id of the new path
-            sql = "SELECT idPath\
+            sql = 'SELECT idPath\
                     FROM path\
-                    WHERE strPath = ('%s/')" % (newpath)
+                    WHERE strPath = ("%s/")' % (newpath)
             self.debug('Executing ' + str(sql))    
             cur.execute(sql)
             idPath = cur.fetchone()[0]
             
             # Update path reference for the file
-            sql = "UPDATE files\
+            sql = 'UPDATE OR IGNORE files\
                      SET idPath = %d\
-                    WHERE idFile = %d" % (idPath, idFile)
+                    WHERE idFile = %d' % (idPath, idFile)
             self.debug('Executing ' + str(sql))
             cur.execute(sql)
             con.commit()
