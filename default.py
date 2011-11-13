@@ -70,8 +70,8 @@ class Main:
                             else:
                                 newpath = self.holdingFolder
                             self.debug("Moving %s to %s..." % (file, newpath))
-                            self.move_file(path, newpath)
-                            if self.doupdatePathReference:
+                            moveOk = self.move_file(path, newpath)
+                            if self.doupdatePathReference and moveOk:
                                 self.updatePathReference(idFile, newpath)
                         else:
                             self.debug("Deleting %s..." % (file))
@@ -212,14 +212,24 @@ class Main:
 
     """ Move file """
     def move_file(self, file, destination):
-        if os.path.exists(file):
-            newfile = os.path.join(
-                destination,
-                os.path.basename(file)
-            ) 
-            shutil.move(file, newfile)
-            """ Deleted """
-            self.notify(__settings__.getLocalizedString(30025) % (file))
+        try:
+            if os.path.exists(file) and os.path.exists(destination):
+                newfile = os.path.join(destination, os.path.basename(file)) 
+                shutil.move(file, newfile)
+                """ Deleted """
+                self.notify(__settings__.getLocalizedString(30025) % (file))
+                return True;
+            else:
+                if not os.path.exists(file):
+                    self.debug("Can not move file %s as it doesn't exist" % (file));
+                    self.notify("Can not move file %s as it doesn't exist" % (file));
+                else:
+                    self.debug("Can not move file, destination %s unavailable" % (destination));
+                    self.notify("Can not move file, destination %s unavailable" % (destination));
+                return False;
+        except:
+            self.debug("Failed to move file");
+            return False;
 
     """ Create series and season based dirs """
     def createseasondirs(self, seasondir):
