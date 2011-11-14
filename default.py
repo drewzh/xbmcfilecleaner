@@ -1,4 +1,4 @@
-import xbmc, xbmcgui, xbmcaddon, os, shutil, math, time
+import xbmc, xbmcgui, xbmcaddon, os, shutil, math, time, sys
 from pysqlite2 import dbapi2 as sqlite
 
 """ Addon info """
@@ -14,7 +14,9 @@ AUTOEXEC_SCRIPT = '\nimport time;time.sleep(5);xbmc.executebuiltin("XBMC.RunScri
 
 class Main:
     def __init__(self):
-        """ Refreh settings """
+        reload(sys)
+        sys.setdefaultencoding('utf-8')
+        """ Refresh settings """
         self.refresh_settings()
         
         if self.serviceEnabled:
@@ -54,12 +56,23 @@ class Main:
             if self.deleteTVShows:
                 episodes = self.get_expired('episode')
                 if episodes:
-                    for file, path in episodes:
+                    for file, path, show, season, idFile in episodes:
                         if os.path.exists(path):
                             doClean = True
                         if self.enableHolding:
-                            self.debug("Moving %s to %s..." % (file, self.holdingFolder))
-                            self.move_file(path, self.holdingFolder)
+                            if self.createSeriesSeasonDirs:
+                                newpath = os.path.join(
+                                    self.holdingFolder,
+                                    show,
+                                    "Season " + season
+                                )
+                                self.createseasondirs(newpath)  
+                            else:
+                                newpath = self.holdingFolder
+                            self.debug("Moving %s to %s..." % (file, newpath))
+                            moveOk = self.move_file(path, newpath)
+                            if self.doupdatePathReference and moveOk:
+                                self.updatePathReference(idFile, newpath)
                         else:
                             self.debug("Deleting %s..." % (file))
                             self.delete_file(path)                    
@@ -80,9 +93,10 @@ class Main:
                               path.strPath || files.strFilename as full_path\
                          FROM files, path, %s\
                         WHERE %s.idFile = files.idFile\
+                          AND NOT path.strPath like '%s%%'\
                           AND files.idPath = path.idPath\
-                          AND files.lastPlayed < datetime('now', '-%f days')\
-                          AND playCount > 0" % (option, option, self.expireAfter)
+                          AND files.lastPlayed < datetime('now', '-%f days', 'localtime')\
+                          AND playCount > 0" % (option, option, self.holdingFolder, self.expireAfter)
                 if self.deleteLowRating:
                     sql += ' AND c05+0 < %f' % (self.lowRatingFigure)
                     if self.ignoreNoRating:
@@ -90,12 +104,18 @@ class Main:
 
             elif option == 'episode':
                 sql = "SELECT files.strFilename as filename,\
-                              path.strPath || files.strFilename as full_path\
-                         FROM files, path, %s\
+                              path.strPath || files.strFilename as full_path,\
+                              tvshow.c00 as showname,\
+                              episode.c12 as episodeno,\
+                              files.idFile\
+                         FROM files, path, %s, tvshow, tvshowlinkepisode\
                         WHERE %s.idFile = files.idFile\
+                          AND NOT path.strPath like '%s%%'\
                           AND files.idPath = path.idPath\
-                          AND files.lastPlayed < datetime('now', '-%f days')\
-                          AND playCount > 0" % (option, option, self.expireAfter)
+                          AND tvshowlinkepisode.idEpisode = episode.idEpisode\
+                          AND tvshowlinkepisode.idShow = tvshow.idShow\
+                          AND files.lastPlayed < datetime('now', '-%f days', 'localtime')\
+                          AND playCount > 0" % (option, option, self.holdingFolder, self.expireAfter)
                 if self.deleteLowRating:
                     sql += ' AND c03+0 < %f' % (self.lowRatingFigure)
                     if self.ignoreNoRating:
@@ -112,6 +132,38 @@ class Main:
             self.notify(__settings__.getLocalizedString(30012))
             raise
 
+    """ updates file reference for a file """
+    def updatePathReference(self, idFile, newpath):
+        try:
+            con = sqlite.connect(xbmc.translatePath('special://database/MyVideos34.db'))
+            cur = con.cursor()
+            
+            # Insert path if it doesn't exist
+            sql = 'INSERT OR IGNORE INTO\
+                    path(strPath)\
+                    values("%s/")' % (newpath)
+            self.debug('Executing ' + str(sql))    
+            cur.execute(sql)
+            
+            # Look up the id of the new path
+            sql = 'SELECT idPath\
+                    FROM path\
+                    WHERE strPath = ("%s/")' % (newpath)
+            self.debug('Executing ' + str(sql))    
+            cur.execute(sql)
+            idPath = cur.fetchone()[0]
+            
+            # Update path reference for the file
+            sql = 'UPDATE OR IGNORE files\
+                     SET idPath = %d\
+                    WHERE idFile = %d' % (idPath, idFile)
+            self.debug('Executing ' + str(sql))
+            cur.execute(sql)
+            con.commit()
+        except:
+            """ Error opening video library database """
+            self.notify(__settings__.getLocalizedString(30012))
+            raise
 
     """ Refreshes current settings """
     def refresh_settings(self):
@@ -133,6 +185,8 @@ class Main:
         self.holdingFolder = xbmc.translatePath(__settings__.getSetting('holding_folder'))
         #self.holdingExpire = int(__settings__.getSetting('holding_expire'))
         self.enableDebug = bool(xbmc.translatePath(__settings__.getSetting('enable_debug')) == "true")
+        self.createSeriesSeasonDirs = bool(xbmc.translatePath(__settings__.getSetting('create_series_season_dirs')) == "true")
+        self.doupdatePathReference = bool(xbmc.translatePath(__settings__.getSetting('update_path_reference')) == "true")
         
         """ Set or remove autoexec.py line """
         self.toggle_auto_start(self.serviceEnabled)
@@ -158,10 +212,42 @@ class Main:
 
     """ Move file """
     def move_file(self, file, destination):
-        if os.path.exists(file):
-            shutil.move(file, destination)
-            """ Deleted """
-            self.notify(__settings__.getLocalizedString(30025) % (file))
+        try:
+            if os.path.exists(file) and os.path.exists(destination):
+                newfile = os.path.join(destination, os.path.basename(file)) 
+                shutil.move(file, newfile)
+                """ Deleted """
+                self.notify(__settings__.getLocalizedString(30025) % (file))
+                return True;
+            else:
+                if not os.path.exists(file):
+                    self.debug("Can not move file %s as it doesn't exist" % (file));
+                    self.notify("Can not move file %s as it doesn't exist" % (file));
+                else:
+                    self.debug("Can not move file, destination %s unavailable" % (destination));
+                    self.notify("Can not move file, destination %s unavailable" % (destination));
+                return False;
+        except:
+            self.debug("Failed to move file");
+            return False;
+
+    """ Create series and season based dirs """
+    def createseasondirs(self, seasondir):
+        seriesdir=os.path.dirname(seasondir)
+        # Create series-based dir if not exists
+        self.debug("Creating dir %s..." % (seriesdir))
+        try:
+            os.mkdir(seriesdir)
+            self.debug("..done")
+        except:
+            self.debug("..dir already exists")
+        # Create season-based if not exists
+        self.debug("Creating dir %s..." % (seasondir))
+        try:
+            os.mkdir(seasondir)
+            self.debug("..done")
+        except:
+            self.debug("..dir already exists") 
 
     """ Display notification on screen and send to log """
     def notify(self, message):
