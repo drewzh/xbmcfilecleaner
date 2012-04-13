@@ -5,6 +5,7 @@ from pysqlite2 import dbapi2 as sqlite
 __title__ = 'XBMC File Cleaner'
 __author__ = 'Andrew Higginson <azhigginson@gmail.com>'
 __addonID__ = "script.filecleaner"
+__icon__ = 'special://home/addons/' + __addonID__ + '/icon.png'
 __settings__ = xbmcaddon.Addon(__addonID__)
 
 """ Autoexec info """
@@ -218,7 +219,7 @@ class Main:
         if os.path.exists(file):
             os.remove(file)
             """ Deleted """
-            self.notify(__settings__.getLocalizedString(30014) + ' ' + file)
+            self.notify(__settings__.getLocalizedString(30014) + ' ' + os.path.basename(file), 10000)
 
     """ Move file """
     def move_file(self, file, destination):
@@ -227,15 +228,13 @@ class Main:
                 newfile = os.path.join(destination, os.path.basename(file))
                 shutil.move(file, newfile)
                 """ Deleted """
-                self.notify(__settings__.getLocalizedString(30025) % (file))
+                self.notify(__settings__.getLocalizedString(30025) % (file), 10000)
                 return True;
             else:
                 if not os.path.exists(file):
-                    self.debug("Can not move file %s as it doesn't exist" % (file));
-                    self.notify("Can not move file %s as it doesn't exist" % (file));
+                    self.notify("Can not move file %s as it doesn't exist" % (file), 10000);
                 else:
-                    self.debug("Can not move file, destination %s unavailable" % (destination));
-                    self.notify("Can not move file, destination %s unavailable" % (destination));
+                    self.notify("Can not move file, destination %s unavailable" % (destination), 10000);
                 return False;
         except:
             self.debug("Failed to move file");
@@ -260,11 +259,10 @@ class Main:
             self.debug("..dir already exists")
 
     """ Display notification on screen and send to log """
-    def notify(self, message):
+    def notify(self, message, duration=5000, image=__icon__):
         self.debug(message)
         if self.showNotifications:
-            xbmc.executebuiltin('XBMC.Notification(%s, %s)' % (__title__, message))
-
+            xbmc.executebuiltin('XBMC.Notification(%s, %s, %s, %s)' % (__title__, message, duration, image))
 
     """ Log debug message """
     def debug(self, message):
