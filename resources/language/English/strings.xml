@@ -11,7 +11,7 @@
     <string id="30011">Path to check for free disk space</string>
     <string id="30012">Error opening video library database</string>
     <string id="30013">Starting cleaner</string>
-    <string id="30014">Deleted %s</string>
+    <string id="30014">Deleted %s from %s</string>
     <string id="30015">Service Disabled</string>
     <string id="30016">Delete movies</string>
     <string id="30017">Delete TV shows</string>

@@ -81,6 +81,7 @@ class Main:
 
             """ Finally clean the library to account for any deleted videos """
             if doClean and self.cleanLibrary:
+                time.sleep(5) # Wait 5 seconds for deletions to finish
                 xbmc.executebuiltin("XBMC.CleanLibrary(video)")
 
 
@@ -219,7 +220,7 @@ class Main:
         if os.path.exists(file):
             os.remove(file)
             """ Deleted """
-            self.notify(__settings__.getLocalizedString(30014), 10000) % file
+            self.notify(__settings__.getLocalizedString(30014) % (os.path.basepath(file), file), 10000)
 
     """ Move file """
     def move_file(self, file, destination):
