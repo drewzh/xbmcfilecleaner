@@ -18,11 +18,11 @@ class Main:
         sys.setdefaultencoding('utf-8')
         """ Refresh settings """
         self.refresh_settings()
-        
+
         if self.serviceEnabled:
             """ Monitoring library """
             self.notify(__settings__.getLocalizedString(30013))
-            
+
         """ Main service loop """
         while self.refresh_settings() and self.serviceEnabled:
             self.cleanup()
@@ -30,14 +30,14 @@ class Main:
 
         """ Service disabled """
         self.notify(__settings__.getLocalizedString(30015))
-            
-            
+
+
     """ Run cleanup routine """
     def cleanup(self):
         self.debug(__settings__.getLocalizedString(30009))
         if not self.deleteOnDiskLow or (self.deleteOnDiskLow and self.disk_space_low()):
             doClean = False
-            
+
             """ Delete any expired movies """
             if self.deleteMovies:
                 movies = self.get_expired('movie')
@@ -51,7 +51,7 @@ class Main:
                         else:
                             self.debug("Deleting %s..." % (file))
                             self.delete_file(path)
-                    
+
             """ Delete any expired TV shows """
             if self.deleteTVShows:
                 episodes = self.get_expired('episode')
@@ -66,7 +66,7 @@ class Main:
                                     show,
                                     "Season " + season
                                 )
-                                self.createseasondirs(newpath)  
+                                self.createseasondirs(newpath)
                             else:
                                 newpath = self.holdingFolder
                             self.debug("Moving %s to %s..." % (file, newpath))
@@ -75,58 +75,62 @@ class Main:
                                 self.updatePathReference(idFile, newpath)
                         else:
                             self.debug("Deleting %s..." % (file))
-                            self.delete_file(path)                    
-                        
+                            self.delete_file(path)
+
             """ Finally clean the library to account for any deleted videos """
             if doClean and self.cleanLibrary:
                 xbmc.executebuiltin("XBMC.CleanLibrary(video)")
-            
-            
-    """ Get all expired videos from the library database """
+
+
+    """ Get all expired videos from the library databases """
     def get_expired(self, option):
         try:
-            con = sqlite.connect(xbmc.translatePath('special://database/MyVideos34.db'))
-            cur = con.cursor()
-            
-            if option == 'movie':
-                sql = "SELECT files.strFilename as filename,\
-                              path.strPath || files.strFilename as full_path\
-                         FROM files, path, %s\
-                        WHERE %s.idFile = files.idFile\
-                          AND NOT path.strPath like '%s%%'\
-                          AND files.idPath = path.idPath\
-                          AND files.lastPlayed < datetime('now', '-%f days', 'localtime')\
-                          AND playCount > 0" % (option, option, self.holdingFolder, self.expireAfter)
-                if self.deleteLowRating:
-                    sql += ' AND c05+0 < %f' % (self.lowRatingFigure)
-                    if self.ignoreNoRating:
-                      sql += ' AND c05 > 0'
+            results = []
+            folder = os.listdir(xbmc.translatePath('special://database/'))
+            for database in folder:
+                if database.startswith('MyVideos') and database.endswith('.db'):
+                    con = sqlite.connect(xbmc.translatePath('special://database/' + database))
+                    cur = con.cursor()
 
-            elif option == 'episode':
-                sql = "SELECT files.strFilename as filename,\
-                              path.strPath || files.strFilename as full_path,\
-                              tvshow.c00 as showname,\
-                              episode.c12 as episodeno,\
-                              files.idFile\
-                         FROM files, path, %s, tvshow, tvshowlinkepisode\
-                        WHERE %s.idFile = files.idFile\
-                          AND NOT path.strPath like '%s%%'\
-                          AND files.idPath = path.idPath\
-                          AND tvshowlinkepisode.idEpisode = episode.idEpisode\
-                          AND tvshowlinkepisode.idShow = tvshow.idShow\
-                          AND files.lastPlayed < datetime('now', '-%f days', 'localtime')\
-                          AND playCount > 0" % (option, option, self.holdingFolder, self.expireAfter)
-                if self.deleteLowRating:
-                    sql += ' AND c03+0 < %f' % (self.lowRatingFigure)
-                    if self.ignoreNoRating:
-                      sql += ' AND c03 > 0'
-            
-            self.debug('Executing ' + str(sql))
-                
-            cur.execute(sql)
-            
-            """ Return list of files to delete """
-            return cur.fetchall()
+                    if option == 'movie':
+                        sql  = "SELECT files.strFilename as filename, path.strPath || files.strFilename as full_path "
+                        sql += "FROM files, path, %s " % option
+                        sql += "WHERE %s.idFile = files.idFile " % option
+                        if self.enableHolding:
+                            sql += "AND NOT path.strPath like '%s%%' " % self.holdingFolder
+                        sql += "AND files.idPath = path.idPath "
+                        if self.enableExpire:
+                            sql += "AND files.lastPlayed < datetime('now', '-%f days', 'localtime') " % self.expireAfter
+                        sql += "AND playCount > 0"
+                        if self.deleteLowRating:
+                            sql += " AND c05+0 < %f" % self.lowRatingFigure
+                            if self.ignoreNoRating:
+                              sql += " AND c05 > 0"
+
+                    elif option == 'episode':
+                        sql  = "SELECT files.strFilename as filename, path.strPath || files.strFilename as full_path, tvshow.c00 as showname, episode.c12 as episodeno, files.idFile "
+                        sql += "FROM files, path, %s, tvshow, tvshowlinkepisode " % option
+                        sql += "WHERE %s.idFile = files.idFile " % option
+                        if self.enableHolding:
+                            sql += "AND NOT path.strPath like '%s%%' " % self.holdingFolder
+                        sql += "AND files.idPath = path.idPath "
+                        sql += "AND tvshowlinkepisode.idEpisode = episode.idEpisode "
+                        sql += "AND tvshowlinkepisode.idShow = tvshow.idShow "
+                        if self.enableExpire:
+                            sql += "AND files.lastPlayed < datetime('now', '-%f days', 'localtime') " % self.expireAfter
+                        sql += "AND playCount > 0"
+                        if self.deleteLowRating:
+                            sql += " AND c03+0 < %f" % self.lowRatingFigure
+                            if self.ignoreNoRating:
+                              sql += " AND c03 > 0"
+
+                    self.debug('Executing query on ' + database + ': ' + str(sql))
+
+                    cur.execute(sql)
+
+                    """ Return list of files to delete """
+                    results += cur.fetchall()
+            return []
         except:
             """ Error opening video library database """
             self.notify(__settings__.getLocalizedString(30012))
@@ -135,31 +139,34 @@ class Main:
     """ updates file reference for a file """
     def updatePathReference(self, idFile, newpath):
         try:
-            con = sqlite.connect(xbmc.translatePath('special://database/MyVideos34.db'))
-            cur = con.cursor()
-            
-            # Insert path if it doesn't exist
-            sql = 'INSERT OR IGNORE INTO\
-                    path(strPath)\
-                    values("%s/")' % (newpath)
-            self.debug('Executing ' + str(sql))    
-            cur.execute(sql)
-            
-            # Look up the id of the new path
-            sql = 'SELECT idPath\
-                    FROM path\
-                    WHERE strPath = ("%s/")' % (newpath)
-            self.debug('Executing ' + str(sql))    
-            cur.execute(sql)
-            idPath = cur.fetchone()[0]
-            
-            # Update path reference for the file
-            sql = 'UPDATE OR IGNORE files\
-                     SET idPath = %d\
-                    WHERE idFile = %d' % (idPath, idFile)
-            self.debug('Executing ' + str(sql))
-            cur.execute(sql)
-            con.commit()
+            folder = os.listdir(xbmc.translatePath('special://database/'))
+            for database in folder:
+                if database.startswith('MyVideos') and database.endswith('.db'):
+                    con = sqlite.connect(xbmc.translatePath('special://database/' + database))
+                    cur = con.cursor()
+
+                    # Insert path if it doesn't exist
+                    sql = 'INSERT OR IGNORE INTO\
+                            path(strPath)\
+                            values("%s/")' % (newpath)
+                    self.debug('Executing ' + str(sql))
+                    cur.execute(sql)
+
+                    # Look up the id of the new path
+                    sql = 'SELECT idPath\
+                            FROM path\
+                            WHERE strPath = ("%s/")' % (newpath)
+                    self.debug('Executing ' + str(sql))
+                    cur.execute(sql)
+                    idPath = cur.fetchone()[0]
+
+                    # Update path reference for the file
+                    sql = 'UPDATE OR IGNORE files\
+                             SET idPath = %d\
+                            WHERE idFile = %d' % (idPath, idFile)
+                    self.debug('Executing ' + str(sql))
+                    cur.execute(sql)
+                    con.commit()
         except:
             """ Error opening video library database """
             self.notify(__settings__.getLocalizedString(30012))
@@ -168,9 +175,10 @@ class Main:
     """ Refreshes current settings """
     def refresh_settings(self):
         __settings__ = xbmcaddon.Addon(__addonID__)
-        
+
         self.serviceEnabled = bool(__settings__.getSetting('service_enabled') == "true")
         self.showNotifications = bool(__settings__.getSetting('show_notifications') == "true")
+        self.enableExpire = bool(__settings__.getSetting('enable_expire') == "true")
         self.expireAfter = float(__settings__.getSetting('expire_after'))
         self.deleteOnDiskLow = bool(__settings__.getSetting('delete_on_low_disk') == "true")
         self.lowDiskPercentage = float(__settings__.getSetting('low_disk_percentage'))
@@ -183,11 +191,11 @@ class Main:
         self.ignoreNoRating = bool(__settings__.getSetting('ignore_no_rating') == "true")
         self.enableHolding = bool(__settings__.getSetting('enable_holding') == "true")
         self.holdingFolder = xbmc.translatePath(__settings__.getSetting('holding_folder'))
-        #self.holdingExpire = int(__settings__.getSetting('holding_expire'))
+        self.holdingExpire = int(__settings__.getSetting('holding_expire'))
         self.enableDebug = bool(xbmc.translatePath(__settings__.getSetting('enable_debug')) == "true")
         self.createSeriesSeasonDirs = bool(xbmc.translatePath(__settings__.getSetting('create_series_season_dirs')) == "true")
         self.doupdatePathReference = bool(xbmc.translatePath(__settings__.getSetting('update_path_reference')) == "true")
-        
+
         """ Set or remove autoexec.py line """
         self.toggle_auto_start(self.serviceEnabled)
         return True
@@ -214,7 +222,7 @@ class Main:
     def move_file(self, file, destination):
         try:
             if os.path.exists(file) and os.path.exists(destination):
-                newfile = os.path.join(destination, os.path.basename(file)) 
+                newfile = os.path.join(destination, os.path.basename(file))
                 shutil.move(file, newfile)
                 """ Deleted """
                 self.notify(__settings__.getLocalizedString(30025) % (file))
@@ -247,15 +255,15 @@ class Main:
             os.mkdir(seasondir)
             self.debug("..done")
         except:
-            self.debug("..dir already exists") 
+            self.debug("..dir already exists")
 
     """ Display notification on screen and send to log """
     def notify(self, message):
         self.debug(message)
         if self.showNotifications:
             xbmc.executebuiltin('XBMC.Notification(%s, %s)' % (__title__, message))
-    
-    
+
+
     """ Log debug message """
     def debug(self, message):
         if self.enableDebug:
@@ -281,7 +289,7 @@ class Main:
 	        if (not found and option):
 		        autoexecfile = file(AUTOEXEC_PATH, 'w')
 		        filecontents.append(AUTOEXEC_SCRIPT)
-		        autoexecfile.writelines(filecontents)            
+		        autoexecfile.writelines(filecontents)
 		        autoexecfile.close()
 
 	        """ Found that we're in it and it's time to remove ourselves """
