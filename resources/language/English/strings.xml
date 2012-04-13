@@ -2,7 +2,7 @@
     <string id="30001">Enable service</string>
     <string id="30003">Clean library when finished</string>
     <string id="30004">Show notifications</string>
-    <string id="30004">Delete video when watched X days ago</string>
+    <string id="30005">Delete video when watched X days ago</string>
     <string id="30006">Only delete videos if low on disk space</string>
     <string id="30007">Low disk space percentage</string>
     <string id="30008">Service</string>
