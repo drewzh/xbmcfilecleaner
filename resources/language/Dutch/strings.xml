@@ -1,0 +1,28 @@
+<strings>
+    <string id="30001">Activeer XBMC File Cleaner</string>
+    <string id="30003">Bibliotheek opschonen na verwijderen</string>
+    <string id="30004">Toon notificaties</string>
+    <string id="30005">Verwijder bestanden pas na een aantal dagen na bekijken</string>
+    <string id="30006">Verwijder bestanden pas bij te weinig vrije schrijfruimte</string>
+    <string id="30007">Minimaal percentage vrije schijfruimte</string>
+    <string id="30008">Service</string>
+    <string id="30009">Bibliotheek opschonen</string>
+    <string id="30010">Aantal dagen waarna een bestand als verlopen wordt beschouwd</string>
+    <string id="30011">Locatie om te controleren op vrije schijfruimte</string>
+    <string id="30012">Fout bij openen van de videobibliotheek</string>
+    <string id="30013">Reiniger opstarten</string>
+    <string id="30014">%s verwijderd</string>
+    <string id="30015">Service stopgezet</string>
+    <string id="30016">Verwijder films</string>
+    <string id="30017">Verwijder TV series</string>
+    <string id="30018">Verwijder bestanden alleen bij een lage score</string>
+    <string id="30019">Verwijder bestand bij een score lager dan</string>
+    <string id="30020">Negeer bestanden zonder score</string>
+    <string id="30021">Gebruik tijdelijke bewaarmap</string>
+    <string id="30022">Locatie bewaarmap</string>
+    <string id="30023">Aantal dagen dat bestanden worden bewaard</string>
+    <string id="30024">Toon debuginformatie</string>
+    <string id="30025">%s verplaatst naar bewaarmap</string>
+    <string id="30026">Maak serie- en seizoensmappen aan</string>
+    <string id="30027">Werk bestandslocatie bij na verplaatsen</string>
+</strings>

@@ -219,7 +219,7 @@ class Main:
         if os.path.exists(file):
             os.remove(file)
             """ Deleted """
-            self.notify(__settings__.getLocalizedString(30014) + ' ' + os.path.basename(file), 10000)
+            self.notify(__settings__.getLocalizedString(30014), 10000) % file
 
     """ Move file """
     def move_file(self, file, destination):
