@@ -26,7 +26,8 @@ class Main:
         """ Main service loop """
         while self.refresh_settings() and self.serviceEnabled:
             self.cleanup()
-            time.sleep(60)
+            # only run once every half hour
+            time.sleep(1800)
 
         """ Service disabled """
         self.notify(__settings__.getLocalizedString(30015))
@@ -130,7 +131,7 @@ class Main:
 
                     """ Return list of files to delete """
                     results += cur.fetchall()
-            return []
+            return results
         except:
             """ Error opening video library database """
             self.notify(__settings__.getLocalizedString(30012))
@@ -177,6 +178,7 @@ class Main:
         __settings__ = xbmcaddon.Addon(__addonID__)
 
         self.serviceEnabled = bool(__settings__.getSetting('service_enabled') == "true")
+        #self.scanInterval = float(__settings__.getSetting('scan_interval') == "true")
         self.showNotifications = bool(__settings__.getSetting('show_notifications') == "true")
         self.enableExpire = bool(__settings__.getSetting('enable_expire') == "true")
         self.expireAfter = float(__settings__.getSetting('expire_after'))
