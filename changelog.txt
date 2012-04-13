@@ -5,6 +5,7 @@ Version 2.0.0
 - Updated text strings
 - Enhanced queries used to select files to be deleted
 - Enable cleaning multiple databases at once, instead of just the hardcoded MyVideos34.db
+- Dutch language support
 
 Version 1.3.5
 ===============
