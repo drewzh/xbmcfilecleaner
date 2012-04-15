@@ -29,19 +29,19 @@ class Main:
         reload(sys)
         sys.setdefaultencoding('utf-8')
         
-        self.refresh_settings()
+        self.reload_settings()
         
         if self.serviceEnabled:
             self.notify(__settings__.getLocalizedString(30013))
         
         # Main service loop
         while self.serviceEnabled:
-            self.refresh_settings()
+            self.reload_settings()
             self.cleanup()
             # only run once every half hour
             time.sleep(1800)
         
-        # Cleaning is disabled, do nothing
+        # Cleaning is disabled, so do nothing
         self.notify(__settings__.getLocalizedString(30015))
         
     def cleanup(self):
@@ -51,19 +51,19 @@ class Main:
         """
         self.debug(__settings__.getLocalizedString(30009))
         if not self.deleteOnDiskLow or (self.deleteOnDiskLow and self.disk_space_low()):
-            doClean = False
+            cleaningRequired = False
             
             if self.deleteMovies:
                 movies = self.get_expired('movie')
                 if movies:
                     for file, path in movies:
                         if os.path.exists(path):
-                            doClean = True
+                            cleaningRequired = True
                         if self.enableHolding:
-                            self.debug("Moving %s to %s" % (file, self.holdingFolder))
+                            self.debug("Moving %s from %s to %s" % (os.path.basename(file), file, self.holdingFolder))
                             self.move_file(path, self.holdingFolder)
                         else:
-                            self.debug("Deleting %s" % (file))
+                            self.debug("Deleting %s from %s" % (os.path.basename(file), file))
                             self.delete_file(path)
             
             if self.deleteTVShows:
@@ -71,7 +71,7 @@ class Main:
                 if episodes:
                     for file, path, show, season, idFile in episodes:
                         if os.path.exists(path):
-                            doClean = True
+                            cleaningRequired = True
                         if self.enableHolding:
                             if self.createSeriesSeasonDirs:
                                 newpath = os.path.join(
@@ -90,14 +90,18 @@ class Main:
                             self.debug("Deleting %s" % (file))
                             self.delete_file(path)
             
-            # Finally clean the library to account for any deleted videos
-            if doClean and self.cleanLibrary:
-                time.sleep(10) # Wait 10 seconds for deletions to finish
+            # Finally clean the library to account for any deleted videos.
+            if self.cleanLibrary and cleaningRequired:
+                # Wait 10 seconds for deletions to finish before cleaning.
+                time.sleep(10)
                 xbmc.executebuiltin("XBMC.CleanLibrary(video)")
     
     def get_expired(self, option):
         """
         Retrieve a list of episodes that have been watched and match any criteria set in the addon's settings.
+        
+        Keyword arguments:
+        option -- the type of videos to remove, can be either 'movie' or 'episode.'
         """
         try:
             results = []
@@ -140,7 +144,7 @@ class Main:
                             if self.ignoreNoRating:
                               query += " AND c03 > 0"
                     
-                    self.debug('Executing query on ' + database + ': ' + str(query))
+                    self.debug('Executing query on %s: %s' % (database, query))
                     
                     cur.execute(query)
                     
@@ -173,7 +177,7 @@ class Main:
                     query = 'INSERT OR IGNORE INTO\
                             path(strPath)\
                             values("%s/")' % (newPath)
-                    self.debug('Executing query on ' + database + ': ' + str(query))
+                    self.debug('Executing query on %s: %s' % (database, query))
                     cur.execute(query)
                     
                     # Look up the id of the new path
@@ -190,7 +194,7 @@ class Main:
                     query += ' SET idPath = %d' % idPath
                     query += ' WHERE idFile = %d' % idFile
                     
-                    self.debug('Executing query on ' + database + ': ' + str(query))
+                    self.debug('Executing query on %s: %s' % (database, query))
                     cur.execute(query)
                     con.commit()
         # TODO: Don't catch all exceptions
@@ -199,7 +203,7 @@ class Main:
             self.notify(__settings__.getLocalizedString(30012))
             raise
     
-    def refresh_settings(self):
+    def reload_settings(self):
         """
         Retrieve new values for all settings, in order to account for any changes.
         """
@@ -238,7 +242,11 @@ class Main:
         diskStats = os.statvfs(self.lowDiskPath)
         diskCapacity = diskStats.f_frsize * diskStats.f_blocks
         diskFree = diskStats.f_frsize * diskStats.f_bavail
-        diskFreePercent = math.ceil(float(100) / float(diskCapacity) * float(diskFree))
+        try:
+            diskFreePercent = math.ceil(float(100) / float(diskCapacity) * float(diskFree))
+        except ZeroDivisionError, e:
+            self.debug('Handling run-time error:' + e)
+            return False
         
         return (float(diskFreePercent) < float(self.lowDiskPercentage))
     
@@ -247,9 +255,11 @@ class Main:
         Delete a file from the file system.
         """
         if os.path.exists(file):
-            os.remove(file)
-            # Deleted
-            self.notify(__settings__.getLocalizedString(30014) % (os.path.basename(file), file), 10000)
+            try:
+                os.remove(file)
+                self.notify(__settings__.getLocalizedString(30014) % (os.path.basename(file), file), 10000)
+            except OSError, e:
+                self.debug('Deleting file %s failed with error code %f' % (file, e.errno))
     
     def move_file(self, file, destination):
         """
@@ -272,8 +282,8 @@ class Main:
                 else:
                     self.notify("Can not move file, destination %s unavailable" % (destination), 10000);
                 return False;
-        except:
-            self.debug("Failed to move file");
+        except OSError, e:
+            self.debug("Moving file %s failed with error code %f" % (file, e.errno));
             return False;
     
     def create_season_dirs(self, seasondir):
@@ -284,27 +294,19 @@ class Main:
         seasondir -- the directory in which to create the folder(s)
         """
         seriesdir = os.path.dirname(seasondir)
-        
-        # Create series directory if it doesn't exist
-        self.debug("Creating directory %s" % (seriesdir))
-        try:
-            os.mkdir(seriesdir)
-            self.debug("Successfully created directory")
-        except:
-            self.debug("The directory already exists")
-        
-        # Create season directory if it doesn't exist
-        self.debug("Creating directory %s" % (seasondir))
-        try:
-            os.mkdir(seasondir)
-            self.debug("Successfully created directory")
-        except:
-            self.debug("The directory already exists")
+        create_directory(seriesdir)
+        create_directory(seasondir)
     
     def create_directory(self, location):
         '''
         Creates a directory at the location provided.
         '''
+        try:
+            self.debug('Creating directory at %s' % location)
+            os.mkdir(location)
+            self.debug('Successfully created directory')
+        except OSError, e:
+            self.debug('Creating directory at %s failed with error code %f' % (location, e.errno))
     
     def notify(self, message, duration=5000, image=__icon__):
         '''
