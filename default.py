@@ -17,7 +17,7 @@ __settings__ = xbmcaddon.Addon(__addonID__)
 
 # Autoexec info
 AUTOEXEC_PATH = xbmc.translatePath('special://home/userdata/autoexec.py')
-AUTOEXEC_SCRIPT = '\nimport time;time.sleep(5);xbmc.executebuiltin("XBMC.RunScript(special://home/addons/script.filecleaner/default.py,-startup)")\n'
+AUTOEXEC_SCRIPT = 'import time;time.sleep(5);xbmc.executebuiltin("XBMC.RunScript(special://home/addons/script.filecleaner/default.py,-startup)")'
 
 class Main:
     
@@ -61,10 +61,10 @@ class Main:
                         if os.path.exists(path):
                             cleaningRequired = True
                         if self.enableHolding:
-                            self.debug("Moving %s from %s to %s" % (os.path.basename(file), file, self.holdingFolder))
+                            self.debug("Moving movie %s from %s to %s" % (os.path.basename(file), file, self.holdingFolder))
                             self.move_file(path, self.holdingFolder)
                         else:
-                            self.debug("Deleting %s from %s" % (os.path.basename(file), file))
+                            self.debug("Deleting movie %s from %s" % (os.path.basename(file), file))
                             self.delete_file(path)
             
             if self.deleteTVShows:
@@ -80,15 +80,15 @@ class Main:
                                     show,
                                     "Season " + season
                                 )
-                                self.createseasondirs(newpath)
+                                self.create_season_dirs(newpath)
                             else:
                                 newpath = self.holdingFolder
-                            self.debug("Moving %s to %s" % (file, newpath))
+                            self.debug("Moving episode %s from %s to %s" % (os.path.basename(file), os.path.dirname(file), newpath))
                             moveOk = self.move_file(path, newpath)
                             if self.doupdatePathReference and moveOk:
                                 self.updatePathReference(idFile, newpath)
                         else:
-                            self.debug("Deleting %s" % (file))
+                            self.debug("Deleting episode %s from %s" % (os.path.basename(file), os.path.dirname(file)))
                             self.delete_file(path)
             
             # Finally clean the library to account for any deleted videos.
@@ -174,7 +174,6 @@ class Main:
                     cur = con.cursor()
                     
                     # Insert path if it doesn't exist
-                    # path(strPath) is probably invalid and should read path.strPath instead.
                     query = 'INSERT OR IGNORE INTO\
                             path(strPath)\
                             values("%s/")' % (newPath)
@@ -332,6 +331,8 @@ class Main:
         Since version 2.0 this addon is run as a service. This line was needed in prior versions of the addon to allow for automatically starting the addon. 
         If this line is not removed after updating to version 2.0, the script would be started twice. 
         In short, this function allows for backward compatibility for updaters.
+        
+        TODO: Add hidden setting to check if we already removed the script. This saves overhead by not having to open the file and read all lines.
         '''
         # See if the autoexec.py file exists
         try:
