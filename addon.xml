@@ -8,18 +8,16 @@
   <requires>
     <import addon="xbmc.python" version="1.0"/>
   </requires>
-  <extension point="xbmc.python.script" library="default.py">
-    <provides>executable</provides>
-  </extension>
+  <extension point="xbmc.service" library="default.py" start="login"></extension>
   <extension point="xbmc.addon.metadata">
     <summary lang="en">Regularly deletes old movie and tv files</summary>
     <description lang="en">DANGER WILL ROBINSON!!!
 =====================================
-This script has the potential to wipe your entire video collection!  Please make sure you understand exactly what this script is designed to do before running.  I will not be held responsible for loss of data due to user error.
+This addon has the potential to wipe your entire video collection!  Please make sure you understand exactly what this script is designed to do before running.  I will not be held responsible for loss of data due to user error.
 
 DESCRIPTION
 =====================================
-This plugin will automatically scan your library for watched TV shows and Movies and delete them from the file system based on numerous critia such as age, rating, disk free space etc.  All these options and more can be configured via add-on settings (right click addon or press C for context menu and select 'Add-on Settings').  Also make sure you set the disk usage path before enabling if you store your videos on a secondary drive (e.g, /media/external or D:\ etc).
+This addon will automatically scan your library for watched TV shows and Movies and delete them from the file system based on numerous critia such as age, rating, free disk space, etc.  All options can be configured using the addon settings. Also make sure you set the disk usage path before enabling if you store your videos on a secondary drive (e.g, /media/external or D:\ etc).
 
 QUESTIONS/COMMENTS/SUGGESTIONS
 =====================================

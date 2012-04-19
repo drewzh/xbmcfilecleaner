@@ -17,7 +17,6 @@ __settings__ = xbmcaddon.Addon(__addonID__)
 
 # Autoexec info
 AUTOEXEC_PATH = xbmc.translatePath('special://home/userdata/autoexec.py')
-AUTOEXEC_FOLDER_PATH = xbmc.translatePath('special://home/userdata/')
 AUTOEXEC_SCRIPT = '\nimport time;time.sleep(5);xbmc.executebuiltin("XBMC.RunScript(special://home/addons/script.filecleaner/default.py,-startup)")\n'
 
 class Main:
@@ -30,18 +29,20 @@ class Main:
         sys.setdefaultencoding('utf-8')
         
         self.reload_settings()
+        self.disable_autoexec()
         
         if self.serviceEnabled:
             self.notify(__settings__.getLocalizedString(30013))
         
         # Main service loop
-        while self.serviceEnabled:
+        while (not xbmc.abortRequested and self.serviceEnabled):
+            
             self.reload_settings()
             self.cleanup()
             # only run once every half hour
             time.sleep(1800)
         
-        # Cleaning is disabled, so do nothing
+        # Cleaning is disabled or abort is requested by XBMC, so do nothing
         self.notify(__settings__.getLocalizedString(30015))
         
     def cleanup(self):
@@ -229,15 +230,12 @@ class Main:
         self.enableDebug = bool(xbmc.translatePath(__settings__.getSetting('enable_debug')) == "true")
         self.createSeriesSeasonDirs = bool(xbmc.translatePath(__settings__.getSetting('create_series_season_dirs')) == "true")
         self.doupdatePathReference = bool(xbmc.translatePath(__settings__.getSetting('update_path_reference')) == "true")
-        
-        # Set or remove autoexec.py line
-        self.toggle_auto_start(self.serviceEnabled)
-        return True
     
     def disk_space_low(self):
         """
         Check if the disk is running low on free space.
         Returns true if the free space is less than the threshold specified in the addon's settings.
+        TODO: Checks to make sure you set the disk usage path before enabling, if you store your videos on a secondary drive (e.g, /media/external or D:\ etc).
         """
         diskStats = os.statvfs(self.lowDiskPath)
         diskCapacity = diskStats.f_frsize * diskStats.f_blocks
@@ -326,49 +324,39 @@ class Main:
         logs a debug message
         '''
         if self.enableDebug:
-            xbmc.log('::' + __title__ + '::' + message)
+            xbmc.log(__title__ + '::' + message)
     
-    def toggle_auto_start(self, option):
+    def disable_autoexec(self):
         '''
-        sets or removes autostart line in special://home/userdata/autoexec.py
-        this function needs to be updated to work as an XBMC service
+        Removes the autoexec line in special://home/userdata/autoexec.py
+        Since version 2.0 this addon is run as a service. This line was needed in prior versions of the addon to allow for automatically starting the addon. 
+        If this line is not removed after updating to version 2.0, the script would be started twice. 
+        In short, this function allows for backward compatibility for updaters.
         '''
         # See if the autoexec.py file exists
-        if (os.path.exists(AUTOEXEC_PATH)):
-            # Var to check if we're in autoexec.py
-            found = False
-            autoexecfile = file(AUTOEXEC_PATH, 'r')
-            filecontents = autoexecfile.readlines()
-            autoexecfile.close()
-            
-            # Check if we're in it
-            for line in filecontents:
-                if line.find(__addonID__) > 0:
-                   found = True
-
-            # If the autoexec.py file is found and we're not in it
-            if (not found and option):
-                autoexecfile = file(AUTOEXEC_PATH, 'w')
-                filecontents.append(AUTOEXEC_SCRIPT)
-                autoexecfile.writelines(filecontents)
+        try:
+            if (os.path.exists(AUTOEXEC_PATH)):
+                found = False
+                autoexecfile = file(AUTOEXEC_PATH, 'r')
+                filecontents = autoexecfile.readlines()
                 autoexecfile.close()
-            
-            # Found that we're in it and it's time to remove ourselves
-            if (found and not option):
-                autoexecfile = file(AUTOEXEC_PATH, 'w')
+                
+                # Check if we're in it
                 for line in filecontents:
-                    if not line.find(__addonID__) > 0:
-                        autoexecfile.write(line)
-                autoexecfile.close()
-        else:
-            if (os.path.exists(AUTOEXEC_FOLDER_PATH)):
-                autoexecfile = file(AUTOEXEC_PATH, 'w')
-                autoexecfile.write (AUTOEXEC_SCRIPT.strip())
-                autoexecfile.close()
-            else:
-                os.makedirs(AUTOEXEC_FOLDER_PATH)
-                autoexecfile = file(AUTOEXEC_PATH, 'w')
-                autoexecfile.write (AUTOEXEC_SCRIPT.strip())
-                autoexecfile.close()
+                    if line.find(__addonID__) > 0:
+                       found = True
+                
+                # Found that we're in it and it's time to remove ourselves
+                if (found):
+                    autoexecfile = file(AUTOEXEC_PATH, 'w')
+                    for line in filecontents:
+                        if not line.find(__addonID__) > 0:
+                            autoexecfile.write(line)
+                    autoexecfile.close()
+                    self.debug("The autostart script was successfully removed from %s" % AUTOEXEC_PATH)
+                else:
+                    self.debug("No need to remove the autostart script, as it was already removed from %s" % AUTOEXEC_PATH)
+        except OSError, e:
+            self.debug('Removing the autostart script in %s failed with error code %d' % (AUTOEXEC_PATH, e.errno))
 
 run = Main()
