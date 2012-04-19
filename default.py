@@ -3,10 +3,9 @@ import sys
 import shutil
 import math
 import time
-import xbmc 
-import xbmcgui
+import xbmc
 import xbmcaddon
-from pysqlite2 import dbapi2 as sqlite
+import sqlite3
 
 # Addon info
 __title__ = 'XBMC File Cleaner'
@@ -29,6 +28,7 @@ class Main:
         sys.setdefaultencoding('utf-8')
         
         self.reload_settings()
+        #if not self.removedFromAutoExec:
         self.disable_autoexec()
         
         if self.serviceEnabled:
@@ -110,7 +110,7 @@ class Main:
             for database in folder:
                 # Check all video databases
                 if database.startswith('MyVideos') and database.endswith('.db'):
-                    con = sqlite.connect(xbmc.translatePath('special://database/' + database))
+                    con = sqlite3.connect(xbmc.translatePath('special://database/' + database))
                     cur = con.cursor()
                     
                     if option == 'movie':
@@ -170,7 +170,7 @@ class Main:
             folder = os.listdir(xbmc.translatePath('special://database/'))
             for database in folder:
                 if database.startswith('MyVideos') and database.endswith('.db'):
-                    con = sqlite.connect(xbmc.translatePath('special://database/' + database))
+                    con = sqlite3.connect(xbmc.translatePath('special://database/' + database))
                     cur = con.cursor()
                     
                     # Insert path if it doesn't exist
@@ -210,7 +210,7 @@ class Main:
         __settings__ = xbmcaddon.Addon(__addonID__)
         
         self.serviceEnabled = bool(__settings__.getSetting('service_enabled') == "true")
-        #self.scanInterval = float(__settings__.getSetting('scan_interval') == "true")
+        #self.scanInterval = float(__settings__.getSetting('scan_interval'))
         self.showNotifications = bool(__settings__.getSetting('show_notifications') == "true")
         self.enableExpire = bool(__settings__.getSetting('enable_expire') == "true")
         self.expireAfter = float(__settings__.getSetting('expire_after'))
@@ -229,6 +229,7 @@ class Main:
         self.enableDebug = bool(xbmc.translatePath(__settings__.getSetting('enable_debug')) == "true")
         self.createSeriesSeasonDirs = bool(xbmc.translatePath(__settings__.getSetting('create_series_season_dirs')) == "true")
         self.doupdatePathReference = bool(xbmc.translatePath(__settings__.getSetting('update_path_reference')) == "true")
+        #self.removedFromAutoExec = bool(xbmc.translatePath(__settings__.getSetting('autoexec')) == "true")
     
     def disk_space_low(self):
         """
@@ -354,6 +355,7 @@ class Main:
                         if not line.find(__addonID__) > 0:
                             autoexecfile.write(line)
                     autoexecfile.close()
+                    __settings__.setSetting(id='autoexec', value='true')
                     self.debug("The autostart script was successfully removed from %s" % AUTOEXEC_PATH)
                 else:
                     self.debug("No need to remove the autostart script, as it was already removed from %s" % AUTOEXEC_PATH)
