@@ -26,21 +26,22 @@ class Main:
         """
         reload(sys)
         sys.setdefaultencoding('utf-8')
-        
         self.reload_settings()
-        #if not self.removedFromAutoExec:
-        self.disable_autoexec()
+        
+        if self.removeFromAutoExec:
+            self.debug("Checking for presence of the old script in " + AUTOEXEC_PATH)
+            self.disable_autoexec()
         
         if self.serviceEnabled:
             self.notify(__settings__.getLocalizedString(30013))
         
         # Main service loop
         while (not xbmc.abortRequested and self.serviceEnabled):
-            
             self.reload_settings()
             self.cleanup()
-            # only run once every half hour
-            time.sleep(1800)
+            
+            # wait for scanInterval minutes to rescan
+            time.sleep(self.scanInterval * 60)
         
         # Cleaning is disabled or abort is requested by XBMC, so do nothing
         self.notify(__settings__.getLocalizedString(30015))
@@ -205,12 +206,12 @@ class Main:
     
     def reload_settings(self):
         """
-        Retrieve new values for all settings, in order to account for any changes.
+        Retrieve new values for all settings, in order to account for any recent changes.
         """
         __settings__ = xbmcaddon.Addon(__addonID__)
         
         self.serviceEnabled = bool(__settings__.getSetting('service_enabled') == "true")
-        #self.scanInterval = float(__settings__.getSetting('scan_interval'))
+        self.scanInterval = float(__settings__.getSetting('scan_interval'))
         self.showNotifications = bool(__settings__.getSetting('show_notifications') == "true")
         self.enableExpire = bool(__settings__.getSetting('enable_expire') == "true")
         self.expireAfter = float(__settings__.getSetting('expire_after'))
@@ -225,17 +226,18 @@ class Main:
         self.ignoreNoRating = bool(__settings__.getSetting('ignore_no_rating') == "true")
         self.enableHolding = bool(__settings__.getSetting('enable_holding') == "true")
         self.holdingFolder = xbmc.translatePath(__settings__.getSetting('holding_folder'))
-        self.holdingExpire = int(__settings__.getSetting('holding_expire'))
+        self.holdingExpire = float(__settings__.getSetting('holding_expire'))
         self.enableDebug = bool(xbmc.translatePath(__settings__.getSetting('enable_debug')) == "true")
         self.createSeriesSeasonDirs = bool(xbmc.translatePath(__settings__.getSetting('create_series_season_dirs')) == "true")
         self.doupdatePathReference = bool(xbmc.translatePath(__settings__.getSetting('update_path_reference')) == "true")
-        #self.removedFromAutoExec = bool(xbmc.translatePath(__settings__.getSetting('autoexec')) == "true")
+        self.removeFromAutoExec = bool(xbmc.translatePath(__settings__.getSetting('remove_from_autoexec')) != "false") # true
     
     def disk_space_low(self):
         """
         Check if the disk is running low on free space.
         Returns true if the free space is less than the threshold specified in the addon's settings.
         TODO: Checks to make sure you set the disk usage path before enabling, if you store your videos on a secondary drive (e.g, /media/external or D:\ etc).
+        TODO: statvfs is deprecated since python 2.6
         """
         diskStats = os.statvfs(self.lowDiskPath)
         diskCapacity = diskStats.f_frsize * diskStats.f_blocks
@@ -243,7 +245,7 @@ class Main:
         try:
             diskFreePercent = math.ceil(float(100) / float(diskCapacity) * float(diskFree))
         except ZeroDivisionError, e:
-            self.debug('Handling run-time error:' + e)
+            self.notify('No free space left, or hard disk capacity is 0. Did you select the correct hard disk to check for free space?', 15000)
             return False
         
         return (float(diskFreePercent) < float(self.lowDiskPercentage))
@@ -332,11 +334,9 @@ class Main:
         Since version 2.0 this addon is run as a service. This line was needed in prior versions of the addon to allow for automatically starting the addon. 
         If this line is not removed after updating to version 2.0, the script would be started twice. 
         In short, this function allows for backward compatibility for updaters.
-        
-        TODO: Add hidden setting to check if we already removed the script. This saves overhead by not having to open the file and read all lines.
         '''
-        # See if the autoexec.py file exists
         try:
+            # See if the autoexec.py file exists
             if (os.path.exists(AUTOEXEC_PATH)):
                 found = False
                 autoexecfile = file(AUTOEXEC_PATH, 'r')
@@ -347,6 +347,7 @@ class Main:
                 for line in filecontents:
                     if line.find(__addonID__) > 0:
                        found = True
+                       __settings__.setSetting(id='remove_from_autoexec', value='true')
                 
                 # Found that we're in it and it's time to remove ourselves
                 if (found):
@@ -355,7 +356,7 @@ class Main:
                         if not line.find(__addonID__) > 0:
                             autoexecfile.write(line)
                     autoexecfile.close()
-                    __settings__.setSetting(id='autoexec', value='true')
+                    __settings__.setSetting(id='remove_from_autoexec', value='false')
                     self.debug("The autostart script was successfully removed from %s" % AUTOEXEC_PATH)
                 else:
                     self.debug("No need to remove the autostart script, as it was already removed from %s" % AUTOEXEC_PATH)

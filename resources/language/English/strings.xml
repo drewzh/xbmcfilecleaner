@@ -25,4 +25,5 @@
     <string id="30025">Moved %s to holding folder</string>
     <string id="30026">Create series and season directories</string>
     <string id="30027">Update path reference after moving</string>
+    <string id="30028">Scan interval (in minutes)</string>
 </strings>
