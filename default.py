@@ -260,6 +260,8 @@ class Main:
                 self.notify(__settings__.getLocalizedString(30014) % (os.path.basename(file), os.path.dirname(file)), 10000)
             except OSError, e:
                 self.debug('Deleting file %s failed with error code %d' % (file, e.errno))
+        else:
+            self.debug('The file "%s" was already deleted' % file)
     
     def move_file(self, file, destination):
         """
