@@ -11,27 +11,6 @@ DESCRIPTION
 =====================================    
 This plugin will automatically scan your library for watched TV shows and Movies and delete them from the file system based on numerous critia such as age, rating, disk free space etc.  All these options and more can be configured via add-on settings (right click addon or press C for context menu and select 'Add-on Settings').  Also make sure you set the disk usage path before enabling if you store your videos on a secondary drive (e.g, /media/external or D:\ etc).
 
-CHANGES BY JOYMYR
-=====================================
-HEADLINES
-Opens for moving files to an external disk while still keeping the files available through the library.
-Able to create sub-directories based on the series name and season number before moving the files.
-
-DETAILS
-* Set default encoding to utf8 to get around encoding problems with filenames encoded with utf8
-  - This is a bad quickfix that works with ext filesystems, but might cause problems on other.
-* Added local timezone adjustments to queries
-  - Neccessary to get correct calculations for systems not using UTC
-* Use full path when moving files
-  - Makes the move function use the much quicker rename functionality when moving files on same partition, 
-    instead of copy/delete.
-* Do not select files that's already in the holdingfolder
-  - No need to move files that's already in the holdingfolder. This also opens for keeping the files available after moving.
-* Optionally create series and season based dirs when moving series files
-  - Creates folders like <holding folder>/<series name>/Season <season number>/
-* Optionally update path reference for a file after moving it
-  - Updates the file in the database with reference to the new location
-
 QUESTIONS/COMMENTS/SUGGESTIONS
 =====================================
 web: http://drewzh.com
