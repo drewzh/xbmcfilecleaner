@@ -1,25 +1,26 @@
 <settings>
     <category label="00008">
         <setting id="service_enabled" type="bool" label="30001" default="false"/>
-        <setting id="scan_interval" type="slider" label="30028" default="30" range="5,5,120" option="int" visible="eq(-1,true)" />
-        <setting id="show_notifications" type="bool" label="30004" default="true" visible="eq(-2,true)" />
-        <setting id="delete_movies" type="bool" label="30016" default="false" visible="eq(-3,true)" />
-        <setting id="delete_tvshows" type="bool" label="30017" default="true" visible="eq(-4,true)" />
-        <setting id="clean_library" type="bool" label="30003" default="true" visible="eq(-5,true)" />
-        <setting id="enable_expire" type="bool" label="30005" default="true" visible="eq(-6,true)" />
+        <setting id="delayed_start" type="slider" label="30029" default="0" range="0,10,120" option="int" visible="eq(-1,true)" />
+        <setting id="scan_interval" type="slider" label="30028" default="30" range="5,5,120" option="int" visible="eq(-2,true)" />
+        <setting id="show_notifications" type="bool" label="30004" default="true" visible="eq(-3,true)" />
+        <setting id="delete_movies" type="bool" label="30016" default="false" visible="eq(-4,true)" />
+        <setting id="delete_tvshows" type="bool" label="30017" default="true" visible="eq(-5,true)" />
+        <setting id="clean_library" type="bool" label="30003" default="true" visible="eq(-6,true)" />
+        <setting id="enable_expire" type="bool" label="30005" default="true" visible="eq(-7,true)" />
         <setting id="expire_after" type="slider" label="30010" subsetting="true" default="7" range="1,1,30" option="int" visible="eq(-1,true)" />
-        <setting id="delete_low_rating" type="bool" label="30018" default="true" visible="eq(-8,true)" />
-        <setting id="low_rating_figure" type="slider" label="30019" subsetting="true" default="7" range="1,1,10" option="int" visible="eq(-9,true) + eq(-1,true)" />
-        <setting id="ignore_no_rating" type="bool" label="30020" subsetting="true" default="true" visible="eq(-10,true) + eq(-2,true)" />
-        <setting id="delete_on_low_disk" type="bool" label="30006" default="true" visible="eq(-11,true)" />
-        <setting id="low_disk_percentage" type="slider" label="30007" subsetting="true" default="0" range="10,10,80" visible="eq(-12,true) + eq(-1,true)" />
-        <setting id="low_disk_path" type="folder" label="30011" subsetting="true" default="special://home" visible="eq(-13,true) + eq(-2,true)" />
-        <setting id="enable_holding" type="bool" label="30021" default="false" visible="eq(-14,true)" />
-        <setting id="holding_folder" type="folder" label="30022" subsetting="true" default="special://temp" visible="eq(-15,true) + eq(-1,true)" />
-        <setting id="create_series_season_dirs" type="bool" label="30026" subsetting="true" default="false" visible="eq(-16,true) + eq(-2,true)" />
-        <setting id="update_path_reference" type="bool" label="30027" subsetting="true" default="false" visible="eq(-17,true) + eq(-3,true)" />
-        <setting id="holding_expire" type="slider" label="30023" subsetting="true" default="5" range="1,1,30" option="int" visible="eq(-18,true) + eq(-4,true)" />
-        <setting id="enable_debug" type="bool" label="30024" default="false" visible="eq(-19,true)" />
+        <setting id="delete_low_rating" type="bool" label="30018" default="true" visible="eq(-9,true)" />
+        <setting id="low_rating_figure" type="slider" label="30019" subsetting="true" default="7" range="1,1,10" option="int" visible="eq(-10,true) + eq(-1,true)" />
+        <setting id="ignore_no_rating" type="bool" label="30020" subsetting="true" default="true" visible="eq(-11,true) + eq(-2,true)" />
+        <setting id="delete_on_low_disk" type="bool" label="30006" default="true" visible="eq(-12,true)" />
+        <setting id="low_disk_percentage" type="slider" label="30007" subsetting="true" default="0" range="10,10,80" visible="eq(-13,true) + eq(-1,true)" />
+        <setting id="low_disk_path" type="folder" label="30011" subsetting="true" default="special://home" visible="eq(-14,true) + eq(-2,true)" />
+        <setting id="enable_holding" type="bool" label="30021" default="false" visible="eq(-15,true)" />
+        <setting id="holding_folder" type="folder" label="30022" subsetting="true" default="special://temp" visible="eq(-16,true) + eq(-1,true)" />
+        <setting id="create_series_season_dirs" type="bool" label="30026" subsetting="true" default="false" visible="eq(-17,true) + eq(-2,true)" />
+        <setting id="update_path_reference" type="bool" label="30027" subsetting="true" default="false" visible="eq(-18,true) + eq(-3,true)" />
+        <setting id="holding_expire" type="slider" label="30023" subsetting="true" default="5" range="1,1,30" option="int" visible="eq(-19,true) + eq(-4,true)" />
+        <setting id="enable_debug" type="bool" label="30024" default="false" visible="eq(-20,true)" />
         <setting id="remove_from_autoexec" type="bool" label="" default="true" visible="false" />
     </category>
 </settings>

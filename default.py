@@ -35,6 +35,9 @@ class Main:
         if self.serviceEnabled:
             self.notify(__settings__.getLocalizedString(30013))
         
+        # wait delayedStart minutes upon startup
+        time.sleep(self.delayedStart * 60)
+        
         # Main service loop
         while (not xbmc.abortRequested and self.serviceEnabled):
             self.reload_settings()
@@ -211,6 +214,7 @@ class Main:
         __settings__ = xbmcaddon.Addon(__addonID__)
         
         self.serviceEnabled = bool(__settings__.getSetting('service_enabled') == "true")
+        self.delayedStart = float(__settings__.getSetting('delayed_start'))
         self.scanInterval = float(__settings__.getSetting('scan_interval'))
         self.showNotifications = bool(__settings__.getSetting('show_notifications') == "true")
         self.enableExpire = bool(__settings__.getSetting('enable_expire') == "true")
