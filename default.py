@@ -99,6 +99,20 @@ class Main:
             if self.cleanLibrary and cleaningRequired:
                 # Wait 10 seconds for deletions to finish before cleaning.
                 time.sleep(10)
+                
+                # Check if the library is being updated before cleaning up
+                while (xbmc.getCondVisibility('Library.IsScanningVideo')  == True):
+                    pause = 5
+                    iterations = 0
+                    limit = self.scanInterval - pause
+                    
+                    # Make sure we don't mess up the scan interval timing by waiting too long.
+                    if (iterations * pause >= limit):
+                        break
+                        
+                    self.debug("The video library is currently being updated, waiting %d minutes before cleaning up." % pause)
+                    time.sleep(pause * 60)
+                
                 xbmc.executebuiltin("XBMC.CleanLibrary(video)")
     
     def get_expired(self, option):
