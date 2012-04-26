@@ -65,10 +65,10 @@ class Main:
                         if os.path.exists(path):
                             cleaningRequired = True
                         if self.enableHolding:
-                            self.debug("Moving movie %s from %s to %s" % (os.path.basename(file), file, self.holdingFolder))
+                            self.debug("Moving movie %s from %s to %s" % (os.path.basename(file), path, self.holdingFolder))
                             self.move_file(path, self.holdingFolder)
                         else:
-                            self.debug("Deleting movie %s from %s" % (os.path.basename(file), file))
+                            self.debug("Deleting movie %s from %s" % (os.path.basename(file), path))
                             self.delete_file(path)
             
             if self.deleteTVShows:
@@ -92,7 +92,6 @@ class Main:
                             if self.doupdatePathReference and moveOk:
                                 self.updatePathReference(idFile, newpath)
                         else:
-                            self.debug("Deleting episode %s from %s" % (os.path.basename(file), os.path.dirname(file)))
                             self.delete_file(path)
             
             # Finally clean the library to account for any deleted videos.
@@ -124,6 +123,7 @@ class Main:
         """
         try:
             results = []
+            margin = 0.000001
             folder = os.listdir(xbmc.translatePath('special://database/'))
             for database in folder:
                 # Check all video databases
@@ -142,12 +142,12 @@ class Main:
                             query += "AND files.lastPlayed < datetime('now', '-%f days', 'localtime') " % self.expireAfter
                         query += "AND playCount > 0"
                         if self.deleteLowRating:
-                            query += " AND c05+0 < %f" % self.lowRatingFigure
-                            if self.ignoreNoRating:
-                              query += " AND c05 > 0"
+                            query += " AND %s.c05 BETWEEN %f AND %f" % (option, (margin if self.ignoreNoRating else 0), self.lowRatingFigure - margin)
+                            if self.lowRatingFigure != 10.000000:
+                                query += " AND %s.c05 <> 10.000000" % option # somehow 10.000000 is considered to be between 0.000001 and 7.999999
                     
                     elif option == 'episode':
-                        query = "SELECT files.strFilename as filename, path.strPath || files.strFilename as full_path, tvshow.c00 as showname, episode.c12 as episodeno, files.idFile "
+                        query = "SELECT files.strFilename as filename, path.strPath || files.strFilename as full_path, tvshow.c00 as showname, episode.c12 as season, files.idFile "
                         query += "FROM files, path, %s, tvshow, tvshowlinkepisode " % option
                         query += "WHERE %s.idFile = files.idFile " % option
                         if self.enableHolding:
@@ -159,9 +159,9 @@ class Main:
                             query += "AND files.lastPlayed < datetime('now', '-%f days', 'localtime') " % self.expireAfter
                         query += "AND playCount > 0"
                         if self.deleteLowRating:
-                            query += " AND c03+0 < %f" % self.lowRatingFigure
-                            if self.ignoreNoRating:
-                              query += " AND c03 > 0"
+                            query += " AND %s.c03 BETWEEN %f AND %f" % (option, (margin if self.ignoreNoRating else 0), self.lowRatingFigure - margin)
+                            if self.lowRatingFigure != 10.000000:
+                                query += " AND %s.c03 <> 10.000000" % option # somehow 10.000000 is considered to be between 0.000001 and 7.999999
                     
                     self.debug('Executing query on %s: %s' % (database, query))
                     
@@ -172,9 +172,9 @@ class Main:
                     
             return results
         except:
-            # The video database(s) could not be opened
+            # The video database(s) could not be opened, or the query was invalid
             self.notify(__settings__.getLocalizedString(30012))
-            raise
+            # raise
     
     def update_path_reference(self, idFile, newPath):
         """

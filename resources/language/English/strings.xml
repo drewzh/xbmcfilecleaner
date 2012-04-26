@@ -9,7 +9,7 @@
     <string id="30009">Cleaning library</string>
     <string id="30010">Days after which a video is considerd to have expired</string>
     <string id="30011">Path to check for free disk space</string>
-    <string id="30012">Error opening video library database</string>
+    <string id="30012">Error accessing video library database</string>
     <string id="30013">Starting cleaner</string>
     <string id="30014">Deleted %s from %s</string>
     <string id="30015">Service Disabled</string>

@@ -9,7 +9,7 @@
     <string id="30009">Bibliotheek opschonen</string>
     <string id="30010">Aantal dagen waarna een bestand als verlopen wordt beschouwd</string>
     <string id="30011">Locatie om te controleren op vrije schijfruimte</string>
-    <string id="30012">Fout bij openen van de videobibliotheek</string>
+    <string id="30012">Fout bij lezen van de videobibliotheek</string>
     <string id="30013">Reiniger opgestart</string>
     <string id="30014">%s verwijderd uit %s</string>
     <string id="30015">Service stopgezet</string>
