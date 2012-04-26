@@ -15,3 +15,8 @@ QUESTIONS/COMMENTS/SUGGESTIONS
 =====================================
 web: http://drewzh.com
 email: me@drewzh.com
+
+TO DO LIST
+=====================================
+* Allow the user to start the addon themselves using the "program addons" feature too.
+* Create a single query depending on the type of file to delete (movie/episode). At the moment we write the same query twice, only slightly different.
