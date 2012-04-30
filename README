@@ -18,5 +18,8 @@ email: me@drewzh.com
 
 TO DO LIST
 =====================================
-* Allow the user to start the addon themselves using the "program addons" feature too.
+* Allow users to start the addon themselves using the "program addons" feature too.
 * Create a single query depending on the type of file to delete (movie/episode). At the moment we write the same query twice, only slightly different.
+* Do not catch each and every type of exception, but only the ones we will handle ourselves
+* Fix low disk space measuring, as the currently used module (statvfs) is deprecated since Python 2.6
+* Display one message with the number of files deleted, if more than one, instead of displaying each message individually

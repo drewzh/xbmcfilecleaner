@@ -14,7 +14,7 @@
     <string id="31005">Toon notificaties</string>
     <string id="31006">Toon debuginformatie</string>
     
-    <string id="31007">Videobibliotheek opschonen na verwijderen</string>
+    <string id="31007">Bibliotheek opschonen na verwijderen</string>
     <string id="31008">Verwijder films</string>
     <string id="31009">Verwijder TV series</string>
     
@@ -34,11 +34,11 @@
     <string id="32008">Minimaal percentage vrije schijfruimte</string>
     <string id="32009">Locatie om te controleren op vrije schijfruimte</string>
     
-    <string id="32010">Gebruik tijdelijke bewaarmap in plaats van verwijderen</string>
+    <string id="32010">Gebruik tijdelijke bewaarmap</string>
     <string id="32011">Locatie bewaarmap</string>
     <string id="32012">Maak serie- en seizoensmappen aan</string>
     <string id="32013">Werk bestandslocatie bij na verplaatsen</string>
-    <string id="32014">[I]Let op: bestanden in deze bewaarmap worden nooit automatisch verwijderd [/I]</string>
+    <string id="32014">Aantal dagen dat bestanden worden bewaard</string>
     
     
     
