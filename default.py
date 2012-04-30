@@ -90,7 +90,7 @@ class Main:
                             self.debug("Moving episode %s from %s to %s" % (os.path.basename(file), os.path.dirname(file), newpath))
                             moveOk = self.move_file(path, newpath)
                             if self.doupdatePathReference and moveOk:
-                                self.updatePathReference(idFile, newpath)
+                                self.update_path_reference(idFile, newpath)
                         else:
                             self.delete_file(path)
             
@@ -192,9 +192,10 @@ class Main:
                     cur = con.cursor()
                     
                     # Insert path if it doesn't exist
-                    query = 'INSERT OR IGNORE INTO\
-                            path(strPath)\
-                            values("%s/")' % (newPath)
+                    query = 'INSERT OR IGNORE INTO'
+                    query += 'path(strPath)'
+                    query += 'values("%s/")' % (newPath)
+                    
                     self.debug('Executing query on %s: %s' % (database, query))
                     cur.execute(query)
                     
@@ -219,7 +220,7 @@ class Main:
         except:
             # Error opening video library database
             self.notify(__settings__.getLocalizedString(34002))
-            raise
+            #raise
     
     def reload_settings(self):
         """
@@ -244,7 +245,6 @@ class Main:
         self.ignoreNoRating = bool(__settings__.getSetting('ignore_no_rating') == "true")
         self.enableHolding = bool(__settings__.getSetting('enable_holding') == "true")
         self.holdingFolder = xbmc.translatePath(__settings__.getSetting('holding_folder'))
-        self.holdingExpire = float(__settings__.getSetting('holding_expire'))
         self.enableDebug = bool(xbmc.translatePath(__settings__.getSetting('enable_debug')) == "true")
         self.createSeriesSeasonDirs = bool(xbmc.translatePath(__settings__.getSetting('create_series_season_dirs')) == "true")
         self.doupdatePathReference = bool(xbmc.translatePath(__settings__.getSetting('update_path_reference')) == "true")
@@ -314,8 +314,8 @@ class Main:
         seasondir -- the directory in which to create the folder(s)
         """
         seriesdir = os.path.dirname(seasondir)
-        create_directory(seriesdir)
-        create_directory(seasondir)
+        self.create_directory(seriesdir)
+        self.create_directory(seasondir)
     
     def create_directory(self, location):
         '''
