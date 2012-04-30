@@ -171,10 +171,17 @@ class Main:
                     results += cur.fetchall()
                     
             return results
-        except:
+        except OSError, e:
+            self.debug("Something went wrong while opening the database folder (errno: %d)" % e.errno)
+            raise
+        except sqlite3.OperationalError, oe:
             # The video database(s) could not be opened, or the query was invalid
-            self.notify(__settings__.getLocalizedString(34002))
-            # raise
+            self.notify(__settings__.getLocalizedString(34002), 15000)
+            msg = oe.args[0]
+            self.debug("The following error occurred: '%s'" % msg)
+        finally:
+            cur.close()
+            con.close()
     
     def update_path_reference(self, idFile, newPath):
         """
@@ -216,11 +223,17 @@ class Main:
                     self.debug('Executing query on %s: %s' % (database, query))
                     cur.execute(query)
                     con.commit()
-        # TODO: Don't catch all exceptions
-        except:
-            # Error opening video library database
-            self.notify(__settings__.getLocalizedString(34002))
-            #raise
+        except OSError, e:
+            self.debug("Something went wrong while opening the database folder (errno: %d)" % e.errno)
+            raise
+        except sqlite3.OperationalError, oe:
+            # The video database(s) could not be opened, or the query was invalid
+            self.notify(__settings__.getLocalizedString(34002), 15000)
+            msg = oe.args[0]
+            self.debug(__settings__.getLocalizedString(34008) % msg)
+        finally:
+            cur.close()
+            con.close()
     
     def reload_settings(self):
         """
@@ -293,7 +306,6 @@ class Main:
             if os.path.exists(file) and os.path.exists(destination):
                 newfile = os.path.join(destination, os.path.basename(file))
                 shutil.move(file, newfile)
-                # Deleted
                 self.notify(__settings__.getLocalizedString(34003) % (file), 10000)
                 return True;
             else:
@@ -324,9 +336,15 @@ class Main:
         try:
             self.debug('Creating directory at %s' % location)
             os.mkdir(location)
-            self.debug('Successfully created directory')
         except OSError, e:
-            self.debug('Creating directory at %s failed with error code %d' % (location, e.errno))
+            # Ignore existing directory errors
+            if e.errno != errno.EEXIST:
+                self.debug('Creating directory at %s failed with error code %d' % (location, e.errno))
+                raise
+            else:
+                self.debug('Directory already exists')
+        else:
+            self.debug('Successfully created directory')
     
     def notify(self, message, duration=5000, image=__icon__):
         '''

@@ -56,12 +56,13 @@
     
     
     <!-- Notifications and debug -->
-    <string id="34002">Error accessing video library database</string>
+    <string id="34002">Error accessing video library database. Please check your logs.</string>
     <string id="34003">Moved %s to holding folder</string>
     <string id="34004">Cleaning library</string>
     <string id="34005">Starting cleaner</string>
     <string id="34006">Deleted %s from %s</string>
     <string id="34007">Service Disabled</string>
+    <string id="34008">The following error occurred: '%s'</string>
     
     <!-- Unknown and possibly obsolete labels -->
     <string id="30008">Service</string>
