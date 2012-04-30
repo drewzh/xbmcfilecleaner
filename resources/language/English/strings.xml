@@ -1,30 +1,67 @@
 <strings>
-    <string id="30001">Enable XBMC File Cleaner</string>
-    <string id="30003">Clean library after deleting</string>
-    <string id="30004">Show notifications</string>
-    <string id="30005">Only delete video after a certain number of days after watching</string>
-    <string id="30006">Only delete videos if low on disk space</string>
-    <string id="30007">Minimum percentage of free disk space</string>
+    <!-- Options Sections -->
+    <string id="31000">General</string>
+    <string id="32000">Conditions</string>
+    <string id="33000">Placeholder</string>
+    
+    <!-- Individual Options -->
+    <string id="31001">[B]General options used by XBMC File Cleaner[/B]</string>
+    <string id="31002">Enable deleting of files</string>
+    
+    <string id="31003">Delayed start (in minutes)</string>
+    <string id="31004">Scan interval (in minutes)</string>
+    
+    <string id="31005">Show notifications</string>
+    <string id="31006">Enable debug messages</string>
+    
+    <string id="31007">Clean library after deleting</string>
+    <string id="31008">Delete movies</string>
+    <string id="31009">Delete TV shows</string>
+    
+    
+    
+    
+    
+    <string id="32001">[B]This section specifies the conditions that must be met before any files are deleted[/B]</string>
+    <string id="32002">Only delete video after a certain number of days after watching</string>
+    <string id="32003">Days after which a video is considerd to have expired</string>
+    
+    <string id="32004">Only delete a video when it has a low rating</string>
+    <string id="32005">Delete video when rating is lower than</string>
+    <string id="32006">Ignore files without rating</string>
+    
+    <string id="32007">Only delete videos if low on disk space</string>
+    <string id="32008">Minimum percentage of free disk space</string>
+    <string id="32009">Path to check for free disk space</string>
+    
+    <string id="32010">Enable holding folder</string>
+    <string id="32011">Holding folder location</string>
+    <string id="32012">Create series and season directories</string>
+    <string id="32013">Update path reference after moving</string>
+    <string id="32014">Days to hold files before deleting</string>
+    
+    
+    
+    
+    
+    <string id="33001">[B]This section is a placeholder, and as such may very well turn out to be obsolete[/B]</string>
+    
+    
+    
+    
+    
+    
+    
+    
+    <!-- Notifications and debug -->
+    <string id="34002">Error accessing video library database</string>
+    <string id="34003">Moved %s to holding folder</string>
+    <string id="34004">Cleaning library</string>
+    <string id="34005">Starting cleaner</string>
+    <string id="34006">Deleted %s from %s</string>
+    <string id="34007">Service Disabled</string>
+    
+    <!-- Unknown and possibly obsolete labels -->
     <string id="30008">Service</string>
-    <string id="30009">Cleaning library</string>
-    <string id="30010">Days after which a video is considerd to have expired</string>
-    <string id="30011">Path to check for free disk space</string>
-    <string id="30012">Error accessing video library database</string>
-    <string id="30013">Starting cleaner</string>
-    <string id="30014">Deleted %s from %s</string>
-    <string id="30015">Service Disabled</string>
-    <string id="30016">Delete movies</string>
-    <string id="30017">Delete TV shows</string>
-    <string id="30018">Only delete a video when it has a low rating</string>
-    <string id="30019">Delete video when rating is lower than</string>
-    <string id="30020">Ignore files without rating</string>
-    <string id="30021">Enable holding folder</string>
-    <string id="30022">Holding folder location</string>
-    <string id="30023">Days to hold files before deleting</string>
-    <string id="30024">Enable debug messages</string>
-    <string id="30025">Moved %s to holding folder</string>
-    <string id="30026">Create series and season directories</string>
-    <string id="30027">Update path reference after moving</string>
-    <string id="30028">Scan interval (in minutes)</string>
-    <string id="30029">Delayed start (in minutes)</string>
+    
 </strings>

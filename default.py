@@ -33,7 +33,7 @@ class Main:
             self.disable_autoexec()
         
         if self.serviceEnabled:
-            self.notify(__settings__.getLocalizedString(30013))
+            self.notify(__settings__.getLocalizedString(34005))
         
         # wait delayedStart minutes upon startup
         time.sleep(self.delayedStart * 60)
@@ -47,14 +47,14 @@ class Main:
             time.sleep(self.scanInterval * 60)
         
         # Cleaning is disabled or abort is requested by XBMC, so do nothing
-        self.notify(__settings__.getLocalizedString(30015))
+        self.notify(__settings__.getLocalizedString(34007))
         
     def cleanup(self):
         """
         Delete any watched videos from the XBMC video database.
         The videos to be deleted are subject to a number of criteria as can be specified in the addon's settings.
         """
-        self.debug(__settings__.getLocalizedString(30009))
+        self.debug(__settings__.getLocalizedString(34004))
         if not self.deleteOnDiskLow or (self.deleteOnDiskLow and self.disk_space_low()):
             cleaningRequired = False
             
@@ -173,7 +173,7 @@ class Main:
             return results
         except:
             # The video database(s) could not be opened, or the query was invalid
-            self.notify(__settings__.getLocalizedString(30012))
+            self.notify(__settings__.getLocalizedString(34002))
             # raise
     
     def update_path_reference(self, idFile, newPath):
@@ -218,7 +218,7 @@ class Main:
         # TODO: Don't catch all exceptions
         except:
             # Error opening video library database
-            self.notify(__settings__.getLocalizedString(30012))
+            self.notify(__settings__.getLocalizedString(34002))
             raise
     
     def reload_settings(self):
@@ -275,7 +275,7 @@ class Main:
         if os.path.exists(file):
             try:
                 os.remove(file)
-                self.notify(__settings__.getLocalizedString(30014) % (os.path.basename(file), os.path.dirname(file)), 10000)
+                self.notify(__settings__.getLocalizedString(34006) % (os.path.basename(file), os.path.dirname(file)), 10000)
             except OSError, e:
                 self.debug('Deleting file %s failed with error code %d' % (file, e.errno))
         else:
@@ -294,7 +294,7 @@ class Main:
                 newfile = os.path.join(destination, os.path.basename(file))
                 shutil.move(file, newfile)
                 # Deleted
-                self.notify(__settings__.getLocalizedString(30025) % (file), 10000)
+                self.notify(__settings__.getLocalizedString(34003) % (file), 10000)
                 return True;
             else:
                 if not os.path.exists(file):
