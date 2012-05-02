@@ -1,6 +1,10 @@
+# coding: utf-8
+
 import os
 import sys
+import platform
 import shutil
+import ctypes
 import math
 import time
 import xbmc
@@ -24,6 +28,8 @@ class Main:
         """
         Create a Main object that performs regular cleaning of watched videos.
         """
+        # TODO: Modify the abortRequested so that xbmcfc doesn't sleep when an abort request comes in. 
+        # Put this check at the start of the addon, instead of after a possible sleep
         reload(sys)
         sys.setdefaultencoding('utf-8')
         self.reload_settings()
@@ -54,6 +60,10 @@ class Main:
         Delete any watched videos from the XBMC video database.
         The videos to be deleted are subject to a number of criteria as can be specified in the addon's settings.
         """
+        
+        # Temporarily put a check for disk space here
+        self.get_disk_space(self.lowDiskPath)
+        
         self.debug(__settings__.getLocalizedString(34004))
         if not self.deleteOnDiskLow or (self.deleteOnDiskLow and self.disk_space_low()):
             cleaningRequired = False
@@ -262,6 +272,60 @@ class Main:
         self.createSeriesSeasonDirs = bool(xbmc.translatePath(__settings__.getSetting('create_series_season_dirs')) == "true")
         self.doupdatePathReference = bool(xbmc.translatePath(__settings__.getSetting('update_path_reference')) == "true")
         self.removeFromAutoExec = bool(xbmc.translatePath(__settings__.getSetting('remove_from_autoexec')) != "false") # true
+    
+    
+    
+    
+    
+    
+    
+    # Combineren in één functie:
+    # Uitleg over GetDiskFreeSpaceEx: http://msdn.microsoft.com/en-us/library/windows/desktop/aa364937(v=vs.85).aspx
+    
+    '''
+    def get_free_space(self, folder):
+        """
+        Return folder/drive free space (in bytes)
+        """
+        if os.path.exists(folder):
+            if platform.system() == 'Windows':
+                freeBytesAvailable = ctypes.c_ulonglong(0)
+                ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(folder), None, None, ctypes.pointer(freeBytesAvailable))
+                return freeBytesAvailable.value
+            else:
+                return os.statvfs(folder).f_bfree
+        else:
+            return 0
+    '''
+    def get_disk_space(self, path):
+        """
+        Return folder/drive total space (in bytes)
+        """
+        if os.path.exists(path):
+            # First eliminate any symbolic links
+            # Then remove any redundant separators and up-level references
+            self.debug("Stripping " + path + " of all redundant stuff.")
+            drive = os.path.normpath(os.path.realpath(path))
+            self.debug("The path now is " + drive)
+            if platform.system() == 'Windows':
+                self.debug("We gaan nu de Windowsfuncties aanroepen om te bepalen hoeveel schijfruimte er is.")
+                freeBytesAvailable = ctypes.c_ulonglong(0)
+                totalNumberOfBytes = ctypes.c_ulonglong(0)
+                totalNumberOfFreeBytes = ctypes.c_ulonglong(0)
+                
+                # TODO: UNC file paths may cause trouble, as they require a trailing \ but normpath removes it. More testing needed.
+                ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(drive), ctypes.pointer(totalNumberOfBytes), ctypes.pointer(totalNumberOfFreeBytes), ctypes.pointer(freeBytesAvailable))
+                
+                path = self.lowDiskPath
+                self.debug("Disk space data for %s:\n%s: %f\n%s: %f\n%s: %f" % 
+                    (drive, "freeBytesAvailable", freeBytesAvailable.value, "totalNumberOfBytes", totalNumberOfBytes.value, "totalNumberOfFreeBytes", totalNumberOfFreeBytes.value)
+                )
+                
+                return (freeBytesAvailable.value, totalNumberOfBytes.value, totalNumberOfFreeBytes.value)
+            else:
+                return os.statvfs(folder).f_bfree
+        else:
+            return 0
     
     def disk_space_low(self):
         """
