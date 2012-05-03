@@ -1,4 +1,4 @@
-# coding: utf-8
+# encoding: utf-8
 
 import os
 import sys
@@ -63,7 +63,7 @@ class Main:
         """
         
         # Temporarily put a check for disk space here
-        self.get_disk_space(self.lowDiskPath)
+        self.get_free_disk_space(self.lowDiskPath)
         
         self.debug(__settings__.getLocalizedString(34004))
         if not self.deleteOnDiskLow or (self.deleteOnDiskLow and self.disk_space_low()):
@@ -270,8 +270,7 @@ class Main:
         self.doupdatePathReference = bool(xbmc.translatePath(__settings__.getSetting('update_path_reference')) == "true")
         self.removeFromAutoExec = bool(xbmc.translatePath(__settings__.getSetting('remove_from_autoexec')) != "false") # true
     
-    # GetDiskFreeSpaceEx explained: http://msdn.microsoft.com/en-us/library/windows/desktop/aa364937(v=vs.85).aspx
-    def get_disk_space(self, path):
+    def get_free_disk_space(self, path):
         """
         Determine the percentage of free disk space.
         
@@ -284,12 +283,17 @@ class Main:
             self.debug("Stripping " + path + " of all redundant stuff.")
             drive = os.path.normpath(os.path.realpath(path))
             self.debug("The path now is " + drive)
+            
+            # TODO: return 100% or 0%?
+            percentage = 0
+            
             if platform.system() == 'Windows':
                 self.debug("We are running disk space checks on a Windows file system")
                 totalNumberOfBytes = ctypes.c_ulonglong(0)
                 totalNumberOfFreeBytes = ctypes.c_ulonglong(0)
                 
                 # TODO: UNC file paths may cause trouble, as they require a trailing \ but normpath removes it. More testing needed.
+                # GetDiskFreeSpaceEx explained: http://msdn.microsoft.com/en-us/library/windows/desktop/aa364937(v=vs.85).aspx
                 ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(drive), ctypes.pointer(totalNumberOfBytes), ctypes.pointer(totalNumberOfFreeBytes), None)
                 
                 free = float(totalNumberOfBytes.value)
@@ -299,7 +303,6 @@ class Main:
                     percentage = float(free / capacity * float(100))
                 except ZeroDivisionError, e:
                     self.notify("Hard disk capacity is 0. Did you select the correct hard disk to check for free space?", 15000)
-                    return 0
                 
                 self.debug("Disk space data for %s:\n%s: %f\n%s: %f\n%s: %f\n%s: %f\n%s %s" % 
                     (drive, "Total disk space (in bytes)", capacity, 
@@ -309,13 +312,20 @@ class Main:
                             "Is the disk space below threshold?", percentage <= self.lowDiskPercentage
                     )
                 )
-                
-                return percentage
             else:
                 self.debug("We are running checks on a non-Windows file system")
-                return os.statvfs(path).f_bfree
+                try:
+                    diskstats = os.statvfs(path)
+                    percentage = float(diskstats.f_bfree / diskstats.f_blocks * float(100))
+                except OSError, e:
+                    self.notify("Couldn't access %s" % self.lowDiskPath) 
+                except ZeroDivisionError, e:
+                    self.notify("Hard disk capacity is 0. Did you select the correct hard disk to check for free space?", 15000)
+            
+            return percentage
         else:
             self.notify("No path selected to check for disk space. Check your settings.", 15000)
+            # TODO: return 100% or 0%?
             return 0
     
     def disk_space_low(self):
@@ -323,7 +333,7 @@ class Main:
         Check if the disk is running low on free space.
         Returns true if the free space is less than the threshold specified in the addon's settings.
         """
-        return self.get_disk_space(self.lowDiskPath) <= self.lowDiskPercentage
+        return self.get_free_disk_space(self.lowDiskPath) <= self.lowDiskPercentage
     
     def delete_file(self, file):
         """
@@ -351,16 +361,16 @@ class Main:
                 newfile = os.path.join(destination, os.path.basename(file))
                 shutil.move(file, newfile)
                 self.notify(__settings__.getLocalizedString(34003) % (file), 10000)
-                return True;
+                return True
             else:
                 if not os.path.exists(file):
-                    self.notify("Can not move file %s as it doesn't exist" % (file), 10000);
+                    self.notify("Can not move file %s as it doesn't exist" % (file), 10000)
                 else:
-                    self.notify("Can not move file, destination %s unavailable" % (destination), 10000);
-                return False;
+                    self.notify("Can not move file, destination %s unavailable" % (destination), 10000)
+                return False
         except OSError, e:
-            self.debug("Moving file %s failed with error code %d" % (file, e.errno));
-            return False;
+            self.debug("Moving file %s failed with error code %d" % (file, e.errno))
+            return False
     
     def create_season_dirs(self, seasondir):
         """
