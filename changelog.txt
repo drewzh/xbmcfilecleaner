@@ -6,6 +6,7 @@ Version 2.0.0
 - Added several new options to configure, such as delayed start and scan interval
 - Removed obsolete setting to delete files after x days in the holding folder, as the queries only take into account files that are not in the holding folder
 - Fixed a bug in settings that disallowed users to disable expiration checks
+- Fixed disk space checking for Windows
 - Enhanced queries used to select files to be deleted
 - Enable cleaning multiple databases at once, instead of just the hardcoded MyVideos34.db
 - Updated text strings

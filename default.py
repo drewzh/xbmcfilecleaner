@@ -3,6 +3,7 @@
 import os
 import sys
 import platform
+import errno
 import shutil
 import ctypes
 import math
@@ -89,11 +90,7 @@ class Main:
                             cleaningRequired = True
                         if self.enableHolding:
                             if self.createSeriesSeasonDirs:
-                                newpath = os.path.join(
-                                    self.holdingFolder,
-                                    show,
-                                    "Season " + season
-                                )
+                                newpath = os.path.join(self.holdingFolder, show, "Season " + season)
                                 self.create_season_dirs(newpath)
                             else:
                                 newpath = self.holdingFolder
@@ -210,8 +207,8 @@ class Main:
                     
                     # Insert path if it doesn't exist
                     query = 'INSERT OR IGNORE INTO'
-                    query += 'path(strPath)'
-                    query += 'values("%s/")' % (newPath)
+                    query += ' path(strPath)'
+                    query += ' values("%s/")' % (newPath)
                     
                     self.debug('Executing query on %s: %s' % (database, query))
                     cur.execute(query)
@@ -273,33 +270,13 @@ class Main:
         self.doupdatePathReference = bool(xbmc.translatePath(__settings__.getSetting('update_path_reference')) == "true")
         self.removeFromAutoExec = bool(xbmc.translatePath(__settings__.getSetting('remove_from_autoexec')) != "false") # true
     
-    
-    
-    
-    
-    
-    
-    # Combineren in één functie:
-    # Uitleg over GetDiskFreeSpaceEx: http://msdn.microsoft.com/en-us/library/windows/desktop/aa364937(v=vs.85).aspx
-    
-    '''
-    def get_free_space(self, folder):
-        """
-        Return folder/drive free space (in bytes)
-        """
-        if os.path.exists(folder):
-            if platform.system() == 'Windows':
-                freeBytesAvailable = ctypes.c_ulonglong(0)
-                ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(folder), None, None, ctypes.pointer(freeBytesAvailable))
-                return freeBytesAvailable.value
-            else:
-                return os.statvfs(folder).f_bfree
-        else:
-            return 0
-    '''
+    # GetDiskFreeSpaceEx explained: http://msdn.microsoft.com/en-us/library/windows/desktop/aa364937(v=vs.85).aspx
     def get_disk_space(self, path):
         """
-        Return folder/drive total space (in bytes)
+        Determine the percentage of free disk space.
+        
+        Keyword arguments:
+        path -- the path to the drive to check (this can be any path of any length on the desired drive)
         """
         if os.path.exists(path):
             # First eliminate any symbolic links
@@ -308,42 +285,45 @@ class Main:
             drive = os.path.normpath(os.path.realpath(path))
             self.debug("The path now is " + drive)
             if platform.system() == 'Windows':
-                self.debug("We gaan nu de Windowsfuncties aanroepen om te bepalen hoeveel schijfruimte er is.")
-                freeBytesAvailable = ctypes.c_ulonglong(0)
+                self.debug("We are running disk space checks on a Windows file system")
                 totalNumberOfBytes = ctypes.c_ulonglong(0)
                 totalNumberOfFreeBytes = ctypes.c_ulonglong(0)
                 
                 # TODO: UNC file paths may cause trouble, as they require a trailing \ but normpath removes it. More testing needed.
-                ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(drive), ctypes.pointer(totalNumberOfBytes), ctypes.pointer(totalNumberOfFreeBytes), ctypes.pointer(freeBytesAvailable))
+                ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(drive), ctypes.pointer(totalNumberOfBytes), ctypes.pointer(totalNumberOfFreeBytes), None)
                 
-                path = self.lowDiskPath
-                self.debug("Disk space data for %s:\n%s: %f\n%s: %f\n%s: %f" % 
-                    (drive, "freeBytesAvailable", freeBytesAvailable.value, "totalNumberOfBytes", totalNumberOfBytes.value, "totalNumberOfFreeBytes", totalNumberOfFreeBytes.value)
+                free = float(totalNumberOfBytes.value)
+                capacity = float(totalNumberOfFreeBytes.value)
+                
+                try:
+                    percentage = float(free / capacity * float(100))
+                except ZeroDivisionError, e:
+                    self.notify("Hard disk capacity is 0. Did you select the correct hard disk to check for free space?", 15000)
+                    return 0
+                
+                self.debug("Disk space data for %s:\n%s: %f\n%s: %f\n%s: %f\n%s: %f\n%s %s" % 
+                    (drive, "Total disk space (in bytes)", capacity, 
+                            "Free disk space (in bytes)", free, 
+                            "Percentage of free space", percentage,
+                            "Minimum free percentage", self.lowDiskPercentage,
+                            "Is the disk space below threshold?", percentage <= self.lowDiskPercentage
+                    )
                 )
                 
-                return (freeBytesAvailable.value, totalNumberOfBytes.value, totalNumberOfFreeBytes.value)
+                return percentage
             else:
-                return os.statvfs(folder).f_bfree
+                self.debug("We are running checks on a non-Windows file system")
+                return os.statvfs(path).f_bfree
         else:
+            self.notify("No path selected to check for disk space. Check your settings.", 15000)
             return 0
     
     def disk_space_low(self):
         """
         Check if the disk is running low on free space.
         Returns true if the free space is less than the threshold specified in the addon's settings.
-        TODO: Checks to make sure you set the disk usage path before enabling, if you store your videos on a secondary drive (e.g, /media/external or D:\ etc).
-        TODO: statvfs is deprecated since python 2.6
         """
-        diskStats = os.statvfs(self.lowDiskPath)
-        diskCapacity = diskStats.f_frsize * diskStats.f_blocks
-        diskFree = diskStats.f_frsize * diskStats.f_bavail
-        try:
-            diskFreePercent = math.ceil(float(100) / float(diskCapacity) * float(diskFree))
-        except ZeroDivisionError, e:
-            self.notify('No free space left, or hard disk capacity is 0. Did you select the correct hard disk to check for free space?', 15000)
-            return False
-        
-        return (float(diskFreePercent) < float(self.lowDiskPercentage))
+        return self.get_disk_space(self.lowDiskPath) <= self.lowDiskPercentage
     
     def delete_file(self, file):
         """
