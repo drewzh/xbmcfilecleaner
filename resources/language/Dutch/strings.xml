@@ -63,8 +63,10 @@
     <string id="34005">%s verwijderd uit %s</string>
     <string id="34007">Service inactief</string>
     <string id="34008">Er is een fout opgetreden: '%s'</string>
-    
-    <!-- Unknown and possibly obsolete labels -->
-    <string id="30008">Service</string>
-    
+    <string id="34009">Verplaatsen van bestand mislukt. %s bestaat niet.</string>
+    <string id="34010">Verplaatsen van bestand mislukt. Doelmap %s kan niet worden gevonden.</string>
+    <string id="34011">De harde schijf heeft grootte 0. Heb je de juiste harde schijf geselecteerd in de instellingen?</string>
+    <string id="34012">Fout bij openen van %s. Toegang geweigerd.</string>
+    <string id="34013">Er is geen harde schijf geselecteerd om te controleren op vrije ruimte. Controleer de instellingen.</string>
+
 </strings>

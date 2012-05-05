@@ -63,8 +63,10 @@
     <string id="34006">Deleted %s from %s</string>
     <string id="34007">Service Disabled</string>
     <string id="34008">The following error occurred: '%s'</string>
-    
-    <!-- Unknown and possibly obsolete labels -->
-    <string id="30008">Service</string>
+    <string id="34009">Cannot move file %s as it doesn't exist</string>
+    <string id="34010">Cannot move file, destination %s unavailable</string>
+    <string id="34011">Hard disk capacity is 0. Did you select the correct hard disk to check for free space?</string>
+    <string id="34012">Couldn't access %s</string>
+    <string id="34013">No path selected to check for disk space. Please check your settings.</string>
     
 </strings>

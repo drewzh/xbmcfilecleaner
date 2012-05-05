@@ -306,18 +306,18 @@ class Main:
                 try:
                     percentage = float(free / capacity * float(100))
                 except ZeroDivisionError, e:
-                    self.notify("Hard disk capacity is 0. Did you select the correct hard disk to check for free space?", 15000)
+                    self.notify(__settings__.getLocalizedString(34011), 15000)
             else:
                 self.debug("We are running checks on a non-Windows file system")
                 try:
                     diskstats = os.statvfs(path)
                     percentage = float(diskstats.f_bfree / diskstats.f_blocks * float(100))
                 except OSError, e:
-                    self.notify("Couldn't access %s" % self.lowDiskPath) 
+                    self.notify(__settings__.getLocalizedString(34012) % self.lowDiskPath) 
                 except ZeroDivisionError, e:
-                    self.notify("Hard disk capacity is 0. Did you select the correct hard disk to check for free space?", 15000)
+                    self.notify(__settings__.getLocalizedString(34011), 15000)
         else:
-            self.notify("No path selected to check for disk space. Check your settings.", 15000)
+            self.notify(__settings__.getLocalizedString(34013), 15000)
         
         return percentage
     
@@ -357,9 +357,9 @@ class Main:
                 return True
             else:
                 if not os.path.exists(file):
-                    self.notify("Can not move file %s as it doesn't exist" % (file), 10000)
+                    self.notify(__settings__.getLocalizedString(34009) % (file), 10000)
                 else:
-                    self.notify("Can not move file, destination %s unavailable" % (destination), 10000)
+                    self.notify(__settings__.getLocalizedString(34010) % (destination), 10000)
                 return False
         except OSError, e:
             self.debug("Moving file %s failed with error code %d" % (file, e.errno))
