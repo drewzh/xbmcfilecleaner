@@ -5,7 +5,7 @@ __  _____ __  __  ___   ___ _ _        ___ _
 
 DANGER WILL ROBINSON!!!
 =====================================
-This script has the potential to wipe your entire video collection!  Please make sure you understand exactly what this script is designed to do before running.  I will not be held responsible for loss of data due to user error.
+This script has the potential to wipe your entire video collection!  Please make sure you understand exactly what this script is designed to do before enabling the file deletion capabilities in the settings.  I will not be held responsible for loss of data due to user error.
 
 DESCRIPTION
 =====================================    
@@ -18,9 +18,12 @@ email: me@drewzh.com
 
 TO DO LIST
 =====================================
-* Allow users to start the addon themselves using the "program addons" feature too.
 * Create a single query depending on the type of file to delete (movie/episode). At the moment we write the same query twice, only slightly different.
 * Do not catch each and every type of exception, but only the ones we will handle ourselves
 * Fix low disk space measuring for non-Windows OSes
-* Display one message with the number of files deleted, if more than one, instead of displaying each message individually
 * Adjust all notification popups to use localized text strings
+
+FUTURE IDEAS
+=====================================
+* Allow users to start the addon themselves using the "program addons" feature too.
+* Display one message with the number of files deleted, if more than one, instead of displaying each message individually

@@ -138,39 +138,38 @@ class Main:
                     con = sqlite3.connect(xbmc.translatePath('special://database/' + database))
                     cur = con.cursor()
                     
-                    if option == 'movie':
-                        query = "SELECT files.strFilename as filename, path.strPath || files.strFilename as full_path "
-                        query += "FROM files, path, %s " % option
-                        query += "WHERE %s.idFile = files.idFile " % option
-                        if self.enableHolding:
-                            query += "AND NOT path.strPath like '%s%%' " % self.holdingFolder
-                        query += "AND files.idPath = path.idPath "
-                        if self.enableExpire:
-                            query += "AND files.lastPlayed < datetime('now', '-%f days', 'localtime') " % self.expireAfter
-                        query += "AND playCount > 0"
-                        if self.deleteLowRating:
-                            query += " AND %s.c05 BETWEEN %f AND %f" % (option, (margin if self.ignoreNoRating else 0), self.lowRatingFigure - margin)
-                            if self.lowRatingFigure != 10.000000:
-                                query += " AND %s.c05 <> 10.000000" % option # somehow 10.000000 is considered to be between 0.000001 and 7.999999
+                    query = "SELECT files.strFilename as filename, path.strPath || files.strFilename as full_path"
+                    if option is "episode":
+                        # select more fields for episodes than for movies
+                        query += ", tvshow.c00 as showname, episode.c12 as season, files.idFile"
                     
-                    elif option == 'episode':
-                        query = "SELECT files.strFilename as filename, path.strPath || files.strFilename as full_path, tvshow.c00 as showname, episode.c12 as season, files.idFile "
-                        query += "FROM files, path, %s, tvshow, tvshowlinkepisode " % option
-                        query += "WHERE %s.idFile = files.idFile " % option
-                        if self.enableHolding:
-                            query += "AND NOT path.strPath like '%s%%' " % self.holdingFolder
-                        query += "AND files.idPath = path.idPath "
-                        query += "AND tvshowlinkepisode.idEpisode = episode.idEpisode "
-                        query += "AND tvshowlinkepisode.idShow = tvshow.idShow "
-                        if self.enableExpire:
-                            query += "AND files.lastPlayed < datetime('now', '-%f days', 'localtime') " % self.expireAfter
-                        query += "AND playCount > 0"
-                        if self.deleteLowRating:
-                            query += " AND %s.c03 BETWEEN %f AND %f" % (option, (margin if self.ignoreNoRating else 0), self.lowRatingFigure - margin)
-                            if self.lowRatingFigure != 10.000000:
-                                query += " AND %s.c03 <> 10.000000" % option # somehow 10.000000 is considered to be between 0.000001 and 7.999999
+                    query += " FROM files, path, %s" % option
+                    if option is "episode":
+                        query += ", tvshow, tvshowlinkepisode"
                     
-                    self.debug('Executing query on %s: %s' % (database, query))
+                    query += " WHERE %s.idFile = files.idFile" % option
+                    
+                    if self.enableHolding:
+                        query += " AND NOT path.strPath like '%s%%' " % self.holdingFolder
+                    
+                    query += " AND files.idPath = path.idPath"
+                    
+                    if option is "episode":
+                        query += " AND tvshowlinkepisode.idEpisode = episode.idEpisode"
+                        query += " AND tvshowlinkepisode.idShow = tvshow.idShow"
+                    
+                    if self.enableExpire:
+                        query += "AND files.lastPlayed < datetime('now', '-%f days', 'localtime') " % self.expireAfter
+                    
+                    query += " AND playCount > 0"
+                    
+                    if self.deleteLowRating:
+                        column = "c05" if option is "movie" else "c03"
+                        query += " AND %s.%s BETWEEN %f AND %f" % (option, column, (margin if self.ignoreNoRating else 0), self.lowRatingFigure - margin)
+                        if self.lowRatingFigure != 10.000000:
+                            query += " AND %s.%s <> 10.000000" % (option, column) # somehow 10.000000 is considered to be between 0.000001 and 7.999999
+                    
+                    self.debug("Executing query on %s: %s" % (database, query))
                     
                     cur.execute(query)
                     
