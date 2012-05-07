@@ -39,14 +39,14 @@ class Main:
             self.debug("Checking for presence of the old script in " + AUTOEXEC_PATH)
             self.disable_autoexec()
         
-        if self.serviceEnabled:
+        if self.deletingEnabled:
             self.notify(__settings__.getLocalizedString(34005))
         
         # wait delayedStart minutes upon startup
         time.sleep(self.delayedStart * 60)
         
         # Main service loop
-        while (not xbmc.abortRequested and self.serviceEnabled):
+        while (not xbmc.abortRequested and self.deletingEnabled):
             self.reload_settings()
             self.cleanup()
             
@@ -63,10 +63,10 @@ class Main:
         """
         
         # Temporarily put a check for disk space here
-        self.get_free_disk_space(self.lowDiskPath)
+        self.get_free_disk_space(self.diskSpacePath)
         
         self.debug(__settings__.getLocalizedString(34004))
-        if not self.deleteOnDiskLow or (self.deleteOnDiskLow and self.disk_space_low()):
+        if not self.deleteUponLowDiskSpace or (self.deleteUponLowDiskSpace and self.disk_space_low()):
             cleaningRequired = False
             
             if self.deleteMovies:
@@ -75,7 +75,7 @@ class Main:
                     for file, path in movies:
                         if os.path.exists(path):
                             cleaningRequired = True
-                        if self.enableHolding:
+                        if self.holdingEnabled:
                             self.debug("Moving movie %s from %s to %s" % (os.path.basename(file), path, self.holdingFolder))
                             self.move_file(path, self.holdingFolder)
                         else:
@@ -88,7 +88,7 @@ class Main:
                     for file, path, show, season, idFile in episodes:
                         if os.path.exists(path):
                             cleaningRequired = True
-                        if self.enableHolding:
+                        if self.holdingEnabled:
                             if self.createSubdirectories:
                                 newpath = os.path.join(self.holdingFolder, show, "Season " + season)
                                 self.create_subdirectories(newpath)
@@ -96,7 +96,7 @@ class Main:
                                 newpath = self.holdingFolder
                             self.debug("Moving episode %s from %s to %s" % (os.path.basename(file), os.path.dirname(file), newpath))
                             moveOk = self.move_file(path, newpath)
-                            if self.doupdatePathReference and moveOk:
+                            if self.updatePaths and moveOk:
                                 self.update_path_reference(idFile, newpath)
                         else:
                             self.delete_file(path)
@@ -147,7 +147,7 @@ class Main:
         
         query += " WHERE %s.idFile = files.idFile" % option
         
-        if self.enableHolding:
+        if self.holdingEnabled:
             query += " AND NOT path.strPath like '%s%%' " % self.holdingFolder
         
         query += " AND files.idPath = path.idPath"
@@ -156,15 +156,15 @@ class Main:
             query += " AND tvshowlinkepisode.idEpisode = episode.idEpisode"
             query += " AND tvshowlinkepisode.idShow = tvshow.idShow"
         
-        if self.enableExpire:
+        if self.enableExpiration:
             query += " AND files.lastPlayed < datetime('now', '-%d days', 'localtime')" % self.expireAfter
         
         query += " AND playCount > 0"
         
-        if self.deleteLowRating:
+        if self.deleteOnlyLowRated:
             column = "c05" if option is "movie" else "c03"
-            query += " AND %s.%s BETWEEN %f AND %f" % (option, column, (margin if self.ignoreNoRating else 0), self.lowRatingFigure - margin)
-            if self.lowRatingFigure != 10.000000:
+            query += " AND %s.%s BETWEEN %f AND %f" % (option, column, (margin if self.ignoreNoRating else 0), self.minimumRating - margin)
+            if self.minimumRating != 10.000000:
                 query += " AND %s.%s <> 10.000000" % (option, column) # somehow 10.000000 is considered to be between 0.000001 and x.999999
         
         try:
@@ -252,27 +252,34 @@ class Main:
         """
         __settings__ = xbmcaddon.Addon(__addonID__)
         
-        self.serviceEnabled = bool(__settings__.getSetting("service_enabled") == "true")
+        self.deletingEnabled = bool(__settings__.getSetting("service_enabled") == "true")
         self.delayedStart = float(__settings__.getSetting("delayed_start"))
         self.scanInterval = float(__settings__.getSetting("scan_interval"))
-        self.showNotifications = bool(__settings__.getSetting("show_notifications") == "true")
-        self.enableExpire = bool(__settings__.getSetting("enable_expire") == "true")
+        
+        self.notificationsEnabled = bool(__settings__.getSetting("show_notifications") == "true")
+        self.debuggingEnabled = bool(xbmc.translatePath(__settings__.getSetting("enable_debug")) == "true")
+        
+        self.enableExpiration = bool(__settings__.getSetting("enable_expire") == "true")
         self.expireAfter = float(__settings__.getSetting("expire_after"))
-        self.deleteOnDiskLow = bool(__settings__.getSetting("delete_on_low_disk") == "true")
-        self.lowDiskPercentage = float(__settings__.getSetting("low_disk_percentage"))
-        self.lowDiskPath = xbmc.translatePath(__settings__.getSetting("low_disk_path"))
+        
+        self.deleteOnlyLowRated = bool(__settings__.getSetting("delete_low_rating") == "true")
+        self.minimumRating = float(__settings__.getSetting("low_rating_figure"))
+        self.ignoreNoRating = bool(__settings__.getSetting("ignore_no_rating") == "true")
+        
+        self.deleteUponLowDiskSpace = bool(__settings__.getSetting("delete_on_low_disk") == "true")
+        self.diskSpaceThreshold = float(__settings__.getSetting("low_disk_percentage"))
+        self.diskSpacePath = xbmc.translatePath(__settings__.getSetting("low_disk_path"))
+        
         self.cleanLibrary = bool(__settings__.getSetting("clean_library") == "true")
         self.deleteMovies = bool(__settings__.getSetting("delete_movies") == "true")
         self.deleteTVShows = bool(__settings__.getSetting("delete_tvshows") == "true")
-        self.deleteLowRating = bool(__settings__.getSetting("delete_low_rating") == "true")
-        self.lowRatingFigure = float(__settings__.getSetting("low_rating_figure"))
-        self.ignoreNoRating = bool(__settings__.getSetting("ignore_no_rating") == "true")
-        self.enableHolding = bool(__settings__.getSetting("enable_holding") == "true")
+        
+        self.holdingEnabled = bool(__settings__.getSetting("enable_holding") == "true")
         self.holdingFolder = xbmc.translatePath(__settings__.getSetting("holding_folder"))
-        self.enableDebug = bool(xbmc.translatePath(__settings__.getSetting("enable_debug")) == "true")
         self.createSubdirectories = bool(xbmc.translatePath(__settings__.getSetting("create_series_season_dirs")) == "true")
-        self.doupdatePathReference = bool(xbmc.translatePath(__settings__.getSetting("update_path_reference")) == "true")
-        self.removeFromAutoExec = bool(xbmc.translatePath(__settings__.getSetting("remove_from_autoexec")) != "false") # true
+        self.updatePaths = bool(xbmc.translatePath(__settings__.getSetting("update_path_reference")) == "true")
+        
+        self.removeFromAutoExec = bool(xbmc.translatePath(__settings__.getSetting("remove_from_autoexec")) != "false")
     
     def get_free_disk_space(self, path):
         """
@@ -313,7 +320,7 @@ class Main:
                     diskstats = os.statvfs(path)
                     percentage = float(diskstats.f_bfree / diskstats.f_blocks * float(100))
                 except OSError, e:
-                    self.notify(__settings__.getLocalizedString(34012) % self.lowDiskPath) 
+                    self.notify(__settings__.getLocalizedString(34012) % self.diskSpacePath) 
                 except ZeroDivisionError, e:
                     self.notify(__settings__.getLocalizedString(34011), 15000)
         else:
@@ -326,7 +333,7 @@ class Main:
         Check if the disk is running low on free space.
         Returns true if the free space is less than the threshold specified in the addon's settings.
         """
-        return self.get_free_disk_space(self.lowDiskPath) <= self.lowDiskPercentage
+        return self.get_free_disk_space(self.diskSpacePath) <= self.diskSpaceThreshold
     
     def delete_file(self, file):
         """
@@ -403,14 +410,14 @@ class Main:
         image -- the path to the image to be displayed on the notification (default "icon.png")
         """
         self.debug(message)
-        if self.showNotifications:
+        if self.notificationsEnabled:
             xbmc.executebuiltin("XBMC.Notification(%s, %s, %s, %s)" % (__title__, message, duration, image))
     
     def debug(self, message):
         """
         logs a debug message
         """
-        if self.enableDebug:
+        if self.debuggingEnabled:
             xbmc.log(__title__ + "::" + message)
     
     def disable_autoexec(self):
