@@ -175,7 +175,7 @@ class Main:
                     cur.execute(query)
                     
                     # Append the results to the list of files to delete.
-                    #results += cur.fetchall()
+                    results += cur.fetchall()
             
             return results
         except OSError, e:
