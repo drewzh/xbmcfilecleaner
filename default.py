@@ -61,10 +61,6 @@ class Main:
         Delete any watched videos from the XBMC video database.
         The videos to be deleted are subject to a number of criteria as can be specified in the addon's settings.
         """
-        
-        # Temporarily put a check for disk space here
-        self.get_free_disk_space(self.diskSpacePath)
-        
         self.debug(__settings__.getLocalizedString(34004))
         if not self.deleteUponLowDiskSpace or (self.deleteUponLowDiskSpace and self.disk_space_low()):
             cleaningRequired = False
@@ -179,7 +175,7 @@ class Main:
                     cur.execute(query)
                     
                     # Append the results to the list of files to delete.
-                    results += cur.fetchall()
+                    #results += cur.fetchall()
             
             return results
         except OSError, e:
@@ -290,20 +286,20 @@ class Main:
         If the path doesn't exist, this function returns 100, in order to prevent files from being deleted accidentally.
         """
         percentage = 100
-        
-        if os.path.exists(path):
-            # First eliminate any symbolic links
-            # Then remove any redundant separators and up-level references
-            self.debug("Stripping " + path + " of all redundant stuff.")
-            drive = os.path.normpath(os.path.realpath(path))
-            self.debug("The path now is " + drive)
-            
+        self.debug("path is: " + path)
+        if os.path.exists(path) or path.startswith("smb://") or path.startswith("nfs://"):
             if platform.system() == "Windows":
                 self.debug("We are running disk space checks on a Windows file system")
+                self.debug("Stripping " + path + " of all redundant stuff.")
+                if path.startswith("smb://") or path.startswith("nfs://"):
+                    drive = os.path.normpath(path[4:]) + "\\"
+                else:
+                    drive = os.path.normpath(path)
+                self.debug("The path now is " + drive)
+                
                 totalNumberOfBytes = ctypes.c_ulonglong(0)
                 totalNumberOfFreeBytes = ctypes.c_ulonglong(0)
                 
-                # TODO: UNC file paths may cause trouble, as they require a trailing \ but normpath removes it. More testing needed.
                 # GetDiskFreeSpaceEx explained: http://msdn.microsoft.com/en-us/library/windows/desktop/aa364937(v=vs.85).aspx
                 ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(drive), ctypes.pointer(totalNumberOfBytes), ctypes.pointer(totalNumberOfFreeBytes), None)
                 
@@ -312,13 +308,19 @@ class Main:
                 
                 try:
                     percentage = float(free / capacity * float(100))
+                    self.debug("Hard disk checks returned the following results:\n%s: %f\n%s: %f\n%s: %f" % ("free", free, "capacity", capacity, "percentage", percentage))
                 except ZeroDivisionError, e:
                     self.notify(__settings__.getLocalizedString(34011), 15000)
             else:
                 self.debug("We are running checks on a non-Windows file system")
+                self.debug("Stripping " + path + " of all redundant stuff.")
+                drive = os.path.normpath(path)
+                self.debug("The path now is " + drive)
+                
                 try:
                     diskstats = os.statvfs(path)
                     percentage = float(diskstats.f_bfree / diskstats.f_blocks * float(100))
+                    self.debug("Hard disk checks returned the following results:\n%s: %f\n%s: %f\n%s: %f" % ("free blocks", f_bfree, "total blocks", f_blocks, "percentage", percentage))
                 except OSError, e:
                     self.notify(__settings__.getLocalizedString(34012) % self.diskSpacePath) 
                 except ZeroDivisionError, e:
