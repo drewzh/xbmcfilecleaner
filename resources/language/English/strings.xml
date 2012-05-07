@@ -1,28 +1,62 @@
 <strings>
-    <string id="30001">Enable service</string>
-    <string id="30003">Clean library when finished</string>
-    <string id="30004">Show notifications</string>
-    <string id="30004">Delete video when watched X days ago</string>
-    <string id="30006">Only delete videos if low on disk space</string>
-    <string id="30007">Low disk space percentage</string>
-    <string id="30008">Service</string>
-    <string id="30009">Running clearup</string>
-    <string id="30010">Days after which a video is classed as expired</string>
-    <string id="30011">Path to check for low disk usage</string>
-    <string id="30012">Error opening video library database</string>
-    <string id="30013">Monitoring library</string>
-    <string id="30014">Deleted</string>
-    <string id="30015">Service Disabled</string>
-    <string id="30016">Delete movies</string>
-    <string id="30017">Delete TV shows</string>
-    <string id="30018">Only delete when rating has a low rating</string>
-    <string id="30019">Delete when rating lower than</string>
-    <string id="30020">Ignore files with no rating</string>
-    <string id="30021">Enable holding folder</string>
-    <string id="30022">Holding folder location</string>
-    <string id="30023">How many days to hold files before deletion</string>
-    <string id="30024">Enable debug messages</string>
-    <string id="30025">Moved %s to holding folder</string>
-    <string id="30026">Create series and season directories</string>
-    <string id="30027">Update path reference after moving</string>
+    <!-- Options Sections -->
+    <string id="31000">General</string>
+    <string id="32000">Conditions</string>
+    <string id="33000">FAQ</string>
+    
+    <!-- General -->
+    <string id="31001">[B]General options used by XBMC File Cleaner[/B]</string>
+    <string id="31002">Enable deleting of files</string>
+    
+    <string id="31003">Delayed start (in minutes)</string>
+    <string id="31004">Scan interval (in minutes)</string>
+    
+    <string id="31005">Show notifications</string>
+    <string id="31006">Enable debug messages</string>
+    
+    <string id="31007">Clean video library after deleting</string>
+    <string id="31008">Delete movies</string>
+    <string id="31009">Delete TV shows</string>
+    
+    
+    <!-- Conditions -->
+    <string id="32001">[B]This section specifies the conditions that must be met before any files are deleted[/B]</string>
+    <string id="32002">Only delete a video after a certain number of days after watching</string>
+    <string id="32003">Days after which a video is considerd to have expired</string>
+    
+    <string id="32004">Only delete a video when it has a low rating</string>
+    <string id="32005">Delete a video when its rating is lower than</string>
+    <string id="32006">Ignore videos without rating</string>
+    
+    <string id="32007">Only delete videos if low on disk space</string>
+    <string id="32008">Minimum percentage of free disk space</string>
+    <string id="32009">Path to check for free disk space</string>
+    
+    <string id="32010">Move videos to a holding folder instead</string>
+    <string id="32011">Holding folder location</string>
+    <string id="32012">Create series and season directories</string>
+    <string id="32013">Update path reference after moving</string>
+    <string id="32014">[I]Note that files in this holding folder will never be deleted automatically [/I]</string>
+    
+    
+    <!-- FAQ -->
+    <string id="33001">[B]Here you can find answers to frequently asked questions[/B]</string>
+    <string id="33002">Q: Why do I see more than one notification telling me XBMC File Cleaner has started?</string>
+    <string id="33003">A: [I]This is because you have recently upgraded to the new version. You should modify 'autoexec.py'[/I]</string>
+    <string id="33004">     [I]in the user directory to remove the line that starts XBMC File Cleaner.[/I]</string>
+    
+    
+    <!-- Notifications and debug -->
+    <string id="34002">Error accessing video library database. Please check your logs.</string>
+    <string id="34003">Moved %s to holding folder</string>
+    <string id="34004">Cleaning library</string>
+    <string id="34005">Starting cleaner</string>
+    <string id="34006">Deleted %s from %s</string>
+    <string id="34007">Service Disabled</string>
+    <string id="34008">The following error occurred: '%s'</string>
+    <string id="34009">Cannot move file %s as it doesn't exist</string>
+    <string id="34010">Cannot move file, destination %s unavailable</string>
+    <string id="34011">Hard disk capacity is 0. Did you select the correct hard disk to check for free space?</string>
+    <string id="34012">Couldn't access %s</string>
+    <string id="34013">No path selected to check for disk space. Please check your settings.</string>
 </strings>

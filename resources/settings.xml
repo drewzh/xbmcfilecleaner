@@ -1,23 +1,57 @@
 <settings>
-    <category label="00008">
-        <setting id="service_enabled" type="bool" label="30001" default="false"/>
-        <setting id="show_notifications" type="bool" label="30004" default="true" visible="eq(-1,true)" />
-        <setting id="delete_movies" type="bool" label="30016" default="false" visible="eq(-2,true)" />
-        <setting id="delete_tvshows" type="bool" label="30017" default="true" visible="eq(-3,true)" />
-        <setting id="clean_library" type="bool" label="30003" default="true" visible="eq(-4,true)" />
-        <setting id="enable_expire" type="bool" label="30004" default="true" visible="eq(-5,true)" />
-        <setting id="expire_after" type="labelenum" label="30010" values="0|1|2|3|4|5|7|14|21|28" default="7" visible="eq(-6,true)" />
-        <setting id="delete_low_rating" type="bool" label="30018" default="true" visible="eq(-7,true)" />
-        <setting id="low_rating_figure" type="labelenum" label="30019" values="1|2|3|4|5|6|7|8|9|10" default="7" visible="eq(-8,true) + eq(-1,true)" />
-        <setting id="ignore_no_rating" type="bool" label="30020" default="true" visible="eq(-9,true) + eq(-2,true)" />
-        <setting id="delete_on_low_disk" type="bool" label="30006" default="true" visible="eq(-10,true)" />
-        <setting id="low_disk_percentage" type="labelenum" label="30007" values="10|20|30|40|50|60|70|80" default="0" visible="eq(-11,true) + eq(-1,true)" />
-        <setting id="low_disk_path" type="folder" label="30011" default="special://home" visible="eq(-12,true) + eq(-2,true)" />
-        <setting id="enable_holding" type="bool" label="30021" default="false" visible="eq(-13,true)" />
-        <setting id="holding_folder" type="folder" label="30022" default="special://temp" visible="eq(-14,true) + eq(-1,true)" />
-        <setting id="create_series_season_dirs" type="bool" label="30026" default="false" visible="eq(-15,true) + eq(-2,true)" />
-        <setting id="update_path_reference" type="bool" label="30027" default="false" visible="eq(-16,true) + eq(-3,true)" />
-        <setting id="holding_expire" type="labelenum" label="30023" values="1|2|3|4|5|7|14|21|28" default="5" enable="false" visible="eq(-17,true) + eq(-4,true)" />
-        <setting id="enable_debug" type="bool" label="30024" default="false" visible="eq(-18,true)" />
+    <!-- General Section -->
+    <category label="31000" id="section_general">
+        <setting type="sep" />
+        <setting label="31001" type="lsep" />
+        <setting type="sep" />
+        
+        <setting id="service_enabled" type="bool" label="31002" default="false"/>
+        
+        <setting id="delayed_start" type="slider" label="31003" default="0" range="0,10,120" option="int" visible="eq(-1,true)" />
+        <setting id="scan_interval" type="slider" label="31004" default="30" range="5,5,120" option="int" visible="eq(-2,true)" />
+        
+        <setting id="show_notifications" type="bool" label="31005" default="true" visible="eq(-3,true)" />
+        <setting id="enable_debug" type="bool" label="31006" default="false" visible="eq(-4,true)" />
+        
+        <setting id="clean_library" type="bool" label="31007" default="true" visible="eq(-5,true)" />
+        <setting id="delete_movies" type="bool" label="31008" default="false" visible="eq(-6,true)" />
+        <setting id="delete_tvshows" type="bool" label="31009" default="false" visible="eq(-7,true)" />
+        
+        <setting id="remove_from_autoexec" type="bool" label="" default="true" visible="false" />
+    </category>
+    
+    <!-- Conditions Section -->
+    <category label="32000" id="section_conditions">
+        <setting type="sep" />
+        <setting label="32001" type="lsep" />
+        <setting type="sep" />
+        
+        <setting id="enable_expire" type="bool" label="32002" default="false" />
+        <setting id="expire_after" type="slider" label="32003" subsetting="true" default="7" range="1,1,30" option="int" visible="eq(-1,true)" />
+        
+        <setting id="delete_low_rating" type="bool" label="32004" default="false" />
+        <setting id="low_rating_figure" type="slider" label="32005" subsetting="true" default="6" range="1,1,10" option="int" visible="eq(-1,true)" />
+        <setting id="ignore_no_rating" type="bool" label="32006" subsetting="true" default="true" visible="eq(-2,true)" />
+        
+        <setting id="delete_on_low_disk" type="bool" label="32007" default="false" />
+        <setting id="low_disk_percentage" type="slider" label="32008" subsetting="true" default="0" range="5,5,80" visible="eq(-1,true)" />
+        <setting id="low_disk_path" type="folder" label="32009" subsetting="true" default="special://home" visible="eq(-2,true)" />
+        
+        <setting id="enable_holding" type="bool" label="32010" default="false" />
+        <setting id="holding_folder" type="folder" label="32011" subsetting="true" default="special://temp" visible="eq(-1,true)" />
+        <setting id="create_series_season_dirs" type="bool" label="32012" subsetting="true" default="false" visible="eq(-2,true)" />
+        <setting id="update_path_reference" type="bool" label="32013" subsetting="true" default="true" visible="eq(-3,true)" />
+        <setting id="holding_info" label="32014" type="lsep" subsetting="true" />
+    </category>
+    
+    <!-- FAQ Section -->
+    <category label="33000" id="section_info">
+        <setting type="sep" />
+        <setting label="33001" type="lsep" />
+        <setting type="sep" />
+        <setting type="lsep" label="33002" />
+        <setting type="lsep" label="33003" />
+        <setting type="lsep" label="33004" />
+        <setting type="sep" />
     </category>
 </settings>
