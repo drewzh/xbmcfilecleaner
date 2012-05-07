@@ -157,7 +157,7 @@ class Main:
             query += " AND tvshowlinkepisode.idShow = tvshow.idShow"
         
         if self.enableExpire:
-            query += "AND files.lastPlayed < datetime('now', '-%f days', 'localtime') " % self.expireAfter
+            query += " AND files.lastPlayed < datetime('now', '-%d days', 'localtime')" % self.expireAfter
         
         query += " AND playCount > 0"
         
@@ -165,7 +165,7 @@ class Main:
             column = "c05" if option is "movie" else "c03"
             query += " AND %s.%s BETWEEN %f AND %f" % (option, column, (margin if self.ignoreNoRating else 0), self.lowRatingFigure - margin)
             if self.lowRatingFigure != 10.000000:
-                query += " AND %s.%s <> 10.000000" % (option, column) # somehow 10.000000 is considered to be between 0.000001 and 7.999999
+                query += " AND %s.%s <> 10.000000" % (option, column) # somehow 10.000000 is considered to be between 0.000001 and x.999999
         
         try:
             # After building the query we can use it on all video databases
