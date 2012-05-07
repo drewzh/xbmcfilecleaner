@@ -3,25 +3,21 @@ __  _____ __  __  ___   ___ _ _        ___ _
  >  <| _ \ |\/| | (__  | _|| | / -_) | (__| / -_) _` | ' \/ -_) '_|
 /_/\_\___/_|  |_|\___| |_| |_|_\___|  \___|_\___\__,_|_||_\___|_|  
 
-DANGER WILL ROBINSON!!!
+[B][I]READ BEFORE PROCEEDING[/I][/B]
 =====================================
-This script has the potential to wipe your entire video collection!  Please make sure you understand exactly what this script is designed to do before enabling the file deletion capabilities in the settings.  I will not be held responsible for loss of data due to user error.
+This addon has the potential to wipe your entire video collection! Please make sure you understand exactly what this addon is designed to do before enabling the file deletion capabilities in the settings. I will not be held responsible for loss of data due to user error.
 
-DESCRIPTION
-=====================================    
-This plugin will automatically scan your library for watched TV shows and Movies and delete them from the file system based on numerous critia such as age, rating, disk free space etc.  All these options and more can be configured via add-on settings (right click addon or press C for context menu and select 'Add-on Settings').  Also make sure you set the disk usage path before enabling if you store your videos on a secondary drive (e.g, /media/external or D:\ etc).
+[B][I]DESCRIPTION[/I][/B]
+=====================================
+This addon will automatically scan your library for watched TV shows and Movies and delete them from the file system based on numerous critia such as age, rating, free disk space, etc. All these options and more can be configured via the addon's settings. Also make sure you set the correct path to the disk you wish to check for free space, especially when you store your videos on a secondary drive or a network share.
 
-QUESTIONS/COMMENTS/SUGGESTIONS
+[B][I]QUESTIONS/COMMENTS/SUGGESTIONS[/I][/B]
 =====================================
 web: http://drewzh.com
 email: me@drewzh.com
 
-TO DO LIST
-=====================================
-* Do not catch each and every type of exception, but only the ones we will handle ourselves
-* Fix low disk space measuring for non-Windows OSes
-
-FUTURE IDEAS
+[B][I]FUTURE IDEAS[/I][/B]
 =====================================
 * Allow users to start the addon themselves using the "program addons" feature too.
 * Display one message with the number of files deleted, if more than one, instead of displaying each message individually
+* Delete files after a user-determined number of plays instead of the fixed one play
