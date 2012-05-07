@@ -56,11 +56,11 @@
     
     
     <!-- Notifications and debug logging -->
-    <string id="34001">Fout bij lezen van de videobibliotheek. Controleer de logbestanden voor meer informatie.</string>
-    <string id="34002">%s verplaatst naar bewaarmap</string>
-    <string id="34003">Bibliotheek opschonen</string>
-    <string id="34004">Reiniger opgestart</string>
-    <string id="34005">%s verwijderd uit %s</string>
+    <string id="34002">Fout bij lezen van de videobibliotheek. Controleer de logbestanden voor meer informatie.</string>
+    <string id="34003">%s verplaatst naar bewaarmap</string>
+    <string id="34004">Bibliotheek opschonen</string>
+    <string id="34005">Reiniger opgestart</string>
+    <string id="34006">%s verwijderd uit %s</string>
     <string id="34007">Service inactief</string>
     <string id="34008">Er is een fout opgetreden: '%s'</string>
     <string id="34009">Verplaatsen van bestand mislukt. %s bestaat niet.</string>
