@@ -4,7 +4,7 @@
     <string id="32000">Conditions</string>
     <string id="33000">FAQ</string>
     
-    <!-- Individual Options -->
+    <!-- General -->
     <string id="31001">[B]General options used by XBMC File Cleaner[/B]</string>
     <string id="31002">Enable deleting of files</string>
     
@@ -19,9 +19,7 @@
     <string id="31009">Delete TV shows</string>
     
     
-    
-    
-    
+    <!-- Conditions -->
     <string id="32001">[B]This section specifies the conditions that must be met before any files are deleted[/B]</string>
     <string id="32002">Only delete a video after a certain number of days after watching</string>
     <string id="32003">Days after which a video is considerd to have expired</string>
@@ -41,18 +39,11 @@
     <string id="32014">[I]Note that files in this holding folder will never be deleted automatically [/I]</string>
     
     
-    
-    
-    
+    <!-- FAQ -->
     <string id="33001">[B]Here you can find answers to frequently asked questions[/B]</string>
     <string id="33002">Q: Why do I see more than one notification telling me XBMC File Cleaner has started?</string>
     <string id="33003">A: [I]This is because you have recently upgraded to the new version. You should modify 'autoexec.py'[/I]</string>
     <string id="33004">     [I]in the user directory to remove the line that starts XBMC File Cleaner.[/I]</string>
-    
-    
-    
-    
-    
     
     
     <!-- Notifications and debug -->
@@ -68,5 +59,4 @@
     <string id="34011">Hard disk capacity is 0. Did you select the correct hard disk to check for free space?</string>
     <string id="34012">Couldn't access %s</string>
     <string id="34013">No path selected to check for disk space. Please check your settings.</string>
-    
 </strings>

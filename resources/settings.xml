@@ -44,7 +44,7 @@
         <setting id="holding_info" label="32014" type="lsep" subsetting="true" />
     </category>
     
-    <!-- Placeholder Section -->
+    <!-- FAQ Section -->
     <category label="33000" id="section_info">
         <setting type="sep" />
         <setting label="33001" type="lsep" />
