@@ -31,30 +31,31 @@ class Main:
         """
         # TODO: Modify the abortRequested so that xbmcfc doesn't sleep when an abort request comes in. 
         # Put this check at the start of the addon, instead of after a possible sleep
-        reload(sys)
-        sys.setdefaultencoding("utf-8")
-        self.reload_settings()
-        
-        if self.removeFromAutoExec:
-            self.debug("Checking for presence of the old script in " + AUTOEXEC_PATH)
-            self.disable_autoexec()
-        
-        if self.deletingEnabled:
-            self.notify(__settings__.getLocalizedString(34005))
-        
-        # wait delayedStart minutes upon startup
-        time.sleep(self.delayedStart * 60)
-        
-        # Main service loop
-        while (not xbmc.abortRequested and self.deletingEnabled):
+        while (not xbmc.abortRequested):
+            reload(sys)
+            sys.setdefaultencoding("utf-8")
             self.reload_settings()
-            self.cleanup()
-            
-            # wait for scanInterval minutes to rescan
-            time.sleep(self.scanInterval * 60)
         
-        # Cleaning is disabled or abort is requested by XBMC, so do nothing
-        self.notify(__settings__.getLocalizedString(34007))
+            if self.removeFromAutoExec:
+                self.debug("Checking for presence of the old script in " + AUTOEXEC_PATH)
+                self.disable_autoexec()
+        
+            if self.deletingEnabled:
+                self.notify(__settings__.getLocalizedString(34005))
+            
+            # wait delayedStart minutes upon startup
+            time.sleep(self.delayedStart * 60)
+            
+            # Main service loop
+            while self.deletingEnabled:
+                self.reload_settings()
+                self.cleanup()
+                
+                # wait for scanInterval minutes to rescan
+                time.sleep(self.scanInterval * 60)
+        
+            # Cleaning is disabled or abort is requested by XBMC, so do nothing
+            self.notify(__settings__.getLocalizedString(34007))
         
     def cleanup(self):
         """
