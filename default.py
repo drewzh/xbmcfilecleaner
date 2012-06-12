@@ -29,33 +29,44 @@ class Main:
         """
         Create a Main object that performs regular cleaning of watched videos.
         """
-        # TODO: Modify the abortRequested so that xbmcfc doesn't sleep when an abort request comes in. 
-        # Put this check at the start of the addon, instead of after a possible sleep
-        while (not xbmc.abortRequested):
-            reload(sys)
-            sys.setdefaultencoding("utf-8")
-            self.reload_settings()
+        # TODO: Modify the loop timing to use the system time in checking if an interval has passed 
+        self.reload_settings()
         
+        self.service_sleep = 10
+        scanInterval_ticker = self.scanInterval * 60 / self.service_sleep
+        delayedStart_ticker = self.delayedStart * 60 / self.service_sleep
+        ticker = 0
+        delayed_completed = False
+        
+        if self.deletingEnabled:
+            self.notify(__settings__.getLocalizedString(34005))
+        
+        reload(sys)
+        sys.setdefaultencoding("utf-8")
+        
+        while (not xbmc.abortRequested and self.deletingEnabled):
+            self.reload_settings()
+            
             if self.removeFromAutoExec:
                 self.debug("Checking for presence of the old script in " + AUTOEXEC_PATH)
                 self.disable_autoexec()
         
-            if self.deletingEnabled:
-                self.notify(__settings__.getLocalizedString(34005))
+            if not self.deletingEnabled:
+                break
             
-            # wait delayedStart minutes upon startup
-            time.sleep(self.delayedStart * 60)
-            
-            # Main service loop
-            while self.deletingEnabled:
-                self.reload_settings()
+            if delayed_completed == True and ticker == scanInterval_ticker:
                 self.cleanup()
-                
-                # wait for scanInterval minutes to rescan
-                time.sleep(self.scanInterval * 60)
-        
-            # Cleaning is disabled or abort is requested by XBMC, so do nothing
-            self.notify(__settings__.getLocalizedString(34007))
+                ticker = 0
+            elif delayed_completed == False and ticker == delayedStart_ticker:
+                delayed_completed = True
+                self.cleanup()
+                ticker = 0
+            
+            time.sleep(self.service_sleep)
+            ticker += 1
+            
+        # Cleaning is disabled or abort is requested by XBMC, so do nothing
+        self.notify(__settings__.getLocalizedString(34007))
         
     def cleanup(self):
         """
@@ -72,9 +83,9 @@ class Main:
                     for file, path in movies:
                         if os.path.exists(path):
                             cleaningRequired = True
-                        if self.holdingEnabled:
-                            self.debug("Moving movie %s from %s to %s" % (os.path.basename(file), path, self.holdingFolder))
-                            self.move_file(path, self.holdingFolder)
+                            if self.holdingEnabled:
+                                self.debug("Moving movie %s from %s to %s" % (os.path.basename(file), path, self.holdingFolder))
+                                self.move_file(path, self.holdingFolder)
                         else:
                             self.debug("Deleting movie %s from %s" % (os.path.basename(file), path))
                             self.delete_file(path)
@@ -85,18 +96,18 @@ class Main:
                     for file, path, show, season, idFile in episodes:
                         if os.path.exists(path):
                             cleaningRequired = True
-                        if self.holdingEnabled:
-                            if self.createSubdirectories:
-                                newpath = os.path.join(self.holdingFolder, show, "Season " + season)
-                                self.create_subdirectories(newpath)
+                            if self.holdingEnabled:
+                                if self.createSubdirectories:
+                                    newpath = os.path.join(self.holdingFolder, show, "Season " + season)
+                                    self.create_subdirectories(newpath)
+                                else:
+                                    newpath = self.holdingFolder
+                                self.debug("Moving episode %s from %s to %s" % (os.path.basename(file), os.path.dirname(file), newpath))
+                                moveOk = self.move_file(path, newpath)
+                                if self.updatePaths and moveOk:
+                                    self.update_path_reference(idFile, newpath)
                             else:
-                                newpath = self.holdingFolder
-                            self.debug("Moving episode %s from %s to %s" % (os.path.basename(file), os.path.dirname(file), newpath))
-                            moveOk = self.move_file(path, newpath)
-                            if self.updatePaths and moveOk:
-                                self.update_path_reference(idFile, newpath)
-                        else:
-                            self.delete_file(path)
+                                self.delete_file(path)
             
             # Finally clean the library to account for any deleted videos.
             if self.cleanLibrary and cleaningRequired:
@@ -451,10 +462,12 @@ class Main:
                         if not line.find(__addonID__) > 0:
                             autoexecfile.write(line)
                     autoexecfile.close()
-                    __settings__.setSetting(id="remove_from_autoexec", value="false")
                     self.debug("The autostart script was successfully removed from %s" % AUTOEXEC_PATH)
                 else:
                     self.debug("No need to remove the autostart script, as it was already removed from %s" % AUTOEXEC_PATH)
+                
+                # Make sure the hidden setting is updated so that we do not keep checking it everytime we want to clean up
+                __settings__.setSetting(id="remove_from_autoexec", value="false")
         except OSError, e:
             self.debug("Removing the autostart script in %s failed with error code %d" % (AUTOEXEC_PATH, e.errno))
 
