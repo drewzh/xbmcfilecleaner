@@ -86,9 +86,9 @@ class Main:
                             if self.holdingEnabled:
                                 self.debug("Moving movie %s from %s to %s" % (os.path.basename(file), path, self.holdingFolder))
                                 self.move_file(path, self.holdingFolder)
-                        else:
-                            self.debug("Deleting movie %s from %s" % (os.path.basename(file), path))
-                            self.delete_file(path)
+                            else:
+                                self.debug("Deleting movie %s from %s" % (os.path.basename(file), path))
+                                self.delete_file(path)
             
             if self.deleteTVShows:
                 episodes = self.get_expired("episode")
