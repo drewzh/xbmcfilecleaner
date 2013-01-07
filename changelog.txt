@@ -1,3 +1,9 @@
+Version 2.1.0
+===============
+- Frodo compatibility
+- Music Videos support
+- Queries now use database views to get expired items
+
 Version 2.0.0
 ===============
 - Eden compatibility
@@ -8,7 +14,6 @@ Version 2.0.0
 - Fixed a bug in settings that disallowed users to disable expiration checks
 - Fixed disk space checking for Windows
 - Enhanced queries used to select files to be deleted
-- Enable cleaning multiple databases at once, instead of just the hardcoded MyVideos34.db
 - Updated text strings
 - More more descriptive notifications and logging
 - Dutch language support

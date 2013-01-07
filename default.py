@@ -19,7 +19,7 @@ __addonID__ = "script.filecleaner"
 __icon__ = "special://home/addons/" + __addonID__ + "/icon.png"
 __settings__ = xbmcaddon.Addon(__addonID__)
 
-# Autoexec info
+# AutoExec info
 AUTOEXEC_PATH = xbmc.translatePath("special://home/userdata/autoexec.py")
 AUTOEXEC_SCRIPT = "import time;time.sleep(5);xbmc.executebuiltin('XBMC.RunScript(special://home/addons/script.filecleaner/default.py,-startup)')"
 
@@ -44,7 +44,7 @@ class Main:
         reload(sys)
         sys.setdefaultencoding("utf-8")
         
-        while (not xbmc.abortRequested and self.deletingEnabled):
+        while not xbmc.abortRequested and self.deletingEnabled:
             self.reload_settings()
             
             if self.removeFromAutoExec:
@@ -118,11 +118,11 @@ class Main:
                 iterations = 0
                 limit = self.scanInterval - pause
                 # Check if the library is being updated before cleaning up
-                while (xbmc.getCondVisibility("Library.IsScanningVideo")):
+                while xbmc.getCondVisibility("Library.IsScanningVideo"):
                     iterations += 1
                     
                     # Make sure we don't mess up the scan interval timing by waiting too long.
-                    if (iterations * pause >= limit):
+                    if iterations * pause >= limit:
                         iterations = 0
                         break
                         
@@ -140,7 +140,9 @@ class Main:
         """
         results = []
         margin = 0.000001
-        
+
+        # TODO: Change the queries to use the table's views
+
         # First we shall build the query to be executed on the video databases
         query = "SELECT files.strFilename as filename, path.strPath || files.strFilename as full_path"
         
@@ -213,6 +215,8 @@ class Main:
         try:
             folder = os.listdir(xbmc.translatePath('special://database/'))
             for database in folder:
+                # Check for any database of any XMBC version and use it for cleaning
+                # (e.g. MyVideos34.db / MyVideos60.db / MyVideos75.db)
                 if database.startswith('MyVideos') and database.endswith('.db'):
                     con = sqlite3.connect(xbmc.translatePath('special://database/' + database))
                     cur = con.cursor()
@@ -443,7 +447,7 @@ class Main:
         """
         try:
             # See if the autoexec.py file exists
-            if (os.path.exists(AUTOEXEC_PATH)):
+            if os.path.exists(AUTOEXEC_PATH):
                 found = False
                 autoexecfile = file(AUTOEXEC_PATH, "r")
                 filecontents = autoexecfile.readlines()

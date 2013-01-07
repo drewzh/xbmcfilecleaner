@@ -10,23 +10,23 @@
   </requires>
   <extension point="xbmc.service" library="default.py" start="login"></extension>
   <extension point="xbmc.addon.metadata">
-    <summary lang="en">Regularly deletes old movie and tv files</summary>
+    <summary lang="en">Regularly deletes old movies, tv show episodes and music videos</summary>
     <description lang="en">[B][I]READ BEFORE PROCEEDING[/I][/B]
 This addon has the potential to wipe your entire video collection! Please make sure you understand exactly what this addon is designed to do before enabling the file deletion capabilities in the settings. I will not be held responsible for loss of data due to user error.
 
 [B][I]DESCRIPTION[/I][/B]
-This addon will automatically scan your library for watched TV shows and Movies and delete them from the file system based on numerous critia such as age, rating, free disk space, etc. All these options and more can be configured via the addon's settings. Also make sure you set the correct path to the disk you wish to check for free space, especially when you store your videos on a secondary drive or a network share.
+This addon will automatically scan your library for watched movies, TV show episodes and music videos, and delete them from the file system based on numerous critia such as age, rating, free disk space, etc. All these options and more can be configured via the addon's settings. Also make sure you set the correct path to the disk you wish to check for free space, especially when you store your videos on a secondary drive or a network share.
 
 [B][I]QUESTIONS/COMMENTS/SUGGESTIONS[/I][/B]
 web: http://drewzh.com
 email: me@drewzh.com
     </description>
-    <summary lang="nl">Verwijdert regelmatig oude films en TV series</summary>
+    <summary lang="nl">Verwijdert regelmatig oude films, afleveringen van TV-series en videoclips</summary>
     <description lang="nl">[B][I]LEES DIT EERST VOOR JE VERDER GAAT[/I][/B]
 Deze addon kan in een keer je hele videocollectie verwijderen! Zorg dat je precies weet wat deze addon doet voor je de verwijdermogelijkheden activeert in de opties. Ik ben niet verantwoordelijk voor verlies van gegevens door handelen van de gebruiker.
 
 [B][I]BESCHRIJVING[/I][/B]
-Deze addon zal automatisch de videobibliotheek scannen op zoek naar bekeken TV series en films en deze van de harde schijf verwijderen met inachtneming van verscheidene criteria, zoals leeftijd, cijfer, vrije harde schijfruimte, etc. Al deze opties, en andere, zijn in te stellen via het optiesmenu van de addon. Let er daarbij ook op dat je het juiste pad instelt naar de schijf die je wil gebruiken voor het controleren van de vrije schijfruimte, met name als je videocollectie op een andere harde schijf staat of op een netwerkshare.
+Deze addon zal automatisch de videobibliotheek scannen op zoek naar bekeken films, afleveringen van TV-series en videoclips, en deze van de harde schijf verwijderen met inachtneming van verscheidene criteria, zoals leeftijd, cijfer, vrije harde schijfruimte, etc. Al deze opties, en andere, zijn in te stellen via het optiesmenu van de addon. Let er daarbij ook op dat je het juiste pad instelt naar de schijf die je wil gebruiken voor het controleren van de vrije schijfruimte, met name als je videocollectie op een andere harde schijf staat of op een netwerkshare.
 
 [B][I]VRAGEN/OPMERKINGEN/SUGGESTIES[/I][/B]
 web: http://drewzh.com
