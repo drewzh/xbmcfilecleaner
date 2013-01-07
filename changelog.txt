@@ -3,6 +3,7 @@ Version 2.1.0
 - Frodo compatibility
 - Music Videos support
 - Queries now use database views to get expired items
+- Removed obsolete FAQ section
 
 Version 2.0.0
 ===============

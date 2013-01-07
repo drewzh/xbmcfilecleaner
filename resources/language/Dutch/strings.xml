@@ -21,8 +21,8 @@
     <string id="31010">Verwijder videoclips</string>
     
     
-    <!-- Voorwaarden -->
-    <string id="32001">[B]In dit menu is het mogelijk om voorwaarden te stellen aan de bestanden die verwijderd moeten worden[/B]</string>
+    <!-- Criteria -->
+    <string id="32001">[B]Voorwaarden aan de bestanden die verwijderd moeten worden[/B]</string>
     <string id="32002">Verwijder bestanden pas na een aantal dagen na bekijken</string>
     <string id="32003">Aantal dagen waarna een bestand als verlopen wordt beschouwd</string>
     
@@ -41,11 +41,7 @@
     <string id="32014">[I]Let op: bestanden in deze bewaarmap worden nooit automatisch verwijderd [/I]</string>
     
     
-    <!-- Help -->
-    <string id="33001">[B]In dit menu vind je antwoorden op veelgestelde vragen[/B]</string>
-    <string id="33002">V: Waarom zie ik twee keer een melding dat XBMC File Cleaner opgestart is?</string>
-    <string id="33003">A: [I]Dit kan gebeuren als je kortgeleden hebt geüpdatet naar de nieuwste versie. Je kunt het oplossen[/I]</string>
-    <string id="33004">    [I]door uit 'autoexec.py' in de gebruikersmap de regel te verwijderen die XBMC File Cleaner opstart.[/I]</string>
+
     
     
     <!-- Meldingen en logs -->

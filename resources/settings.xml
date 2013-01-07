@@ -44,15 +44,4 @@
         <setting id="update_path_reference" type="bool" label="32013" subsetting="true" default="true" visible="eq(-3,true)" />
         <setting id="holding_info" label="32014" type="lsep" subsetting="true" />
     </category>
-    
-    <!-- FAQ Section -->
-    <category label="33000" id="section_info">
-        <setting type="sep" />
-        <setting label="33001" type="lsep" />
-        <setting type="sep" />
-        <setting type="lsep" label="33002" />
-        <setting type="lsep" label="33003" />
-        <setting type="lsep" label="33004" />
-        <setting type="sep" />
-    </category>
 </settings>
