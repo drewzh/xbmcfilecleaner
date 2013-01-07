@@ -17,7 +17,7 @@
     <string id="31007">Clean video library after deleting</string>
     <string id="31008">Delete movies</string>
     <string id="31009">Delete TV shows</string>
-    
+    <string id="31010">Delete Music Videos</string>
     
     <!-- Conditions -->
     <string id="32001">[B]This section specifies the conditions that must be met before any files are deleted[/B]</string>

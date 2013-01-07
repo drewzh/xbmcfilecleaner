@@ -285,6 +285,7 @@ class Main:
         self.cleanLibrary = bool(__settings__.getSetting("clean_library") == "true")
         self.deleteMovies = bool(__settings__.getSetting("delete_movies") == "true")
         self.deleteTVShows = bool(__settings__.getSetting("delete_tvshows") == "true")
+        self.deleteMusicVideos = bool(__settings__.getSetting("delete_musicvideos") == "true")
         
         self.holdingEnabled = bool(__settings__.getSetting("enable_holding") == "true")
         self.holdingFolder = xbmc.translatePath(__settings__.getSetting("holding_folder"))
