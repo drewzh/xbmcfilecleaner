@@ -88,7 +88,8 @@ class Main:
                                 self.move_file(path, self.holdingFolder)
                             else:
                                 self.debug("Deleting movie %s from %s" % (os.path.basename(file), path))
-                                self.delete_file(path)
+                                # TODO self.delete_file(path)
+                                self.notify("Deleting " + path)
             
             if self.deleteTVShows:
                 episodes = self.get_expired("episode")
@@ -107,7 +108,8 @@ class Main:
                                 if self.updatePaths and moveOk:
                                     self.update_path_reference(idFile, newpath)
                             else:
-                                self.delete_file(path)
+                                # TODO self.delete_file(path)
+                                self.notify("Deleting " + path)
             
             # Finally clean the library to account for any deleted videos.
             if self.cleanLibrary and cleaningRequired:
@@ -136,7 +138,7 @@ class Main:
         Retrieve a list of episodes that have been watched and match any criteria set in the addon's settings.
         
         Keyword arguments:
-        option -- the type of videos to remove, can be either 'movie' or 'episode.'
+        option -- the type of videos to remove, can be either 'movie,' 'episode' or 'musicvideo'
         """
         results = []
         margin = 0.000001
@@ -144,39 +146,69 @@ class Main:
         # TODO: Change the queries to use the table's views
 
         # First we shall build the query to be executed on the video databases
-        query = "SELECT files.strFilename as filename, path.strPath || files.strFilename as full_path"
-        
+        # query = "SELECT files.strFilename as filename, path.strPath || files.strFilename as full_path"
+
+        # New query:
+        query = "SELECT strFilename as File, strPath || strFilename as FullPath"
+        if option == "episode":
+            query += ", idFile, strTitle as Show, c12 as Season"
+        query += " FROM %sview" % option # episodeview, movieview or musicvideoview
+        query += " WHERE playCount > 0"
+
+        if self.holdingEnabled:
+            query += " AND NOT strPath like '%s%%'" % self.holdingFolder
+
+        if self.enableExpiration:
+            query += " AND files.lastPlayed < datetime('now', '-%d days', 'localtime')" % self.expireAfter
+
+        if self.deleteOnlyLowRated:
+            column = "c05" if option is "movie" else "c03" # TODO check for music video ratings
+            query += " AND %s.%s BETWEEN %f AND %f" % (option, column, (margin if self.ignoreNoRating else 0), self.minimumRating - margin)
+            if self.minimumRating != 10.000000:
+                query += " AND %s.%s <> 10.000000" % (option, column) # somehow 10.000000 is considered to be between 0.000001 and x.999999
+
+        """
+        # Weggooien
         if option is "episode":
             # select more fields for episodes than for movies
             query += ", tvshow.c00 as showname, episode.c12 as season, files.idFile"
-        
+
+        # Weggooien
         query += " FROM files, path, %s" % option
-        
+
+        # Weggooien
         if option is "episode":
             query += ", tvshow, tvshowlinkepisode"
-        
+
+        # Weggooien
         query += " WHERE %s.idFile = files.idFile" % option
-        
+
+        # Bewaren
         if self.holdingEnabled:
             query += " AND NOT path.strPath like '%s%%' " % self.holdingFolder
-        
+
+        # Weggooien
         query += " AND files.idPath = path.idPath"
-        
+
+        # Weggooien
         if option is "episode":
             query += " AND tvshowlinkepisode.idEpisode = episode.idEpisode"
             query += " AND tvshowlinkepisode.idShow = tvshow.idShow"
-        
+
+        # Bewaren
         if self.enableExpiration:
             query += " AND files.lastPlayed < datetime('now', '-%d days', 'localtime')" % self.expireAfter
-        
+
+        # Bewaren
         query += " AND playCount > 0"
-        
+
+        # Bewaren
         if self.deleteOnlyLowRated:
             column = "c05" if option is "movie" else "c03"
             query += " AND %s.%s BETWEEN %f AND %f" % (option, column, (margin if self.ignoreNoRating else 0), self.minimumRating - margin)
             if self.minimumRating != 10.000000:
                 query += " AND %s.%s <> 10.000000" % (option, column) # somehow 10.000000 is considered to be between 0.000001 and x.999999
-        
+        """
         try:
             # After building the query we can use it on all video databases
             folder = os.listdir(xbmc.translatePath("special://database/"))
