@@ -80,8 +80,9 @@ class Main:
         """
         self.debug(__settings__.getLocalizedString(34004))
         if not self.deleteUponLowDiskSpace or (self.deleteUponLowDiskSpace and self.disk_space_low()):
+            # create stub to summarize cleaning results
+            self.summary = "Deleted" if not self.holdingEnabled else "Moved"
             cleaningRequired = False
-
             if self.deleteMovies:
                 movies = self.get_expired(self.MOVIES)
                 if movies:
@@ -94,8 +95,7 @@ class Main:
                             else:
                                 self.debug("Deleting movie %s from %s" % (os.path.basename(file), path))
                                 self.delete_file(path)
-                                #self.notify("Deleting " + path)
-            
+
             if self.deleteTVShows:
                 episodes = self.get_expired(self.TVSHOWS)
                 if episodes:
@@ -114,7 +114,6 @@ class Main:
                                     self.update_path_reference(idFile, newpath)
                             else:
                                 self.delete_file(path)
-                                #self.notify("Deleting " + path)
 
             if self.deleteMusicVideos:
                 musicvideos = self.get_expired(self.MUSIC_VIDEOS)
@@ -128,6 +127,9 @@ class Main:
                             else:
                                 self.debug("Deleting music video %s from %s" % (os.path.basename(file), path))
                                 self.delete_file(path)
+
+            # Give a status report
+            self.notify(self.summary[:-2])
 
             # Finally clean the library to account for any deleted videos.
             if self.cleanLibrary and cleaningRequired:
@@ -156,17 +158,13 @@ class Main:
         Retrieve a list of episodes that have been watched and match any criteria set in the addon's settings.
         
         Keyword arguments:
-        option -- the type of videos to remove, can be either 'movie,' 'episode' or 'musicvideo'
+        option -- the type of videos to remove, can be one of the constants MOVIES, TVSHOWS or MUSIC_VIDEOS
         """
         results = []
         margin = 0.000001
 
-        # TODO: Change the queries to use the table's views
-
         # First we shall build the query to be executed on the video databases
-        # query = "SELECT files.strFilename as filename, path.strPath || files.strFilename as full_path"
 
-        # New query:
         query = "SELECT strFilename as File, strPath || strFilename as FullPath"
         if option == "episode":
             query += ", idFile, strTitle as Show, c12 as Season"
@@ -179,56 +177,15 @@ class Main:
         if self.enableExpiration:
             query += " AND files.lastPlayed < datetime('now', '-%d days', 'localtime')" % self.expireAfter
 
-        if self.deleteOnlyLowRated:
-            column = "c05" if option is "movie" else "c03" # TODO check for music video ratings
-            query += " AND %s.%s BETWEEN %f AND %f" % (option, column, (margin if self.ignoreNoRating else 0), self.minimumRating - margin)
+        if self.deleteOnlyLowRated and option is not self.MUSIC_VIDEOS:
+            column = "c05" if option is self.MOVIES else "c03"
+            query += " AND %s BETWEEN %f AND %f" % (column, (margin if self.ignoreNoRating else 0), self.minimumRating - margin)
             if self.minimumRating != 10.000000:
-                query += " AND %s.%s <> 10.000000" % (option, column) # somehow 10.000000 is considered to be between 0.000001 and x.999999
+                # somehow 10.000000 is considered to be between 0.000001 and x.999999
+                query += " AND %s <> 10.000000" % column
 
-        """
-        # Weggooien
-        if option is "episode":
-            # select more fields for episodes than for movies
-            query += ", tvshow.c00 as showname, episode.c12 as season, files.idFile"
-
-        # Weggooien
-        query += " FROM files, path, %s" % option
-
-        # Weggooien
-        if option is "episode":
-            query += ", tvshow, tvshowlinkepisode"
-
-        # Weggooien
-        query += " WHERE %s.idFile = files.idFile" % option
-
-        # Bewaren
-        if self.holdingEnabled:
-            query += " AND NOT path.strPath like '%s%%' " % self.holdingFolder
-
-        # Weggooien
-        query += " AND files.idPath = path.idPath"
-
-        # Weggooien
-        if option is "episode":
-            query += " AND tvshowlinkepisode.idEpisode = episode.idEpisode"
-            query += " AND tvshowlinkepisode.idShow = tvshow.idShow"
-
-        # Bewaren
-        if self.enableExpiration:
-            query += " AND files.lastPlayed < datetime('now', '-%d days', 'localtime')" % self.expireAfter
-
-        # Bewaren
-        query += " AND playCount > 0"
-
-        # Bewaren
-        if self.deleteOnlyLowRated:
-            column = "c05" if option is "movie" else "c03"
-            query += " AND %s.%s BETWEEN %f AND %f" % (option, column, (margin if self.ignoreNoRating else 0), self.minimumRating - margin)
-            if self.minimumRating != 10.000000:
-                query += " AND %s.%s <> 10.000000" % (option, column) # somehow 10.000000 is considered to be between 0.000001 and x.999999
-        """
         try:
-            # After building the query we can use it on all video databases
+            # After building the query we can execute it on any video databases we find
             folder = os.listdir(xbmc.translatePath("special://database/"))
             for database in folder:
                 if database.startswith("MyVideos") and database.endswith(".db"):
@@ -237,7 +194,10 @@ class Main:
                     
                     self.debug("Executing query on %s: %s" % (database, query))
                     cur.execute(query)
-                    
+
+                    # Append intermediate results to summary
+                    self.summary += " %d %ss /" % (cur.rowcount if cur.rowcount >= 0 else 0, option)
+                    self.debug(self.summary)
                     # Append the results to the list of files to delete.
                     results += cur.fetchall()
             
@@ -405,6 +365,7 @@ class Main:
         """
         Check if the disk is running low on free space.
         Returns true if the free space is less than the threshold specified in the addon's settings.
+        :rtype : Boolean
         """
         return self.get_free_disk_space(self.diskSpacePath) <= self.diskSpaceThreshold
     
@@ -476,7 +437,7 @@ class Main:
     def notify(self, message, duration=5000, image=__icon__):
         """
         Display an XBMC notification and log the message.
-        
+
         Keyword arguments:
         message -- the message to be displayed and logged
         duration -- the duration the notification is displayed in milliseconds (default 5000)

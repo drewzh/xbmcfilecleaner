@@ -1,8 +1,9 @@
 Version 2.1.0
 ===============
 - Frodo compatibility
-- Music Videos support
-- Queries now use database views to get expired items
+- Music videos support (use TheAudioDB.com scraper)
+- Queries now use databases' views to get expired items
+- No more individual notifications, but a summary instead (see logs for more details)
 - Removed obsolete FAQ section
 
 Version 2.0.0
