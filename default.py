@@ -24,7 +24,12 @@ AUTOEXEC_PATH = xbmc.translatePath("special://home/userdata/autoexec.py")
 AUTOEXEC_SCRIPT = "import time;time.sleep(5);xbmc.executebuiltin('XBMC.RunScript(special://home/addons/script.filecleaner/default.py,-startup)')"
 
 class Main:
-    
+
+    # Constants to ensure correct SQL queries
+    MOVIES = "movie"
+    MUSIC_VIDEOS = "musicvideo"
+    TVSHOWS = "episode"
+
     def __init__(self):
         """
         Create a Main object that performs regular cleaning of watched videos.
@@ -76,9 +81,9 @@ class Main:
         self.debug(__settings__.getLocalizedString(34004))
         if not self.deleteUponLowDiskSpace or (self.deleteUponLowDiskSpace and self.disk_space_low()):
             cleaningRequired = False
-            
+
             if self.deleteMovies:
-                movies = self.get_expired("movie")
+                movies = self.get_expired(self.MOVIES)
                 if movies:
                     for file, path in movies:
                         if os.path.exists(path):
@@ -88,11 +93,11 @@ class Main:
                                 self.move_file(path, self.holdingFolder)
                             else:
                                 self.debug("Deleting movie %s from %s" % (os.path.basename(file), path))
-                                # TODO self.delete_file(path)
-                                self.notify("Deleting " + path)
+                                self.delete_file(path)
+                                #self.notify("Deleting " + path)
             
             if self.deleteTVShows:
-                episodes = self.get_expired("episode")
+                episodes = self.get_expired(self.TVSHOWS)
                 if episodes:
                     for file, path, show, season, idFile in episodes:
                         if os.path.exists(path):
@@ -108,9 +113,22 @@ class Main:
                                 if self.updatePaths and moveOk:
                                     self.update_path_reference(idFile, newpath)
                             else:
-                                # TODO self.delete_file(path)
-                                self.notify("Deleting " + path)
-            
+                                self.delete_file(path)
+                                #self.notify("Deleting " + path)
+
+            if self.deleteMusicVideos:
+                musicvideos = self.get_expired(self.MUSIC_VIDEOS)
+                if musicvideos:
+                    for file, path in musicvideos:
+                        if os.path.exists(path):
+                            cleaningRequired = True
+                            if self.holdingEnabled:
+                                self.debug("Moving music video %s from %s to %s" % (os.path.basename(file), path, self.holdingFolder))
+                                self.move_file(path, self.holdingFolder)
+                            else:
+                                self.debug("Deleting music video %s from %s" % (os.path.basename(file), path))
+                                self.delete_file(path)
+
             # Finally clean the library to account for any deleted videos.
             if self.cleanLibrary and cleaningRequired:
                 # Wait 10 seconds for deletions to finish before cleaning.
@@ -340,6 +358,7 @@ class Main:
             if platform.system() == "Windows":
                 self.debug("We are running disk space checks on a Windows file system")
                 self.debug("Stripping " + path + " of all redundant stuff.")
+                # TODO: Check for remote paths outside of the platform.system() check. This is useless.
                 if path.startswith("smb://") or path.startswith("nfs://"):
                     drive = os.path.normpath(path[4:]) + "\\"
                 else:
@@ -348,7 +367,10 @@ class Main:
                 
                 totalNumberOfBytes = ctypes.c_ulonglong(0)
                 totalNumberOfFreeBytes = ctypes.c_ulonglong(0)
-                
+
+                if not isinstance(path, unicode):
+                    path = path.decode('mbcs') # this is windows only code
+
                 # GetDiskFreeSpaceEx explained: http://msdn.microsoft.com/en-us/library/windows/desktop/aa364937(v=vs.85).aspx
                 ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(drive), ctypes.pointer(totalNumberOfBytes), ctypes.pointer(totalNumberOfFreeBytes), None)
                 
