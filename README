@@ -18,11 +18,11 @@ email: me@drewzh.com
 
 BUGS
 =====================================
-* Disk capacity checks are not supported for NFS or SMB shares at the moment.
 * Deleting of files does not seem to work for NFS or SMB shares at the moment.
-* Music videos do not have ratings, so their ratings are not being checked.
+* Music videos do not have ratings, so their ratings are not being checked (Not really a bug).
 
 FUTURE IDEAS
 =====================================
+* Deleting empty directories.
 * Allow users to start the addon themselves using the "program addons" feature too (partially solved by Frodo, which allows launching from addon browser).
 * Delete files after a user-determined number of plays instead of the fixed one play.

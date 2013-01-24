@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 import os, sys, platform, time
+import re
 import shutil, errno
 import xbmc, xbmcaddon
 from ctypes import c_wchar_p, c_ulonglong, pointer, windll
@@ -14,8 +15,8 @@ __icon__ = "special://home/addons/" + __addonID__ + "/icon.png"
 __settings__ = xbmcaddon.Addon(__addonID__)
 
 # AutoExec info
-AUTOEXEC_PATH = xbmc.translatePath("special://home/userdata/autoexec.py")
-AUTOEXEC_SCRIPT = "import time;time.sleep(5);xbmc.executebuiltin('XBMC.RunScript(special://home/addons/script.filecleaner/default.py,-startup)')"
+#AUTOEXEC_PATH = xbmc.translatePath("special://home/userdata/autoexec.py")
+#AUTOEXEC_SCRIPT = "import time;time.sleep(5);xbmc.executebuiltin('XBMC.RunScript(special://home/addons/script.filecleaner/default.py,-startup)')"
 
 class Main:
 
@@ -47,9 +48,9 @@ class Main:
         while not xbmc.abortRequested and self.deletingEnabled:
             self.reload_settings()
 
-            if self.removeFromAutoExec:
-                self.debug("Checking for presence of the old script in " + AUTOEXEC_PATH)
-                self.disable_autoexec()
+            #if self.removeFromAutoExec:
+                #self.debug("Checking for presence of the old script in " + AUTOEXEC_PATH)
+                #self.disable_autoexec()
 
             if not self.deletingEnabled:
                 break
@@ -190,8 +191,6 @@ class Main:
                 # somehow 10.000000 is considered to be between 0.000001 and x.999999
                 query += " AND %s <> 10.000000" % column
 
-        con = Connection()
-        cur = Cursor()
         try:
             # After building the query we can execute it on any video databases we find
             folder = os.listdir(xbmc.translatePath("special://database/"))
@@ -227,8 +226,6 @@ class Main:
         idFile -- the id of the file to update the path reference for
         newPath -- the new location for the file
         """
-        cur = Cursor()
-        con = Connection()
         try:
             folder = os.listdir(xbmc.translatePath('special://database/'))
             for database in folder:
@@ -321,25 +318,33 @@ class Main:
         """
         percentage = 100
         self.debug("path is: " + path)
-        if os.path.exists(path) or path.startswith("smb://") or path.startswith("nfs://"):
+        if os.path.exists(path) or r"://" in path: #os.path.exists() doesn't work for non-UNC network paths
             if platform.system() == "Windows":
-                self.debug("We are running disk space checks on a Windows file system")
+                self.debug("We are checking disk space from a Windows file system")
                 self.debug("Stripping " + path + " of all redundant stuff.")
-                # TODO: Check for remote paths outside of the platform.system() check. This is useless.
-                if path.startswith("smb://") or path.startswith("nfs://"):
-                    drive = os.path.normpath(path[4:]) + "\\"
+
+                if r"://" in path:
+                    self.debug("We are dealing with network paths:\n" + path)
+                    # TODO: Verify this regex captures all possible usernames and passwords.
+                    pattern = re.compile("(?P<protocol>smb|nfs)://(?P<user>\w+):(?P<pass>[\w\-]+)@(?P<host>\w+)", re.I)
+                    match = pattern.match(path)
+                    share = match.groupdict()
+                    self.debug("Regex result:\nprotocol: %s\nuser: %s\npass: %s\nhost: %s" % (share['protocol'], share['user'], share['pass'], share['host']))
+                    path = path[match.end():]
+                    self.debug("Creating UNC paths, so Windows understands the shares, result:\n" + path)
+                    path = os.path.normcase(r"\\" + share["host"] + path)
+                    self.debug("os.path.normcase result:\n" + path)
                 else:
-                    drive = os.path.normpath(path)
-                self.debug("The path now is " + drive)
+                    self.debug("We are dealing with local paths:\n" + path)
+
+                if not isinstance(path, unicode):
+                    path = path.decode('mbcs')
 
                 totalNumberOfBytes = c_ulonglong(0)
                 totalNumberOfFreeBytes = c_ulonglong(0)
 
-                if not isinstance(path, unicode):
-                    path = path.decode('mbcs') # this is windows only code
-
                 # GetDiskFreeSpaceEx explained: http://msdn.microsoft.com/en-us/library/windows/desktop/aa364937(v=vs.85).aspx
-                windll.kernel32.GetDiskFreeSpaceExW(c_wchar_p(drive), pointer(totalNumberOfBytes), pointer(totalNumberOfFreeBytes), None)
+                windll.kernel32.GetDiskFreeSpaceExW(c_wchar_p(path), pointer(totalNumberOfBytes), pointer(totalNumberOfFreeBytes), None)
 
                 free = float(totalNumberOfBytes.value)
                 capacity = float(totalNumberOfFreeBytes.value)
@@ -350,7 +355,7 @@ class Main:
                 except ZeroDivisionError, e:
                     self.notify(__settings__.getLocalizedString(34011), 15000)
             else:
-                self.debug("We are running checks on a non-Windows file system")
+                self.debug("We are checking disk space from a non-Windows file system")
                 self.debug("Stripping " + path + " of all redundant stuff.")
                 drive = os.path.normpath(path)
                 self.debug("The path now is " + drive)
@@ -460,14 +465,14 @@ class Main:
         """
         if self.debuggingEnabled:
             xbmc.log(__title__ + "::" + message)
-
+"""
     def disable_autoexec(self):
-        """
-        Removes the autoexec line in special://home/userdata/autoexec.py
-        Since version 2.0 this addon is run as a service. This line was needed in prior versions of the addon to allow for automatically starting the addon. 
-        If this line is not removed after updating to version 2.0, the script would be started twice. 
-        In short, this function allows for backward compatibility for updaters.
-        """
+
+        #Removes the autoexec line in special://home/userdata/autoexec.py
+        #Since version 2.0 this addon is run as a service. This line was needed in prior versions of the addon to allow for automatically starting the addon.
+        #If this line is not removed after updating to version 2.0, the script would be started twice.
+        #In short, this function allows for backward compatibility for updaters.
+
         try:
             # See if the autoexec.py file exists
             if os.path.exists(AUTOEXEC_PATH):
@@ -497,5 +502,5 @@ class Main:
                 __settings__.setSetting(id="remove_from_autoexec", value="false")
         except OSError, e:
             self.debug("Removing the autostart script in %s failed with error code %d" % (AUTOEXEC_PATH, e.errno))
-
+"""
 run = Main()

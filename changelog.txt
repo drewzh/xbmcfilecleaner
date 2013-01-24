@@ -5,6 +5,7 @@ Version 2.1.0
 - Queries now use databases' views to get expired items
 - No more individual notifications, but a summary instead (see logs for more details)
 - Removed obsolete FAQ section
+- Removed autoexec.py code, since the addon runs as a service since Eden (Dharma compatibility is lost)
 
 Version 2.0.0
 ===============
