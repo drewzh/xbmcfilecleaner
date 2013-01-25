@@ -27,16 +27,17 @@
     <string id="32004">Only delete a video when it has a low rating</string>
     <string id="32005">Delete a video when its rating is lower than</string>
     <string id="32006">Ignore videos without rating</string>
+    <string id="32007">[I]Note that music videos do not have ratings and ignore these settings [/I]</string>
+
+    <string id="32008">Only delete videos if low on disk space</string>
+    <string id="32009">Minimum percentage of free disk space</string>
+    <string id="32010">Path to check for free disk space</string>
     
-    <string id="32007">Only delete videos if low on disk space</string>
-    <string id="32008">Minimum percentage of free disk space</string>
-    <string id="32009">Path to check for free disk space</string>
-    
-    <string id="32010">Move videos to a holding folder instead</string>
-    <string id="32011">Holding folder location</string>
-    <string id="32012">Create series and season directories</string>
-    <string id="32013">Update path reference after moving</string>
-    <string id="32014">[I]Note that files in this holding folder will never be deleted automatically [/I]</string>
+    <string id="32011">Move videos to a holding folder instead</string>
+    <string id="32012">Holding folder location</string>
+    <string id="32013">Create series and season directories</string>
+    <string id="32014">Update path reference after moving</string>
+    <string id="32015">[I]Note that files in this holding folder will never be deleted automatically [/I]</string>
     
     
 

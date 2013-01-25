@@ -5,7 +5,7 @@ import re
 import shutil, errno
 import xbmc, xbmcaddon
 from ctypes import c_wchar_p, c_ulonglong, pointer, windll
-from sqlite3 import Cursor, Connection, connect, OperationalError
+from sqlite3 import connect, OperationalError
 
 # Addon info
 __title__ = "XBMC File Cleaner"
@@ -306,7 +306,7 @@ class Main:
         self.createSubdirectories = bool(xbmc.translatePath(__settings__.getSetting("create_series_season_dirs")) == "true")
         self.updatePaths = bool(xbmc.translatePath(__settings__.getSetting("update_path_reference")) == "true")
 
-        self.removeFromAutoExec = bool(xbmc.translatePath(__settings__.getSetting("remove_from_autoexec")) != "false")
+        #self.removeFromAutoExec = bool(xbmc.translatePath(__settings__.getSetting("remove_from_autoexec")) != "false")
 
     def get_free_disk_space(self, path):
         """
