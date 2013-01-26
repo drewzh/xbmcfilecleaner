@@ -2,10 +2,11 @@ Version 2.1.0
 ===============
 - Frodo compatibility
 - Music videos support (use TheAudioDB.com scraper)
+- New option to only delete while not playing video
 - Queries now use databases' views to get expired items
 - No more individual notifications, but a summary instead (see logs for more details)
 - Removed obsolete FAQ section
-- Removed autoexec.py code, since the addon runs as a service since Eden (Dharma compatibility is lost)
+- Removed autoexec.py code, since the addon runs as a service since Eden (Dharma autorun no longer supported)
 
 Version 2.0.0
 ===============

@@ -3,7 +3,8 @@
     <string id="31000">General</string>
     <string id="32000">Conditions</string>
     <string id="33000">FAQ</string>
-    
+
+
     <!-- General -->
     <string id="31001">[B]General options used by XBMC File Cleaner[/B]</string>
     <string id="31002">Enable deleting of files</string>
@@ -18,7 +19,9 @@
     <string id="31008">Delete movies</string>
     <string id="31009">Delete TV shows</string>
     <string id="31010">Delete music videos</string>
-    
+    <string id="31011">Do not clean during video playback</string>
+
+
     <!-- Conditions -->
     <string id="32001">[B]Conditions that must be met before any files are deleted[/B]</string>
     <string id="32002">Only delete a video after a certain number of days after watching</string>
@@ -56,4 +59,5 @@
     <string id="34011">Hard disk capacity is 0. Did you select the correct hard disk to check for free space?</string>
     <string id="34012">Couldn't access %s</string>
     <string id="34013">No path selected to check for disk space. Please check your settings.</string>
+    <string id="34014">A video is currently being played. No cleaning will be performed during this interval.</string>
 </strings>

@@ -17,7 +17,7 @@
         <setting id="delete_movies" type="bool" label="31008" default="false" visible="eq(-6,true)" />
         <setting id="delete_tvshows" type="bool" label="31009" default="false" visible="eq(-7,true)" />
         <setting id="delete_musicvideos" type="bool" label="31010" default="false" visible="eq(-8,true)" />
-        
+        <setting id="delete_only_when_idle" type="bool" label="31011" default="false" visible="eq(-9,true)" />
         <!-- This was used for backward compatibility with Dharma, which did not have service addons. Deprecated.
         <setting id="remove_from_autoexec" type="bool" label="" default="true" visible="false" />
         -->

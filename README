@@ -4,7 +4,7 @@ This addon has the potential to wipe your entire video collection! Please make s
 
 DESCRIPTION
 =====================================
-This addon will automatically scan your library for watched TV shows and Movies and delete them from the file system based on numerous critia such as age, rating, free disk space, etc. All these options and more can be configured via the addon's settings. Also make sure you set the correct path to the disk you wish to check for free space, especially when you store your videos on a secondary drive or a network share.
+This addon will automatically scan your library for watched TV shows, movies and music videos and delete them from the file system based on numerous critia such as age, rating, free disk space, etc. All these options and more can be configured via the addon's settings. Also make sure you set the correct path to the disk you wish to check for free space, especially when you store your videos on a secondary drive or a network share.
 
 QUESTIONS/COMMENTS/SUGGESTIONS
 =====================================

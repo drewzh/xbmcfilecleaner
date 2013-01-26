@@ -32,6 +32,7 @@ class Main:
         # TODO: Modify the loop timing to use the system time in checking if an interval has passed 
         self.reload_settings()
 
+        # TODO: By declaring these out of the cleaning loop, changes require a restart of XBMC
         self.service_sleep = 10
         scanInterval_ticker = self.scanInterval * 60 / self.service_sleep
         delayedStart_ticker = self.delayedStart * 60 / self.service_sleep
@@ -74,8 +75,13 @@ class Main:
         Delete any watched videos from the XBMC video database.
         The videos to be deleted are subject to a number of criteria as can be specified in the addon's settings.
         """
-        # TODO combine these functionalities into a single loop
         self.debug(__settings__.getLocalizedString(34004))
+
+        if self.deleteOnlyWhenIdle and xbmc.Player().isPlayingVideo():
+            self.debug(__settings__.getLocalizedString(34014))
+            return
+
+        # TODO combine these functionalities into a single loop
         if not self.deleteUponLowDiskSpace or (self.deleteUponLowDiskSpace and self.disk_space_low()):
             # create stub to summarize cleaning results
             summary = "Deleted" if not self.holdingEnabled else "Moved"
@@ -284,6 +290,7 @@ class Main:
 
         self.notificationsEnabled = bool(__settings__.getSetting("show_notifications") == "true")
         self.debuggingEnabled = bool(xbmc.translatePath(__settings__.getSetting("enable_debug")) == "true")
+        self.deleteOnlyWhenIdle = bool(xbmc.translatePath(__settings__.getSetting("delete_only_when_idle")) == "true")
 
         self.enableExpiration = bool(__settings__.getSetting("enable_expire") == "true")
         self.expireAfter = float(__settings__.getSetting("expire_after"))
