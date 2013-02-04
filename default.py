@@ -1,9 +1,14 @@
 # encoding: utf-8
 
-import os, sys, platform, time
+import os
+import sys
+import platform
+import time
 import re
-import shutil, errno
-import xbmc, xbmcaddon, xbmcvfs
+import errno
+import xbmc
+import xbmcaddon
+import xbmcvfs
 from ctypes import c_wchar_p, c_ulonglong, pointer, windll
 from sqlite3 import connect, OperationalError
 
@@ -85,59 +90,54 @@ class Main:
         if not self.deleteUponLowDiskSpace or (self.deleteUponLowDiskSpace and self.disk_space_low()):
             # create stub to summarize cleaning results
             summary = "Deleted" if not self.holdingEnabled else "Moved"
-            cleaningRequired = False
+            cleaning_required = False
             if self.deleteMovies:
                 movies = self.get_expired(self.MOVIES)
                 if movies:
                     count = 0
-                    for file, path in movies:
-                        if xbmcvfs.exists(path):
-                            cleaningRequired = True
-                            if self.holdingEnabled:
-                                self.debug("Moving movie %s from %s to %s" % (os.path.basename(file), path, self.holdingFolder))
-                                self.move_file(path, self.holdingFolder)
-                            else:
-                                self.debug("Deleting movie %s from %s" % (os.path.basename(file), path))
-                                self.delete_file(path)
+                    for abs_path in movies:
+                        if xbmcvfs.exists(abs_path):
+                            cleaning_required = True
+                            self.move_file(abs_path, self.holdingFolder) if self.holdingEnabled else self.delete_file(abs_path)
                             count += 1
+                        else:
+                            self.debug("XBMC could not find the file at %s" % abs_path)
                     summary += " %d %s(s)" % (count, self.MOVIES)
 
             if self.deleteTVShows:
                 episodes = self.get_expired(self.TVSHOWS)
                 if episodes:
                     count = 0
-                    for file, path, show, season, idFile in episodes:
-                        if xbmcvfs.exists(path):
-                            cleaningRequired = True
+                    for abs_path, show_name, season_number, idFile in episodes:
+                        if xbmcvfs.exists(abs_path):
+                            cleaning_required = True
                             if self.holdingEnabled:
                                 if self.createSubdirectories:
-                                    newpath = os.path.join(self.holdingFolder, show, "Season " + season)
-                                    self.create_subdirectories(newpath)
+                                    new_path = os.path.join(self.holdingFolder, show_name, os.sep, "Season " + season_number)
+                                    self.create_subdirectories(new_path)
                                 else:
-                                    newpath = self.holdingFolder
-                                self.debug("Moving episode %s from %s to %s" % (os.path.basename(file), os.path.dirname(file), newpath))
-                                moveOk = self.move_file(path, newpath)
+                                    new_path = self.holdingFolder
+                                moveOk = self.move_file(abs_path, new_path)
                                 if self.updatePaths and moveOk:
-                                    self.update_path_reference(idFile, newpath)
+                                    self.update_path_reference(idFile, new_path)
                             else:
-                                self.delete_file(path)
+                                self.delete_file(abs_path)
                             count += 1
+                        else:
+                            self.debug("XBMC could not find the file at %s" % abs_path)
                     summary += " %d %s(s)" % (count, self.TVSHOWS)
 
             if self.deleteMusicVideos:
                 musicvideos = self.get_expired(self.MUSIC_VIDEOS)
                 if musicvideos:
                     count = 0
-                    for file, path in musicvideos:
-                        if xbmcvfs.exists(path):
-                            cleaningRequired = True
-                            if self.holdingEnabled:
-                                self.debug("Moving music video %s from %s to %s" % (os.path.basename(file), path, self.holdingFolder))
-                                self.move_file(path, self.holdingFolder)
-                            else:
-                                self.debug("Deleting music video %s from %s" % (os.path.basename(file), path))
-                                self.delete_file(path)
+                    for abs_path in musicvideos:
+                        if xbmcvfs.exists(abs_path):
+                            cleaning_required = True
+                            self.move_file(abs_path, self.holdingFolder) if self.holdingEnabled else self.delete_file(abs_path)
                             count += 1
+                        else:
+                            self.debug("XBMC could not find the file at %s" % abs_path)
                     summary += " %d %s(s)" % (count, self.MUSIC_VIDEOS)
 
             # Give a status report if any deletes occurred
@@ -145,7 +145,7 @@ class Main:
                 self.notify(summary)
 
             # Finally clean the library to account for any deleted videos.
-            if self.cleanLibrary and cleaningRequired:
+            if self.cleanLibrary and cleaning_required:
                 # Wait 10 seconds for deletions to finish before cleaning.
                 time.sleep(10)
 
@@ -173,12 +173,13 @@ class Main:
         Keyword arguments:
         option -- the type of videos to remove, can be one of the constants MOVIES, TVSHOWS or MUSIC_VIDEOS
         """
+        self.debug("Looking for watched videos")
+
         results = []
         margin = 0.000001
 
         # First we shall build the query to be executed on the video databases
-
-        query = "SELECT strFilename as File, strPath || strFilename as FullPath"
+        query = "SELECT strPath || strFilename as FullPath"
         if option == "episode":
             query += ", idFile, strTitle as Show, c12 as Season"
         query += " FROM %sview" % option # episodeview, movieview or musicvideoview
@@ -199,8 +200,8 @@ class Main:
 
         try:
             # After building the query we can execute it on any video databases we find
-            folder = os.listdir(xbmc.translatePath("special://database/"))
-            for database in folder:
+            _, files, = xbmcvfs.listdir(xbmc.translatePath("special://database/"))
+            for database in files:
                 if database.startswith("MyVideos") and database.endswith(".db"):
                     con = connect(xbmc.translatePath("special://database/" + database))
                     cur = con.cursor()
@@ -225,6 +226,9 @@ class Main:
             con.close()
 
     def update_path_reference(self, idFile, newPath):
+        # TODO: Evaluate the need for this method.
+        # If the video is moved out of XBMC's watched folders, it will not be playable and doesn't belong in XBMC.
+        # If it is moved inside, a database update will suffice.
         """
         Update file reference for a file
 
@@ -392,43 +396,39 @@ class Main:
         """
         Delete a file from the file system.
         """
-        if os.path.exists(file):
-            try:
-                os.remove(file)
-                self.debug(__settings__.getLocalizedString(34006) % (os.path.basename(file), os.path.dirname(file)))
-            except OSError, e:
-                self.debug("Deleting file %s failed with error code %d" % (file, e.errno))
+        self.debug("Deleting file at %s" % file)
+        if xbmcvfs.exists(file):
+            if xbmcvfs.delete(file):
+                self.debug("Deleted file at %s" % file)
+            else:
+                self.debug("Deleting file %s failed" % file)
         else:
-            self.debug("The file '%s' was already deleted" % file)
+            self.debug("XBMC could not find the file at %s" % file)
 
-    def move_file(self, file, destination):
+    def move_file(self, source, destination):
         """
         Move a file to a new destination. Returns True if the move succeeded, False otherwise.
+        Will create destination if it does not exist.
 
         Keyword arguments:
-        file -- the file to be moved
-        destination -- the new location of the file
+        source -- the source path (absolute)
+        destination -- the destination path (absolute)
         """
-        try:
-            if xbmcvfs.exists(file) and xbmcvfs.exists(destination):
-                self.debug("Moving %s\nto %s\nNew path: %s" % (file, destination, os.path.join(destination, os.path.basename(file))))
-                if xbmcvfs.rename(file, os.path.join(destination, os.path.basename(file))):
-                    self.debug("File renaming success")
+        self.debug("Moving %s to %s" % (os.path.basename(source), destination))
+        if xbmcvfs.exists(source):
+            if not xbmcvfs.exists(destination):
+                self.debug("XBMC could not find destination %s" % destination)
+                self.debug("Creating destination %s" % destination)
+                if xbmcvfs.mkdirs(destination):
+                    self.debug("Successfully created %s" % destination)
                 else:
-                    self.debug("Error renaming file")
+                    self.debug("XBMC could not create destination %s" % destination)
+                    return False
 
-                    #newfile = os.path.join(destination, os.path.basename(file))
-                    #shutil.move(file, newfile)
-                    #self.debug(__settings__.getLocalizedString(34003) % file)
-                    #return True
-            else:
-                if not xbmcvfs.exists(file):
-                    self.notify(__settings__.getLocalizedString(34009) % file, 10000)
-                else:
-                    self.notify(__settings__.getLocalizedString(34010) % destination, 10000)
-                return False
-        except OSError, e:
-            self.debug("Moving file %s failed with error code %d" % (file, e.errno))
+            self.debug("Moving %s\nto %s\nNew path: %s" % (source, destination, os.path.join(destination, os.path.basename(source))))
+            return xbmcvfs.rename(source, os.path.join(destination, os.path.basename(source)))
+        else:
+            self.debug("XBMC could not find the file at %s" % source)
             return False
 
     def create_subdirectories(self, seasondir):
