@@ -437,34 +437,6 @@ class Main:
             self.debug("XBMC could not find the file at %s" % source)
             return False
 
-    def create_subdirectories(self, seasondir):
-        """
-        Create season as well as series directories in the folder specified.
-
-        Keyword arguments:
-        seasondir -- the directory in which to create the folder(s)
-        """
-        seriesdir = os.path.dirname(seasondir)
-        self.create_directory(seriesdir)
-        self.create_directory(seasondir)
-
-    def create_directory(self, location):
-        """
-        Creates a directory at the location provided.
-        """
-        try:
-            self.debug("Creating directory at %s" % location)
-            os.mkdir(location)
-        except OSError, e:
-            # Ignore existing directory errors
-            if e.errno != errno.EEXIST:
-                self.debug("Creating directory at %s failed with error code %d" % (location, e.errno))
-                raise
-            else:
-                self.debug("Directory already exists")
-        else:
-            self.debug("Successfully created directory")
-
     def notify(self, message, duration=5000, image=__icon__):
         """
         Display an XBMC notification and log the message.
