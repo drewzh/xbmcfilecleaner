@@ -3,7 +3,7 @@
 import os, sys, platform, time
 import re
 import shutil, errno
-import xbmc, xbmcaddon
+import xbmc, xbmcaddon, xbmcvfs
 from ctypes import c_wchar_p, c_ulonglong, pointer, windll
 from sqlite3 import connect, OperationalError
 
@@ -29,7 +29,7 @@ class Main:
         """
         Create a Main object that performs regular cleaning of watched videos.
         """
-        # TODO: Modify the loop timing to use the system time in checking if an interval has passed 
+        # TODO: Modify the loop timing to use the system time in checking if an interval has passed
         self.reload_settings()
 
         # TODO: By declaring these out of the cleaning loop, changes require a restart of XBMC
@@ -91,7 +91,7 @@ class Main:
                 if movies:
                     count = 0
                     for file, path in movies:
-                        if os.path.exists(path):
+                        if xbmcvfs.exists(path):
                             cleaningRequired = True
                             if self.holdingEnabled:
                                 self.debug("Moving movie %s from %s to %s" % (os.path.basename(file), path, self.holdingFolder))
@@ -107,7 +107,7 @@ class Main:
                 if episodes:
                     count = 0
                     for file, path, show, season, idFile in episodes:
-                        if os.path.exists(path):
+                        if xbmcvfs.exists(path):
                             cleaningRequired = True
                             if self.holdingEnabled:
                                 if self.createSubdirectories:
@@ -129,7 +129,7 @@ class Main:
                 if musicvideos:
                     count = 0
                     for file, path in musicvideos:
-                        if os.path.exists(path):
+                        if xbmcvfs.exists(path):
                             cleaningRequired = True
                             if self.holdingEnabled:
                                 self.debug("Moving music video %s from %s to %s" % (os.path.basename(file), path, self.holdingFolder))
@@ -169,7 +169,7 @@ class Main:
     def get_expired(self, option):
         """
         Retrieve a list of episodes that have been watched and match any criteria set in the addon's settings.
-        
+
         Keyword arguments:
         option -- the type of videos to remove, can be one of the constants MOVIES, TVSHOWS or MUSIC_VIDEOS
         """
@@ -227,7 +227,7 @@ class Main:
     def update_path_reference(self, idFile, newPath):
         """
         Update file reference for a file
-        
+
         Keyword arguments:
         idFile -- the id of the file to update the path reference for
         newPath -- the new location for the file
@@ -318,9 +318,9 @@ class Main:
     def get_free_disk_space(self, path):
         """
         Determine the percentage of free disk space.
-        
+
         Keyword arguments:
-        path -- the path to the drive to check (this can be any path of any length on the desired drive). 
+        path -- the path to the drive to check (this can be any path of any length on the desired drive).
         If the path doesn't exist, this function returns 100, in order to prevent files from being deleted accidentally.
         """
         percentage = 100
@@ -404,19 +404,25 @@ class Main:
     def move_file(self, file, destination):
         """
         Move a file to a new destination. Returns True if the move succeeded, False otherwise.
-        
+
         Keyword arguments:
         file -- the file to be moved
         destination -- the new location of the file
         """
         try:
-            if os.path.exists(file) and os.path.exists(destination):
-                newfile = os.path.join(destination, os.path.basename(file))
-                shutil.move(file, newfile)
-                self.debug(__settings__.getLocalizedString(34003) % file)
-                return True
+            if xbmcvfs.exists(file) and xbmcvfs.exists(destination):
+                self.debug("Moving %s\nto %s\nNew path: %s" % (file, destination, os.path.join(destination, os.path.basename(file))))
+                if xbmcvfs.rename(file, os.path.join(destination, os.path.basename(file))):
+                    self.debug("File renaming success")
+                else:
+                    self.debug("Error renaming file")
+
+                    #newfile = os.path.join(destination, os.path.basename(file))
+                    #shutil.move(file, newfile)
+                    #self.debug(__settings__.getLocalizedString(34003) % file)
+                    #return True
             else:
-                if not os.path.exists(file):
+                if not xbmcvfs.exists(file):
                     self.notify(__settings__.getLocalizedString(34009) % file, 10000)
                 else:
                     self.notify(__settings__.getLocalizedString(34010) % destination, 10000)
@@ -428,7 +434,7 @@ class Main:
     def create_subdirectories(self, seasondir):
         """
         Create season as well as series directories in the folder specified.
-        
+
         Keyword arguments:
         seasondir -- the directory in which to create the folder(s)
         """
