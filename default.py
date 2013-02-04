@@ -80,10 +80,10 @@ class Main:
         Delete any watched videos from the XBMC video database.
         The videos to be deleted are subject to a number of criteria as can be specified in the addon's settings.
         """
-        self.debug(__settings__.getLocalizedString(34004))
+        self.debug("Starting cleaning routine")
 
         if self.deleteOnlyWhenIdle and xbmc.Player().isPlayingVideo():
-            self.debug(__settings__.getLocalizedString(34014))
+            self.debug("A video is currently being played. No cleaning will be performed during this interval.")
             return
 
         # TODO combine these functionalities into a single loop
@@ -98,8 +98,12 @@ class Main:
                     for abs_path in movies:
                         if xbmcvfs.exists(abs_path):
                             cleaning_required = True
-                            self.move_file(abs_path, self.holdingFolder) if self.holdingEnabled else self.delete_file(abs_path)
-                            count += 1
+                            if self.holdingEnabled:
+                                if self.move_file(abs_path, self.holdingFolder):
+                                    count += 1
+                            else:
+                                if self.delete_file(abs_path):
+                                    count += 1
                         else:
                             self.debug("XBMC could not find the file at %s" % abs_path)
                     summary += " %d %s(s)" % (count, self.MOVIES)
@@ -108,21 +112,19 @@ class Main:
                 episodes = self.get_expired(self.TVSHOWS)
                 if episodes:
                     count = 0
-                    for abs_path, show_name, season_number, idFile in episodes:
+                    for abs_path, idFile, show_name, season_number in episodes:
                         if xbmcvfs.exists(abs_path):
                             cleaning_required = True
                             if self.holdingEnabled:
                                 if self.createSubdirectories:
-                                    new_path = os.path.join(self.holdingFolder, show_name, os.sep, "Season " + season_number)
-                                    self.create_subdirectories(new_path)
+                                    new_path = os.path.join(self.holdingFolder, show_name, "Season " + season_number)
                                 else:
                                     new_path = self.holdingFolder
-                                moveOk = self.move_file(abs_path, new_path)
-                                if self.updatePaths and moveOk:
-                                    self.update_path_reference(idFile, new_path)
+                                if self.move_file(abs_path, new_path):
+                                    count += 1
                             else:
-                                self.delete_file(abs_path)
-                            count += 1
+                                if self.delete_file(abs_path):
+                                    count += 1
                         else:
                             self.debug("XBMC could not find the file at %s" % abs_path)
                     summary += " %d %s(s)" % (count, self.TVSHOWS)
@@ -134,8 +136,12 @@ class Main:
                     for abs_path in musicvideos:
                         if xbmcvfs.exists(abs_path):
                             cleaning_required = True
-                            self.move_file(abs_path, self.holdingFolder) if self.holdingEnabled else self.delete_file(abs_path)
-                            count += 1
+                            if self.holdingEnabled:
+                                if self.move_file(abs_path, self.holdingFolder):
+                                    count += 1
+                            else:
+                                if self.delete_file(abs_path):
+                                    count += 1
                         else:
                             self.debug("XBMC could not find the file at %s" % abs_path)
                     summary += " %d %s(s)" % (count, self.MUSIC_VIDEOS)
@@ -477,43 +483,6 @@ class Main:
         logs a debug message
         """
         if self.debuggingEnabled:
-            xbmc.log(__title__ + "::" + message)
-"""
-    def disable_autoexec(self):
+            xbmc.log(__title__ + ": " + message)
 
-        #Removes the autoexec line in special://home/userdata/autoexec.py
-        #Since version 2.0 this addon is run as a service. This line was needed in prior versions of the addon to allow for automatically starting the addon.
-        #If this line is not removed after updating to version 2.0, the script would be started twice.
-        #In short, this function allows for backward compatibility for updaters.
-
-        try:
-            # See if the autoexec.py file exists
-            if os.path.exists(AUTOEXEC_PATH):
-                found = False
-                autoexecfile = file(AUTOEXEC_PATH, "r")
-                filecontents = autoexecfile.readlines()
-                autoexecfile.close()
-
-                # Check if we're in it
-                for line in filecontents:
-                    if line.find(__addonID__) > 0:
-                       found = True
-                       __settings__.setSetting(id="remove_from_autoexec", value="true")
-
-                # Found that we're in it and it's time to remove ourselves
-                if found:
-                    autoexecfile = file(AUTOEXEC_PATH, "w")
-                    for line in filecontents:
-                        if not line.find(__addonID__) > 0:
-                            autoexecfile.write(line)
-                    autoexecfile.close()
-                    self.debug("The autostart script was successfully removed from %s" % AUTOEXEC_PATH)
-                else:
-                    self.debug("No need to remove the autostart script, as it was already removed from %s" % AUTOEXEC_PATH)
-
-                # Make sure the hidden setting is updated so that we do not keep checking it everytime we want to clean up
-                __settings__.setSetting(id="remove_from_autoexec", value="false")
-        except OSError, e:
-            self.debug("Removing the autostart script in %s failed with error code %d" % (AUTOEXEC_PATH, e.errno))
-"""
 run = Main()
