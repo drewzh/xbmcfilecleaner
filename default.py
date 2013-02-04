@@ -5,7 +5,6 @@ import sys
 import platform
 import time
 import re
-import errno
 import xbmc
 import xbmcaddon
 import xbmcvfs
@@ -18,10 +17,6 @@ __author__ = "Andrew Higginson <azhigginson@gmail.com>"
 __addonID__ = "script.filecleaner"
 __icon__ = "special://home/addons/" + __addonID__ + "/icon.png"
 __settings__ = xbmcaddon.Addon(__addonID__)
-
-# AutoExec info
-#AUTOEXEC_PATH = xbmc.translatePath("special://home/userdata/autoexec.py")
-#AUTOEXEC_SCRIPT = "import time;time.sleep(5);xbmc.executebuiltin('XBMC.RunScript(special://home/addons/script.filecleaner/default.py,-startup)')"
 
 class Main:
 
@@ -53,10 +48,6 @@ class Main:
 
         while not xbmc.abortRequested and self.deletingEnabled:
             self.reload_settings()
-
-            #if self.removeFromAutoExec:
-                #self.debug("Checking for presence of the old script in " + AUTOEXEC_PATH)
-                #self.disable_autoexec()
 
             if not self.deletingEnabled:
                 break
@@ -227,63 +218,6 @@ class Main:
             self.notify(__settings__.getLocalizedString(34002), 15000)
             msg = oe.args[0]
             self.debug("The following error occurred: '%s'" % msg)
-        finally:
-            cur.close()
-            con.close()
-
-    def update_path_reference(self, idFile, newPath):
-        # TODO: Evaluate the need for this method.
-        # If the video is moved out of XBMC's watched folders, it will not be playable and doesn't belong in XBMC.
-        # If it is moved inside, a database update will suffice.
-        """
-        Update file reference for a file
-
-        Keyword arguments:
-        idFile -- the id of the file to update the path reference for
-        newPath -- the new location for the file
-        """
-        try:
-            folder = os.listdir(xbmc.translatePath('special://database/'))
-            for database in folder:
-                # Check for any database of any XMBC version and use it for cleaning
-                # (e.g. MyVideos34.db / MyVideos60.db / MyVideos75.db)
-                if database.startswith('MyVideos') and database.endswith('.db'):
-                    con = connect(xbmc.translatePath('special://database/' + database))
-                    cur = con.cursor()
-
-                    # Insert path if it doesn't exist
-                    query = "INSERT OR IGNORE INTO"
-                    query += " path(strPath)"
-                    query += " values('%s/')" % newPath
-
-                    self.debug("Executing query on %s: %s" % (database, query))
-                    cur.execute(query)
-
-                    # Look up the id of the new path
-                    query = "SELECT idPath"
-                    query += " FROM path"
-                    query += " WHERE strPath = ('%s/')" % newPath
-
-                    self.debug("Executing " + str(query))
-                    cur.execute(query)
-                    idPath = cur.fetchone()[0]
-
-                    # Update path reference for the moved file
-                    query = "UPDATE OR IGNORE files"
-                    query += " SET idPath = %d" % idPath
-                    query += " WHERE idFile = %d" % idFile
-
-                    self.debug("Executing query on %s: %s" % (database, query))
-                    cur.execute(query)
-                    con.commit()
-        except OSError, e:
-            self.debug("Something went wrong while opening the database folder (errno: %d)" % e.errno)
-            raise
-        except OperationalError, oe:
-            # The video database(s) could not be opened, or the query was invalid
-            self.notify(__settings__.getLocalizedString(34002), 15000)
-            msg = oe.args[0]
-            self.debug(__settings__.getLocalizedString(34008) % msg)
         finally:
             cur.close()
             con.close()
