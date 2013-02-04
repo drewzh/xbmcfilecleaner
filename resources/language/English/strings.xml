@@ -51,7 +51,7 @@
     <string id="34004">Cleaning library</string>
     <string id="34005">Starting cleaner</string>
     <string id="34006">Deleted %s from %s</string>
-    <string id="34007">Service Disabled</string>
+    <string id="34007">Received an abort signal. Terminating.</string>
     <string id="34008">The following error occurred: '%s'</string>
     <string id="34009">Cannot move file %s as it doesn't exist</string>
     <string id="34010">Cannot move file, destination %s unavailable</string>

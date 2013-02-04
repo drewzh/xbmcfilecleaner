@@ -50,7 +50,7 @@
     <string id="34004">Bibliotheek opschonen</string>
     <string id="34005">Reiniger opgestart</string>
     <string id="34006">%s verwijderd uit %s</string>
-    <string id="34007">Service inactief</string>
+    <string id="34007">Stopsignaal ontvangen. Afsluiten.</string>
     <string id="34008">Er is een fout opgetreden: '%s'</string>
     <string id="34009">Verplaatsen van bestand mislukt. %s bestaat niet.</string>
     <string id="34010">Verplaatsen van bestand mislukt. Doelmap %s kan niet worden gevonden.</string>

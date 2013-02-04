@@ -29,42 +29,40 @@ class Main:
         """
         Create a Main object that performs regular cleaning of watched videos.
         """
-        # TODO: Modify the loop timing to use the system time in checking if an interval has passed
         self.reload_settings()
 
-        # TODO: By declaring these out of the cleaning loop, changes require a restart of XBMC
-        self.service_sleep = 10
-        scanInterval_ticker = self.scanInterval * 60 / self.service_sleep
-        delayedStart_ticker = self.delayedStart * 60 / self.service_sleep
+        service_sleep = 10
         ticker = 0
         delayed_completed = False
-
-        if self.deletingEnabled:
-            self.notify(__settings__.getLocalizedString(34005))
 
         # TODO should be removed: http://ziade.org/2008/01/08/syssetdefaultencoding-is-evil/
         reload(sys)
         sys.setdefaultencoding("utf-8")
 
-        while not xbmc.abortRequested and self.deletingEnabled:
+        while not xbmc.abortRequested:
             self.reload_settings()
 
+            scanInterval_ticker = self.scanInterval * 60 / service_sleep
+            delayedStart_ticker = self.delayedStart * 60 / service_sleep
+
             if not self.deletingEnabled:
-                break
+                continue
+            elif  not self.runAsService:
+                continue
+            else:
+                if delayed_completed and ticker >= scanInterval_ticker:
+                    self.cleanup()
+                    ticker = 0
+                elif not delayed_completed and ticker >= delayedStart_ticker:
+                    delayed_completed = True
+                    self.cleanup()
+                    ticker = 0
 
-            if delayed_completed == True and ticker == scanInterval_ticker:
-                self.cleanup()
-                ticker = 0
-            elif delayed_completed == False and ticker == delayedStart_ticker:
-                delayed_completed = True
-                self.cleanup()
-                ticker = 0
+                time.sleep(service_sleep)
+                ticker += 1
 
-            time.sleep(self.service_sleep)
-            ticker += 1
-
-        # Cleaning is disabled or abort is requested by XBMC, so do nothing
-        self.notify(__settings__.getLocalizedString(34007))
+        # Abort is requested by XBMC: terminate
+        self.debug(__settings__.getLocalizedString(34007))
 
     def cleanup(self):
         """
