@@ -26,9 +26,7 @@ class Main:
     TVSHOWS = "episode"
 
     def __init__(self):
-        """
-        Create a Main object that performs regular cleaning of watched videos.
-        """
+        """Create a Main object that performs regular cleaning of watched videos."""
         self.reload_settings()
 
         service_sleep = 10
@@ -42,13 +40,13 @@ class Main:
         while not xbmc.abortRequested:
             self.reload_settings()
 
-            scanInterval_ticker = self.scanInterval * 60 / service_sleep
-            delayedStart_ticker = self.delayedStart * 60 / service_sleep
+            scanInterval_ticker = self.scan_interval * 60 / service_sleep
+            delayedStart_ticker = self.delayed_start * 60 / service_sleep
 
-            if not self.deletingEnabled:
+            if not self.deleting_enabled:
                 continue
-            elif  not self.runAsService:
-                continue
+            #elif  not self.runAsService:
+                #continue
             else:
                 if delayed_completed and ticker >= scanInterval_ticker:
                     self.cleanup()
@@ -65,30 +63,29 @@ class Main:
         self.debug(__settings__.getLocalizedString(34007))
 
     def cleanup(self):
-        """
-        Delete any watched videos from the XBMC video database.
+        """Delete any watched videos from the XBMC video database.
         The videos to be deleted are subject to a number of criteria as can be specified in the addon's settings.
         """
         self.debug("Starting cleaning routine")
 
-        if self.deleteOnlyWhenIdle and xbmc.Player().isPlayingVideo():
+        if self.delete_when_idle and xbmc.Player().isPlayingVideo():
             self.debug("A video is currently being played. No cleaning will be performed during this interval.")
             return
 
         # TODO combine these functionalities into a single loop
-        if not self.deleteUponLowDiskSpace or (self.deleteUponLowDiskSpace and self.disk_space_low()):
+        if not self.delete_when_low_disk_space or (self.delete_when_low_disk_space and self.disk_space_low()):
             # create stub to summarize cleaning results
-            summary = "Deleted" if not self.holdingEnabled else "Moved"
+            summary = "Deleted" if not self.holding_enabled else "Moved"
             cleaning_required = False
-            if self.deleteMovies:
+            if self.delete_movies:
                 movies = self.get_expired(self.MOVIES)
                 if movies:
                     count = 0
                     for abs_path in movies:
                         if xbmcvfs.exists(abs_path):
                             cleaning_required = True
-                            if self.holdingEnabled:
-                                if self.move_file(abs_path, self.holdingFolder):
+                            if self.holding_enabled:
+                                if self.move_file(abs_path, self.holding_folder):
                                     count += 1
                             else:
                                 if self.delete_file(abs_path):
@@ -97,18 +94,18 @@ class Main:
                             self.debug("XBMC could not find the file at %s" % abs_path)
                     summary += " %d %s(s)" % (count, self.MOVIES)
 
-            if self.deleteTVShows:
+            if self.delete_tv_shows:
                 episodes = self.get_expired(self.TVSHOWS)
                 if episodes:
                     count = 0
                     for abs_path, idFile, show_name, season_number in episodes:
                         if xbmcvfs.exists(abs_path):
                             cleaning_required = True
-                            if self.holdingEnabled:
-                                if self.createSubdirectories:
-                                    new_path = os.path.join(self.holdingFolder, show_name, "Season " + season_number)
+                            if self.holding_enabled:
+                                if self.create_series_season_dirs:
+                                    new_path = os.path.join(self.holding_folder, show_name, "Season " + season_number)
                                 else:
-                                    new_path = self.holdingFolder
+                                    new_path = self.holding_folder
                                 if self.move_file(abs_path, new_path):
                                     count += 1
                             else:
@@ -118,15 +115,15 @@ class Main:
                             self.debug("XBMC could not find the file at %s" % abs_path)
                     summary += " %d %s(s)" % (count, self.TVSHOWS)
 
-            if self.deleteMusicVideos:
+            if self.delete_music_videos:
                 musicvideos = self.get_expired(self.MUSIC_VIDEOS)
                 if musicvideos:
                     count = 0
                     for abs_path in musicvideos:
                         if xbmcvfs.exists(abs_path):
                             cleaning_required = True
-                            if self.holdingEnabled:
-                                if self.move_file(abs_path, self.holdingFolder):
+                            if self.holding_enabled:
+                                if self.move_file(abs_path, self.holding_folder):
                                     count += 1
                             else:
                                 if self.delete_file(abs_path):
@@ -140,13 +137,13 @@ class Main:
                 self.notify(summary)
 
             # Finally clean the library to account for any deleted videos.
-            if self.cleanLibrary and cleaning_required:
+            if self.clean_xbmc_library and cleaning_required:
                 # Wait 10 seconds for deletions to finish before cleaning.
                 time.sleep(10)
 
                 pause = 5
                 iterations = 0
-                limit = self.scanInterval - pause
+                limit = self.scan_interval - pause
                 # Check if the library is being updated before cleaning up
                 while xbmc.getCondVisibility("Library.IsScanningVideo"):
                     iterations += 1
@@ -162,8 +159,7 @@ class Main:
                 xbmc.executebuiltin("XBMC.CleanLibrary(video)")
 
     def get_expired(self, option):
-        """
-        Retrieve a list of episodes that have been watched and match any criteria set in the addon's settings.
+        """Retrieve a list of episodes that have been watched and match any criteria set in the addon's settings.
 
         Keyword arguments:
         option -- the type of videos to remove, can be one of the constants MOVIES, TVSHOWS or MUSIC_VIDEOS
@@ -180,16 +176,16 @@ class Main:
         query += " FROM %sview" % option # episodeview, movieview or musicvideoview
         query += " WHERE playCount > 0"
 
-        if self.holdingEnabled:
-            query += " AND NOT strPath like '%s%%'" % self.holdingFolder
+        if self.holding_enabled:
+            query += " AND NOT strPath like '%s%%'" % self.holding_folder
 
-        if self.enableExpiration:
-            query += " AND files.lastPlayed < datetime('now', '-%d days', 'localtime')" % self.expireAfter
+        if self.enable_expiration:
+            query += " AND files.lastPlayed < datetime('now', '-%d days', 'localtime')" % self.expire_after
 
-        if self.deleteOnlyLowRated and option is not self.MUSIC_VIDEOS:
+        if self.delete_when_low_rated and option is not self.MUSIC_VIDEOS:
             column = "c05" if option is self.MOVIES else "c03"
-            query += " AND %s BETWEEN %f AND %f" % (column, (margin if self.ignoreNoRating else 0), self.minimumRating - margin)
-            if self.minimumRating != 10.000000:
+            query += " AND %s BETWEEN %f AND %f" % (column, (margin if self.ignore_no_rating else 0), self.minimum_rating - margin)
+            if self.minimum_rating != 10.000000:
                 # somehow 10.000000 is considered to be between 0.000001 and x.999999
                 query += " AND %s <> 10.000000" % column
 
@@ -221,45 +217,39 @@ class Main:
             con.close()
 
     def reload_settings(self):
-        """
-        Retrieve new values for all settings, in order to account for any recent changes.
-        """
+        """Retrieve new values for all settings, in order to account for any recent changes."""
         __settings__ = xbmcaddon.Addon(__addonID__)
 
-        self.deletingEnabled = bool(__settings__.getSetting("service_enabled") == "true")
-        self.delayedStart = float(__settings__.getSetting("delayed_start"))
-        self.scanInterval = float(__settings__.getSetting("scan_interval"))
+        self.deleting_enabled = bool(__settings__.getSetting("deleting_enabled") == "true")
+        self.delayed_start = float(__settings__.getSetting("delayed_start"))
+        self.scan_interval = float(__settings__.getSetting("scan_interval"))
 
-        self.notificationsEnabled = bool(__settings__.getSetting("show_notifications") == "true")
-        self.debuggingEnabled = bool(xbmc.translatePath(__settings__.getSetting("enable_debug")) == "true")
-        self.deleteOnlyWhenIdle = bool(xbmc.translatePath(__settings__.getSetting("delete_only_when_idle")) == "true")
+        self.notifications_enabled = bool(__settings__.getSetting("notifications_enabled") == "true")
+        self.debugging_enabled = bool(xbmc.translatePath(__settings__.getSetting("debugging_enabled")) == "true")
 
-        self.enableExpiration = bool(__settings__.getSetting("enable_expire") == "true")
-        self.expireAfter = float(__settings__.getSetting("expire_after"))
+        self.clean_xbmc_library = bool(__settings__.getSetting("clean_xbmc_library") == "true")
+        self.delete_movies = bool(__settings__.getSetting("delete_movies") == "true")
+        self.delete_tv_shows = bool(__settings__.getSetting("delete_tv_shows") == "true")
+        self.delete_music_videos = bool(__settings__.getSetting("delete_music_videos") == "true")
+        self.delete_when_idle = bool(xbmc.translatePath(__settings__.getSetting("delete_when_idle")) == "true")
 
-        self.deleteOnlyLowRated = bool(__settings__.getSetting("delete_low_rating") == "true")
-        self.minimumRating = float(__settings__.getSetting("low_rating_figure"))
-        self.ignoreNoRating = bool(__settings__.getSetting("ignore_no_rating") == "true")
+        self.enable_expiration = bool(__settings__.getSetting("enable_expiration") == "true")
+        self.expire_after = float(__settings__.getSetting("expire_after"))
 
-        self.deleteUponLowDiskSpace = bool(__settings__.getSetting("delete_on_low_disk") == "true")
-        self.diskSpaceThreshold = float(__settings__.getSetting("low_disk_percentage"))
-        self.diskSpacePath = xbmc.translatePath(__settings__.getSetting("low_disk_path"))
+        self.delete_when_low_rated = bool(__settings__.getSetting("delete_when_low_rated") == "true")
+        self.minimum_rating = float(__settings__.getSetting("minimum_rating"))
+        self.ignore_no_rating = bool(__settings__.getSetting("ignore_no_rating") == "true")
 
-        self.cleanLibrary = bool(__settings__.getSetting("clean_library") == "true")
-        self.deleteMovies = bool(__settings__.getSetting("delete_movies") == "true")
-        self.deleteTVShows = bool(__settings__.getSetting("delete_tvshows") == "true")
-        self.deleteMusicVideos = bool(__settings__.getSetting("delete_musicvideos") == "true")
+        self.delete_when_low_disk_space = bool(__settings__.getSetting("delete_when_low_disk_space") == "true")
+        self.disk_space_threshold = float(__settings__.getSetting("disk_space_threshold"))
+        self.disk_space_check_path = xbmc.translatePath(__settings__.getSetting("disk_space_check_path"))
 
-        self.holdingEnabled = bool(__settings__.getSetting("enable_holding") == "true")
-        self.holdingFolder = xbmc.translatePath(__settings__.getSetting("holding_folder"))
-        self.createSubdirectories = bool(xbmc.translatePath(__settings__.getSetting("create_series_season_dirs")) == "true")
-        self.updatePaths = bool(xbmc.translatePath(__settings__.getSetting("update_path_reference")) == "true")
-
-        #self.removeFromAutoExec = bool(xbmc.translatePath(__settings__.getSetting("remove_from_autoexec")) != "false")
+        self.holding_enabled = bool(__settings__.getSetting("holding_enabled") == "true")
+        self.holding_folder = xbmc.translatePath(__settings__.getSetting("holding_folder"))
+        self.create_series_season_dirs = bool(xbmc.translatePath(__settings__.getSetting("create_series_season_dirs")) == "true")
 
     def get_free_disk_space(self, path):
-        """
-        Determine the percentage of free disk space.
+        """Determine the percentage of free disk space.
 
         Keyword arguments:
         path -- the path to the drive to check (this can be any path of any length on the desired drive).
@@ -314,7 +304,7 @@ class Main:
                     percentage = float(diskstats.f_bfree / diskstats.f_blocks * float(100))
                     self.debug("Hard disk checks returned the following results:\n%s: %f\n%s: %f\n%s: %f" % ("free blocks", diskstats.f_bfree, "total blocks", diskstats.f_blocks, "percentage", percentage))
                 except OSError, e:
-                    self.notify(__settings__.getLocalizedString(34012) % self.diskSpacePath)
+                    self.notify(__settings__.getLocalizedString(34012) % self.disk_space_check_path)
                 except ZeroDivisionError, zde:
                     self.notify(__settings__.getLocalizedString(34011), 15000)
         else:
@@ -323,29 +313,23 @@ class Main:
         return percentage
 
     def disk_space_low(self):
-        """
-        Check if the disk is running low on free space.
+        """Check if the disk is running low on free space.
         Returns true if the free space is less than the threshold specified in the addon's settings.
         :rtype : Boolean
         """
-        return self.get_free_disk_space(self.diskSpacePath) <= self.diskSpaceThreshold
+        return self.get_free_disk_space(self.disk_space_check_path) <= self.disk_space_threshold
 
     def delete_file(self, file):
-        """
-        Delete a file from the file system.
-        """
+        """Delete a file from the file system."""
         self.debug("Deleting file at %s" % file)
         if xbmcvfs.exists(file):
-            if xbmcvfs.delete(file):
-                self.debug("Deleted file at %s" % file)
-            else:
-                self.debug("Deleting file %s failed" % file)
+            return xbmcvfs.delete(file)
         else:
             self.debug("XBMC could not find the file at %s" % file)
+            return False
 
     def move_file(self, source, destination):
-        """
-        Move a file to a new destination. Returns True if the move succeeded, False otherwise.
+        """Move a file to a new destination. Returns True if the move succeeded, False otherwise.
         Will create destination if it does not exist.
 
         Keyword arguments:
@@ -370,8 +354,7 @@ class Main:
             return False
 
     def notify(self, message, duration=5000, image=__icon__):
-        """
-        Display an XBMC notification and log the message.
+        """Display an XBMC notification and log the message.
 
         Keyword arguments:
         message -- the message to be displayed and logged
@@ -379,14 +362,12 @@ class Main:
         image -- the path to the image to be displayed on the notification (default "icon.png")
         """
         self.debug(message)
-        if self.notificationsEnabled:
+        if self.notifications_enabled:
             xbmc.executebuiltin("XBMC.Notification(%s, %s, %s, %s)" % (__title__, message, duration, image))
 
     def debug(self, message):
-        """
-        logs a debug message
-        """
-        if self.debuggingEnabled:
+        """logs a debug message"""
+        if self.debugging_enabled:
             xbmc.log(__title__ + ": " + message)
 
 run = Main()
