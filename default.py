@@ -82,6 +82,7 @@ class Main:
                 if movies:
                     count = 0
                     for abs_path in movies:
+                        abs_path = str(*abs_path) # Convert 1 element tuple into string with scatter
                         if xbmcvfs.exists(abs_path):
                             cleaning_required = True
                             if self.holding_enabled:
@@ -120,6 +121,7 @@ class Main:
                 if musicvideos:
                     count = 0
                     for abs_path in musicvideos:
+                        abs_path = str(*abs_path) # Convert 1 element tuple into string with scatter
                         if xbmcvfs.exists(abs_path):
                             cleaning_required = True
                             if self.holding_enabled:
