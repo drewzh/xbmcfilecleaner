@@ -18,8 +18,8 @@ __addonID__ = "script.filecleaner"
 __icon__ = "special://home/addons/" + __addonID__ + "/icon.png"
 __settings__ = xbmcaddon.Addon(__addonID__)
 
-class Main:
 
+class Main:
     # Constants to ensure correct SQL queries
     MOVIES = "movie"
     MUSIC_VIDEOS = "musicvideo"
@@ -45,7 +45,7 @@ class Main:
 
             if not self.deleting_enabled:
                 continue
-            #elif  not self.runAsService:
+                #elif  not self.runAsService:
                 #continue
             else:
                 if delayed_completed and ticker >= scanInterval_ticker:
@@ -82,7 +82,7 @@ class Main:
                 if movies:
                     count = 0
                     for abs_path in movies:
-                        abs_path = str(*abs_path) # Convert 1 element tuple into string with scatter
+                        abs_path = str(*abs_path)  # Convert 1 element tuple into string with scatter
                         if xbmcvfs.exists(abs_path):
                             cleaning_required = True
                             if self.holding_enabled:
@@ -121,7 +121,7 @@ class Main:
                 if musicvideos:
                     count = 0
                     for abs_path in musicvideos:
-                        abs_path = str(*abs_path) # Convert 1 element tuple into string with scatter
+                        abs_path = str(*abs_path)  # Convert 1 element tuple into string with scatter
                         if xbmcvfs.exists(abs_path):
                             cleaning_required = True
                             if self.holding_enabled:
@@ -155,7 +155,8 @@ class Main:
                         iterations = 0
                         break
 
-                    self.debug("The video library is currently being updated, waiting %d minutes before cleaning up." % pause)
+                    self.debug(
+                        "The video library is currently being updated, waiting %d minutes before cleaning up." % pause)
                     time.sleep(pause * 60)
 
                 xbmc.executebuiltin("XBMC.CleanLibrary(video)")
@@ -175,18 +176,19 @@ class Main:
         query = "SELECT strPath || strFilename as FullPath"
         if option == "episode":
             query += ", idFile, strTitle as Show, c12 as Season"
-        query += " FROM %sview" % option # episodeview, movieview or musicvideoview
+        query += " FROM %sview" % option  # episodeview, movieview or musicvideoview
         query += " WHERE playCount > 0"
 
         if self.holding_enabled:
             query += " AND NOT strPath like '%s%%'" % self.holding_folder
 
         if self.enable_expiration:
-            query += " AND files.lastPlayed < datetime('now', '-%d days', 'localtime')" % self.expire_after
+            query += " AND lastPlayed < datetime('now', '-%d days', 'localtime')" % self.expire_after
 
         if self.delete_when_low_rated and option is not self.MUSIC_VIDEOS:
             column = "c05" if option is self.MOVIES else "c03"
-            query += " AND %s BETWEEN %f AND %f" % (column, (margin if self.ignore_no_rating else 0), self.minimum_rating - margin)
+            query += " AND %s BETWEEN %f AND %f" % \
+                     (column, (margin if self.ignore_no_rating else 0), self.minimum_rating - margin)
             if self.minimum_rating != 10.000000:
                 # somehow 10.000000 is considered to be between 0.000001 and x.999999
                 query += " AND %s <> 10.000000" % column
@@ -248,7 +250,8 @@ class Main:
 
         self.holding_enabled = bool(__settings__.getSetting("holding_enabled") == "true")
         self.holding_folder = xbmc.translatePath(__settings__.getSetting("holding_folder"))
-        self.create_series_season_dirs = bool(xbmc.translatePath(__settings__.getSetting("create_series_season_dirs")) == "true")
+        self.create_series_season_dirs = bool(
+            xbmc.translatePath(__settings__.getSetting("create_series_season_dirs")) == "true")
 
     def get_free_disk_space(self, path):
         """Determine the percentage of free disk space.
@@ -259,7 +262,7 @@ class Main:
         """
         percentage = 100
         self.debug("path is: " + path)
-        if os.path.exists(path) or r"://" in path: #os.path.exists() doesn't work for non-UNC network paths
+        if os.path.exists(path) or r"://" in path:  # os.path.exists() doesn't work for non-UNC network paths
             if platform.system() == "Windows":
                 self.debug("We are checking disk space from a Windows file system")
                 self.debug("Stripping " + path + " of all redundant stuff.")
@@ -270,7 +273,8 @@ class Main:
                     pattern = re.compile("(?P<protocol>smb|nfs)://(?P<user>\w+):(?P<pass>[\w\-]+)@(?P<host>\w+)", re.I)
                     match = pattern.match(path)
                     share = match.groupdict()
-                    self.debug("Regex result:\nprotocol: %s\nuser: %s\npass: %s\nhost: %s" % (share['protocol'], share['user'], share['pass'], share['host']))
+                    self.debug("Regex result:\nprotocol: %s\nuser: %s\npass: %s\nhost: %s" %
+                               (share['protocol'], share['user'], share['pass'], share['host']))
                     path = path[match.end():]
                     self.debug("Creating UNC paths, so Windows understands the shares, result:\n" + path)
                     path = os.path.normcase(r"\\" + share["host"] + path)
@@ -284,15 +288,18 @@ class Main:
                 totalNumberOfBytes = c_ulonglong(0)
                 totalNumberOfFreeBytes = c_ulonglong(0)
 
-                # GetDiskFreeSpaceEx explained: http://msdn.microsoft.com/en-us/library/windows/desktop/aa364937(v=vs.85).aspx
-                windll.kernel32.GetDiskFreeSpaceExW(c_wchar_p(path), pointer(totalNumberOfBytes), pointer(totalNumberOfFreeBytes), None)
+                # GetDiskFreeSpaceEx explained:
+                # http://msdn.microsoft.com/en-us/library/windows/desktop/aa364937(v=vs.85).aspx
+                windll.kernel32.GetDiskFreeSpaceExW(c_wchar_p(path), pointer(totalNumberOfBytes),
+                                                    pointer(totalNumberOfFreeBytes), None)
 
                 free = float(totalNumberOfBytes.value)
                 capacity = float(totalNumberOfFreeBytes.value)
 
                 try:
                     percentage = float(free / capacity * float(100))
-                    self.debug("Hard disk checks returned the following results:\n%s: %f\n%s: %f\n%s: %f" % ("free", free, "capacity", capacity, "percentage", percentage))
+                    self.debug("Hard disk checks returned the following results:\n%s: %f\n%s: %f\n%s: %f" %
+                               ("free", free, "capacity", capacity, "percentage", percentage))
                 except ZeroDivisionError, e:
                     self.notify(__settings__.getLocalizedString(34011), 15000)
             else:
@@ -304,7 +311,8 @@ class Main:
                 try:
                     diskstats = os.statvfs(path)
                     percentage = float(diskstats.f_bfree / diskstats.f_blocks * float(100))
-                    self.debug("Hard disk checks returned the following results:\n%s: %f\n%s: %f\n%s: %f" % ("free blocks", diskstats.f_bfree, "total blocks", diskstats.f_blocks, "percentage", percentage))
+                    self.debug("Hard disk checks returned the following results:\n%s: %f\n%s: %f\n%s: %f" % (
+                        "free blocks", diskstats.f_bfree, "total blocks", diskstats.f_blocks, "percentage", percentage))
                 except OSError, e:
                     self.notify(__settings__.getLocalizedString(34012) % self.disk_space_check_path)
                 except ZeroDivisionError, zde:
@@ -321,13 +329,13 @@ class Main:
         """
         return self.get_free_disk_space(self.disk_space_check_path) <= self.disk_space_threshold
 
-    def delete_file(self, file):
+    def delete_file(self, location):
         """Delete a file from the file system."""
-        self.debug("Deleting file at %s" % file)
-        if xbmcvfs.exists(file):
-            return xbmcvfs.delete(file)
+        self.debug("Deleting file at %s" % location)
+        if xbmcvfs.exists(location):
+            return xbmcvfs.delete(location)
         else:
-            self.debug("XBMC could not find the file at %s" % file)
+            self.debug("XBMC could not find the file at %s" % location)
             return False
 
     def move_file(self, source, destination):
@@ -349,7 +357,8 @@ class Main:
                     self.debug("XBMC could not create destination %s" % destination)
                     return False
 
-            self.debug("Moving %s\nto %s\nNew path: %s" % (source, destination, os.path.join(destination, os.path.basename(source))))
+            self.debug("Moving %s\nto %s\nNew path: %s" %
+                       (source, destination, os.path.join(destination, os.path.basename(source))))
             return xbmcvfs.rename(source, os.path.join(destination, os.path.basename(source)))
         else:
             self.debug("XBMC could not find the file at %s" % source)
@@ -371,5 +380,6 @@ class Main:
         """logs a debug message"""
         if self.debugging_enabled:
             xbmc.log(__title__ + ": " + message)
+
 
 run = Main()
