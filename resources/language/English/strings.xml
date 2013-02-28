@@ -13,13 +13,14 @@
     <string id="31004">Scan interval (in minutes)</string>
     
     <string id="31005">Show notifications</string>
-    <string id="31006">Enable debug messages</string>
+    <string id="31006">Do not show notifications during video playback</string>
+    <string id="31007">Enable debug messages</string>
     
-    <string id="31007">Clean video library after deleting</string>
-    <string id="31008">Delete movies</string>
-    <string id="31009">Delete TV shows</string>
-    <string id="31010">Delete music videos</string>
-    <string id="31011">Do not clean during video playback</string>
+    <string id="31008">Clean video library after deleting</string>
+    <string id="31009">Delete movies</string>
+    <string id="31010">Delete TV shows</string>
+    <string id="31011">Delete music videos</string>
+    <string id="31012">Do not clean during video playback</string>
 
 
     <!-- Conditions -->

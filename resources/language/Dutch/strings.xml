@@ -13,13 +13,14 @@
     <string id="31004">Scan-interval (in minuten)</string>
     
     <string id="31005">Toon notificaties</string>
-    <string id="31006">Toon debuginformatie</string>
+    <string id="31006">Toon geen notificaties als er video afgespeeld wordt</string>
+    <string id="31007">Toon debuginformatie</string>
     
-    <string id="31007">Videobibliotheek opschonen na verwijderen</string>
-    <string id="31008">Verwijder films</string>
-    <string id="31009">Verwijder TV series</string>
-    <string id="31010">Verwijder videoclips</string>
-    <string id="31011">Maak niet schoon als er video afgespeeld wordt</string>
+    <string id="31008">Videobibliotheek opschonen na verwijderen</string>
+    <string id="31009">Verwijder films</string>
+    <string id="31010">Verwijder TV series</string>
+    <string id="31011">Verwijder videoclips</string>
+    <string id="31012">Maak niet schoon als er video afgespeeld wordt</string>
     
     
     <!-- Criteria -->

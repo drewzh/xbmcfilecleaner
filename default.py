@@ -229,6 +229,7 @@ class Main:
         self.scan_interval = float(__settings__.getSetting("scan_interval"))
 
         self.notifications_enabled = bool(__settings__.getSetting("notifications_enabled") == "true")
+        self.notify_when_idle = bool(__settings__.getSetting("notify_when_idle") == "true")
         self.debugging_enabled = bool(xbmc.translatePath(__settings__.getSetting("debugging_enabled")) == "true")
 
         self.clean_xbmc_library = bool(__settings__.getSetting("clean_xbmc_library") == "true")
@@ -374,6 +375,8 @@ class Main:
         """
         self.debug(message)
         if self.notifications_enabled:
+            if self.notify_when_idle and xbmc.Player().isPlayingVideo():
+                return
             xbmc.executebuiltin("XBMC.Notification(%s, %s, %s, %s)" % (__title__, message, duration, image))
 
     def debug(self, message):
