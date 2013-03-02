@@ -93,7 +93,8 @@ class Main:
                                     count += 1
                         else:
                             self.debug("XBMC could not find the file at %s" % abs_path)
-                    summary += " %d %s(s)" % (count, self.MOVIES)
+                    if count > 0:
+                        summary += " %d %s(s)" % (count, self.MOVIES)
 
             if self.delete_tv_shows:
                 episodes = self.get_expired(self.TVSHOWS)
@@ -114,7 +115,8 @@ class Main:
                                     count += 1
                         else:
                             self.debug("XBMC could not find the file at %s" % abs_path)
-                    summary += " %d %s(s)" % (count, self.TVSHOWS)
+                    if count > 0:
+                        summary += " %d %s(s)" % (count, self.TVSHOWS)
 
             if self.delete_music_videos:
                 musicvideos = self.get_expired(self.MUSIC_VIDEOS)
@@ -132,7 +134,8 @@ class Main:
                                     count += 1
                         else:
                             self.debug("XBMC could not find the file at %s" % abs_path)
-                    summary += " %d %s(s)" % (count, self.MUSIC_VIDEOS)
+                    if count > 0:
+                        summary += " %d %s(s)" % (count, self.MUSIC_VIDEOS)
 
             # Give a status report if any deletes occurred
             if not (summary.endswith("ed")):
