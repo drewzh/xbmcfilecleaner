@@ -5,11 +5,14 @@ import sys
 import platform
 import time
 import re
+import json
+from ctypes import c_wchar_p, c_ulonglong, pointer, windll
+from sqlite3 import connect, OperationalError
+
 import xbmc
 import xbmcaddon
 import xbmcvfs
-from ctypes import c_wchar_p, c_ulonglong, pointer, windll
-from sqlite3 import connect, OperationalError
+
 
 # Addon info
 __title__ = "XBMC File Cleaner"
@@ -119,11 +122,11 @@ class Main:
                         summary += " %d %s(s)" % (count, self.TVSHOWS)
 
             if self.delete_music_videos:
-                musicvideos = self.get_expired(self.MUSIC_VIDEOS)
+                musicvideos = self.get_expired_videos(self.MUSIC_VIDEOS)  # self.get_expired(self.MUSIC_VIDEOS)
                 if musicvideos:
                     count = 0
                     for abs_path in musicvideos:
-                        abs_path = str(*abs_path)  # Convert 1 element tuple into string with scatter
+                        # abs_path = str(*abs_path)  # Convert 1 element tuple into string with scatter
                         if xbmcvfs.exists(abs_path):
                             cleaning_required = True
                             if self.holding_enabled:
@@ -163,6 +166,165 @@ class Main:
                     time.sleep(pause * 60)
 
                 xbmc.executebuiltin("XBMC.CleanLibrary(video)")
+
+    def get_expired_videos(self, option):
+        """Launch a JSON-RPC to find expired musicvideos
+        http://wiki.xbmc.org/index.php?title=JSON-RPC_API/v4#VideoLibrary.GetMusicVideos
+        """
+        movie_filter_fields = ["title", "plot", "plotoutline", "tagline", "votes", "rating", "time", "writers",
+                               "playcount", "lastplayed", "inprogress", "genre", "country", "year", "director",
+                               "actor", "mpaarating", "top250", "studio", "hastrailer", "filename", "path", "set",
+                               "tag", "dateadded", "videoresolution", "audiochannels", "videocodec", "audiocodec",
+                               "audiolanguage", "subtitlelanguage", "videoaspect", "playlist"],
+
+        episode_filter_fields = ["title", "tvshow", "plot", "votes", "rating", "time", "writers", "airdate",
+                                 "playcount", "lastplayed", "inprogress", "genre", "year", "director", "actor",
+                                 "episode", "season", "filename", "path", "studio", "mpaarating", "dateadded",
+                                 "videoresolution", "audiochannels", "videocodec", "audiocodec", "audiolanguage",
+                                 "subtitlelanguage", "videoaspect", "playlist"]
+
+        musicvideo_filter_fields = ["title", "genre", "album", "year", "artist", "filename", "path", "playcount",
+                                    "lastplayed", "time", "director", "studio", "plot", "dateadded", "videoresolution",
+                                    "audiochannels", "videocodec", "audiocodec", "audiolanguage", "subtitlelanguage",
+                                    "videoaspect", "playlist"]
+
+        operators = ["contains", "doesnotcontain", "is", "isnot", "startswith", "endswith", "greaterthan", "lessthan",
+                     "after", "before", "inthelast", "notinthelast", "true", "false", "between"]
+
+        # A non-exhaustive list of pre-defined filters to use during JSON-RPC requests
+        by_playcount = {"field": "playcount", "operator": "greaterthan", "value": "0"}
+        by_date_played = {"field": "lastplayed", "operator": "notinthelast", "value": "7 days"}
+        by_date_added = {"field": "dateadded", "operator": "notinthelast", "value": "7 days"}
+        by_rating = {"field": "rating", "operator": "lessthan", "value": "%d" % self.minimum_rating}
+        by_artist = {"field": "artist", "operator": "contains", "value": "Muse"}
+
+        # link settings and filters together
+        link_settings_and_filters = [
+            (self.expire_after, by_date_played),
+            (self.minimum_rating, by_rating)
+        ]
+
+        if option is self.MUSIC_VIDEOS:
+            method = "VideoLibrary.GetMusicVideos"
+        elif option is self.MOVIES:
+            method = "VideoLibrary.GetMovies"
+        elif option is self.TVSHOWS:
+            method = "VideoLibrary.GetEpisodes"
+        else:
+            self.debug("[JSON-RPC] method not supported: %s" % option)
+            return []
+
+        fields = ["playcount", "lastplayed", "file", "resume"]
+        filters = {"and": [by_playcount, by_artist]}
+
+        request = {
+            "jsonrpc": "2.0",
+            "method": method,
+            "params": {
+                "properties": fields,
+                "filter": filters
+            },
+            "id": 1
+        }
+
+        rpc_cmd = json.dumps(request)
+        response = xbmc.executeJSONRPC(rpc_cmd)
+        self.debug("[VideoLibrary.GetMusicVideos] " + response)
+        result = json.loads(response)
+
+        try:
+            error = result["error"]
+            return None
+        except KeyError, ke:
+            if "error" in ke:
+                pass  # no error
+
+        good_result = {
+            "id": 1,
+            "jsonrpc": "2.0",
+            "result": {
+                "limits": {
+                    "end": 1,
+                    "start": 0,
+                    "total": 1
+                },
+                "musicvideos": [
+                    {
+                        "file": "E:\\Downloads\\Music Videos\\Biffy Clyro - That Golden Rule.mp4",
+                        "label": "That Golden Rule",
+                        "lastplayed": "",
+                        "musicvideoid": 3,
+                        "playcount": 0,
+                        "resume": {
+                            "position": 0,
+                            "total": 0
+                        }
+                    }
+                ]
+            }
+        }
+
+        self.debug("Building list of expired videos")
+        expired_videos = []
+        response = result["result"]
+        try:
+            self.debug("Found %d watched musicvideo(s) matching the selected conditions" % response["limits"]["total"])
+            for video in response[option]:
+                expired_videos.append(video["file"])
+        except KeyError, ke:
+            if option in ke:
+                pass  # no expired videos
+            else:
+                self.handle_json_error()
+                raise
+        finally:
+            return expired_videos
+
+    def handle_json_error(self, error):
+        """If a JSON-RPC request results in an error, this function will handle it."""
+        error_format = {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "required": True
+                },
+                "message": {
+                    "type": "string",
+                    "required": True
+                },
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "method": {
+                            "type": "string",
+                            "required": True
+                        },
+                        "stack": {
+                            "type": "object",
+                            "id": "Error.Stack",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "required": True
+                                },
+                                "type": {
+                                    "type": "string",
+                                    "required": True
+                                },
+                                "message": {
+                                    "type": "string",
+                                    "required": True
+                                },
+                                "property": {
+                                    "$ref": "Error.Stack"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
     def get_expired(self, option):
         """Retrieve a list of episodes that have been watched and match any criteria set in the addon's settings.
