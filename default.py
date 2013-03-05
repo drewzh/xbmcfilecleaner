@@ -26,7 +26,7 @@ class Main:
     # Constants to ensure correct SQL queries
     MOVIES = "movie"
     MUSIC_VIDEOS = "musicvideo"
-    TVSHOWS = "episode"
+    TVSHOWS = "episodes"
 
     def __init__(self):
         """Create a Main object that performs regular cleaning of watched videos."""
@@ -100,15 +100,15 @@ class Main:
                         summary += " %d %s(s)" % (count, self.MOVIES)
 
             if self.delete_tv_shows:
-                episodes = self.get_expired(self.TVSHOWS)
+                episodes = self.get_expired_videos(self.TVSHOWS)
                 if episodes:
                     count = 0
-                    for abs_path, idFile, show_name, season_number in episodes:
+                    for abs_path, show_name, season_number in episodes:
                         if xbmcvfs.exists(abs_path):
                             cleaning_required = True
                             if self.holding_enabled:
                                 if self.create_series_season_dirs:
-                                    new_path = os.path.join(self.holding_folder, show_name, "Season " + season_number)
+                                    new_path = os.path.join(self.holding_folder, show_name, "Season %d" % season_number)
                                 else:
                                     new_path = self.holding_folder
                                 if self.move_file(abs_path, new_path):
@@ -173,6 +173,8 @@ class Main:
         To test:
         http://localhost:8000/jsonrpc?request=...
         """
+
+        # Maybe we should move this to the globals
         movie_filter_fields = ["title", "plot", "plotoutline", "tagline", "votes", "rating", "time", "writers",
                                "playcount", "lastplayed", "inprogress", "genre", "country", "year", "director",
                                "actor", "mpaarating", "top250", "studio", "hastrailer", "filename", "path", "set",
@@ -190,21 +192,24 @@ class Main:
                                     "audiochannels", "videocodec", "audiocodec", "audiolanguage", "subtitlelanguage",
                                     "videoaspect", "playlist"]
 
+        supported_filter_fields = {
+            self.TVSHOWS: episode_filter_fields,
+            self.MOVIES: movie_filter_fields,
+            self.MUSIC_VIDEOS: musicvideo_filter_fields
+        }
+
         operators = ["contains", "doesnotcontain", "is", "isnot", "startswith", "endswith", "greaterthan", "lessthan",
                      "after", "before", "inthelast", "notinthelast", "true", "false", "between"]
 
-        if option is self.MUSIC_VIDEOS:
-            method = "VideoLibrary.GetMusicVideos"
-        elif option is self.MOVIES:
-            method = "VideoLibrary.GetMovies"
-        elif option is self.TVSHOWS:
-            method = "VideoLibrary.GetEpisodes"
-        else:
-            self.debug("[JSON-RPC] method not supported: %s" % option)
-            return []
+        methods = {
+            self.TVSHOWS: "VideoLibrary.GetEpisodes",
+            self.MOVIES: "VideoLibrary.GetMovies",
+            self.MUSIC_VIDEOS: "VideoLibrary.GetMusicVideos"
+        }
 
         # A non-exhaustive list of pre-defined filters to use during JSON-RPC requests
         # These are possible conditions that must be met before a video can be deleted
+        # Maybe we should move this into a separate function
         by_playcount = {"field": "playcount", "operator": "greaterthan", "value": "0"}
         by_date_played = {"field": "lastplayed", "operator": "notinthelast", "value": "7 days"}  # TODO add GUI setting
         by_date_added = {"field": "dateadded", "operator": "notinthelast", "value": "%d" % self.expire_after}
@@ -221,17 +226,22 @@ class Main:
 
         enabled_filters = [by_playcount]
         for s, f in settings_and_filters:
-            if s:
+            if s and f["field"] in supported_filter_fields[option]:
                 enabled_filters.append(f)
 
-        fields = ["playcount", "lastplayed", "file", "resume"]
+        required_fields = {
+            self.TVSHOWS: ["file", "showtitle", "season"],
+            self.MOVIES: ["file"],
+            self.MUSIC_VIDEOS: ["file"]
+        }
+
         filters = {"and": enabled_filters}
 
         request = {
             "jsonrpc": "2.0",
-            "method": method,
+            "method": methods[option],
             "params": {
-                "properties": fields,
+                "properties": required_fields[option],
                 "filter": filters
             },
             "id": 1
@@ -239,7 +249,7 @@ class Main:
 
         rpc_cmd = json.dumps(request)
         response = xbmc.executeJSONRPC(rpc_cmd)
-        self.debug("[" + method + "] " + response)
+        self.debug("[" + methods[option] + "] " + response)
         result = json.loads(response)
 
         try:
@@ -278,16 +288,23 @@ class Main:
         expired_videos = []
         response = result["result"]
         try:
-            self.debug("Found %d watched musicvideo(s) matching the selected conditions" % response["limits"]["total"])
+            self.debug("Found %d watched %s(s) matching your conditions" % (response["limits"]["total"], option))
+            self.debug("JSON Response: " + str(response))
             for video in response[option]:
-                expired_videos.append(video["file"])
+                if option is self.TVSHOWS:
+                    expired_videos.append((video["file"], video["showtitle"], video["season"]))
+                else:
+                    expired_videos.append(video["file"])
         except KeyError, ke:
             if option in ke:
                 pass  # no expired videos
             else:
+                self.debug("KeyError: %s not found" % ke)
                 self.handle_json_error(response)
                 raise
         finally:
+            #return expired_videos
+            self.debug("Expired videos: " + str(expired_videos))
             return expired_videos
 
     def handle_json_error(self, error):
