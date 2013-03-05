@@ -43,5 +43,8 @@
         <setting id="holding_folder" type="folder" label="32012" subsetting="true" default="special://temp" visible="eq(-1,true)" />
         <setting id="create_series_season_dirs" type="bool" label="32013" subsetting="true" default="false" visible="eq(-2,true)" />
         <setting id="holding_info" label="32014" type="lsep" subsetting="true" visible="eq(-3,true)" />
+
+        <setting id="not_in_progress" type="bool" label="32015" default="true" />
+        <setting id="musicvideo_progress_info" label="32016" type="lsep" subsetting="true" visible="eq(-1,true)" />
     </category>
 </settings>

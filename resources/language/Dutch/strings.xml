@@ -41,8 +41,8 @@
     <string id="32013">Maak serie- en seizoensmappen aan</string>
     <string id="32014">[I]Let op: bestanden in deze bewaarmap worden nooit automatisch verwijderd [/I]</string>
     
-    
-
+    <string id="32015">Verwijder geen bestanden die nog niet klaar zijn met afspelen</string>
+    <string id="32016">[I]Let op: videoclips kunnen niet gedeeltelijk afgespeeld zijn en negeren dit [/I]</string>
     
     
     <!-- Meldingen en logs -->

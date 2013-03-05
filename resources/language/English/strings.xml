@@ -41,8 +41,9 @@
     <string id="32012">Holding folder location</string>
     <string id="32013">Create series and season directories</string>
     <string id="32014">[I]Note that files in this holding folder will never be deleted automatically [/I]</string>
-    
-    
+
+    <string id="32015">Do not delete videos that have not finished playing</string>
+    <string id="32016">[I]Note that music videos cannot be partially played and will ignore this</string>
 
     
     

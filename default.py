@@ -169,7 +169,9 @@ class Main:
 
     def get_expired_videos(self, option):
         """Launch a JSON-RPC to find expired musicvideos
-        http://wiki.xbmc.org/index.php?title=JSON-RPC_API/v4#VideoLibrary.GetMusicVideos
+        http://wiki.xbmc.org/index.php?title=JSON-RPC_API
+        To test:
+        http://localhost:8000/jsonrpc?request=...
         """
         movie_filter_fields = ["title", "plot", "plotoutline", "tagline", "votes", "rating", "time", "writers",
                                "playcount", "lastplayed", "inprogress", "genre", "country", "year", "director",
@@ -191,19 +193,6 @@ class Main:
         operators = ["contains", "doesnotcontain", "is", "isnot", "startswith", "endswith", "greaterthan", "lessthan",
                      "after", "before", "inthelast", "notinthelast", "true", "false", "between"]
 
-        # A non-exhaustive list of pre-defined filters to use during JSON-RPC requests
-        by_playcount = {"field": "playcount", "operator": "greaterthan", "value": "0"}
-        by_date_played = {"field": "lastplayed", "operator": "notinthelast", "value": "7 days"}
-        by_date_added = {"field": "dateadded", "operator": "notinthelast", "value": "7 days"}
-        by_rating = {"field": "rating", "operator": "lessthan", "value": "%d" % self.minimum_rating}
-        by_artist = {"field": "artist", "operator": "contains", "value": "Muse"}
-
-        # link settings and filters together
-        link_settings_and_filters = [
-            (self.expire_after, by_date_played),
-            (self.minimum_rating, by_rating)
-        ]
-
         if option is self.MUSIC_VIDEOS:
             method = "VideoLibrary.GetMusicVideos"
         elif option is self.MOVIES:
@@ -214,8 +203,29 @@ class Main:
             self.debug("[JSON-RPC] method not supported: %s" % option)
             return []
 
+        # A non-exhaustive list of pre-defined filters to use during JSON-RPC requests
+        # These are possible conditions that must be met before a video can be deleted
+        by_playcount = {"field": "playcount", "operator": "greaterthan", "value": "0"}
+        by_date_played = {"field": "lastplayed", "operator": "notinthelast", "value": "7 days"}  # TODO add GUI setting
+        by_date_added = {"field": "dateadded", "operator": "notinthelast", "value": "%d" % self.expire_after}
+        by_rating = {"field": "rating", "operator": "lessthan", "value": "%d" % self.minimum_rating}
+        by_artist = {"field": "artist", "operator": "contains", "value": "Muse"}
+        by_progress = {"field": "inprogress", "operator": "false", "value": ""}
+
+        # link settings and filters together
+        settings_and_filters = [
+            (self.enable_expiration, by_date_added),
+            (self.delete_when_low_rated, by_rating),
+            (self.not_in_progress, by_progress)
+        ]
+
+        enabled_filters = [by_playcount]
+        for s, f in settings_and_filters:
+            if s:
+                enabled_filters.append(f)
+
         fields = ["playcount", "lastplayed", "file", "resume"]
-        filters = {"and": [by_playcount, by_artist]}
+        filters = {"and": enabled_filters}
 
         request = {
             "jsonrpc": "2.0",
@@ -229,7 +239,7 @@ class Main:
 
         rpc_cmd = json.dumps(request)
         response = xbmc.executeJSONRPC(rpc_cmd)
-        self.debug("[VideoLibrary.GetMusicVideos] " + response)
+        self.debug("[" + method + "] " + response)
         result = json.loads(response)
 
         try:
@@ -275,7 +285,7 @@ class Main:
             if option in ke:
                 pass  # no expired videos
             else:
-                self.handle_json_error()
+                self.handle_json_error(response)
                 raise
         finally:
             return expired_videos
@@ -418,6 +428,8 @@ class Main:
         self.holding_folder = xbmc.translatePath(__settings__.getSetting("holding_folder"))
         self.create_series_season_dirs = bool(
             xbmc.translatePath(__settings__.getSetting("create_series_season_dirs")) == "true")
+
+        self.not_in_progress = bool(__settings__.getSetting("not_in_progress") == "true")
 
     def get_free_disk_space(self, path):
         """Determine the percentage of free disk space.
