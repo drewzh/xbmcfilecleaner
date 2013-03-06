@@ -350,6 +350,10 @@ class Main:
         source -- the source path (absolute)
         destination -- the destination path (absolute)
         """
+        illegal_characters = ["?"]
+        for c in illegal_characters:
+            destination = destination.replace(c, "")
+
         self.debug("Moving %s to %s" % (os.path.basename(source), destination))
         if xbmcvfs.exists(source):
             if not xbmcvfs.exists(destination):
