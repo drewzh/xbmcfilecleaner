@@ -8,7 +8,7 @@ import re
 import xbmc
 import xbmcaddon
 import xbmcvfs
-from ctypes import c_wchar_p, c_ulonglong, pointer, windll
+import ctypes
 from sqlite3 import connect, OperationalError
 
 # Addon info
@@ -289,13 +289,13 @@ class Main:
                 if not isinstance(path, unicode):
                     path = path.decode('mbcs')
 
-                totalNumberOfBytes = c_ulonglong(0)
-                totalNumberOfFreeBytes = c_ulonglong(0)
+                totalNumberOfBytes = ctypes.c_ulonglong(0)
+                totalNumberOfFreeBytes = ctypes.c_ulonglong(0)
 
                 # GetDiskFreeSpaceEx explained:
                 # http://msdn.microsoft.com/en-us/library/windows/desktop/aa364937(v=vs.85).aspx
-                windll.kernel32.GetDiskFreeSpaceExW(c_wchar_p(path), pointer(totalNumberOfBytes),
-                                                    pointer(totalNumberOfFreeBytes), None)
+                ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(path), ctypes.pointer(totalNumberOfBytes),
+                                                    ctypes.pointer(totalNumberOfFreeBytes), None)
 
                 free = float(totalNumberOfBytes.value)
                 capacity = float(totalNumberOfFreeBytes.value)
