@@ -24,7 +24,7 @@ __settings__ = xbmcaddon.Addon(__addonID__)
 
 class Main:
     # Constants to ensure correct SQL queries
-    MOVIES = "movie"
+    MOVIES = "movies"
     MUSIC_VIDEOS = "musicvideo"
     TVSHOWS = "episodes"
 
@@ -81,11 +81,11 @@ class Main:
             summary = "Deleted" if not self.holding_enabled else "Moved"
             cleaning_required = False
             if self.delete_movies:
-                movies = self.get_expired(self.MOVIES)
+                movies = self.get_expired_videos(self.MOVIES)
                 if movies:
                     count = 0
                     for abs_path in movies:
-                        abs_path = str(*abs_path)  # Convert 1 element tuple into string with scatter
+                        # abs_path = str(*abs_path)  # Convert 1 element tuple into string with scatter
                         if xbmcvfs.exists(abs_path):
                             cleaning_required = True
                             if self.holding_enabled:
@@ -179,7 +179,7 @@ class Main:
                                "playcount", "lastplayed", "inprogress", "genre", "country", "year", "director",
                                "actor", "mpaarating", "top250", "studio", "hastrailer", "filename", "path", "set",
                                "tag", "dateadded", "videoresolution", "audiochannels", "videocodec", "audiocodec",
-                               "audiolanguage", "subtitlelanguage", "videoaspect", "playlist"],
+                               "audiolanguage", "subtitlelanguage", "videoaspect", "playlist"]
 
         episode_filter_fields = ["title", "tvshow", "plot", "votes", "rating", "time", "writers", "airdate",
                                  "playcount", "lastplayed", "inprogress", "genre", "year", "director", "actor",
@@ -211,15 +211,16 @@ class Main:
         # These are possible conditions that must be met before a video can be deleted
         # Maybe we should move this into a separate function
         by_playcount = {"field": "playcount", "operator": "greaterthan", "value": "0"}
-        by_date_played = {"field": "lastplayed", "operator": "notinthelast", "value": "7 days"}  # TODO add GUI setting
-        by_date_added = {"field": "dateadded", "operator": "notinthelast", "value": "%d" % self.expire_after}
+        by_date_played = {"field": "lastplayed", "operator": "notinthelast", "value": "%d" % self.expire_after}
+        # TODO add GUI setting for date_added
+        by_date_added = {"field": "dateadded", "operator": "notinthelast", "value": "7"}
         by_rating = {"field": "rating", "operator": "lessthan", "value": "%d" % self.minimum_rating}
         by_artist = {"field": "artist", "operator": "contains", "value": "Muse"}
         by_progress = {"field": "inprogress", "operator": "false", "value": ""}
 
         # link settings and filters together
         settings_and_filters = [
-            (self.enable_expiration, by_date_added),
+            (self.enable_expiration, by_date_played),
             (self.delete_when_low_rated, by_rating),
             (self.not_in_progress, by_progress)
         ]
@@ -228,6 +229,8 @@ class Main:
         for s, f in settings_and_filters:
             if s and f["field"] in supported_filter_fields[option]:
                 enabled_filters.append(f)
+
+        self.debug("[%s] Filters enabled: %s" % (methods[option], enabled_filters))
 
         required_fields = {
             self.TVSHOWS: ["file", "showtitle", "season"],
@@ -249,7 +252,7 @@ class Main:
 
         rpc_cmd = json.dumps(request)
         response = xbmc.executeJSONRPC(rpc_cmd)
-        self.debug("[" + methods[option] + "] " + response)
+        self.debug("[%s] Response: %s" % (methods[option], response))
         result = json.loads(response)
 
         try:
@@ -303,7 +306,6 @@ class Main:
                 self.handle_json_error(response)
                 raise
         finally:
-            #return expired_videos
             self.debug("Expired videos: " + str(expired_videos))
             return expired_videos
 
