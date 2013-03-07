@@ -33,6 +33,8 @@ class Main:
         ticker = 0
         delayed_completed = False
 
+        self.delete_empty_folders("E:\\Downloads\\TV\\Red Widow")
+
         # TODO should be removed: http://ziade.org/2008/01/08/syssetdefaultencoding-is-evil/
         reload(sys)
         sys.setdefaultencoding("utf-8")
@@ -341,6 +343,50 @@ class Main:
         else:
             self.debug("XBMC could not find the file at %s" % location)
             return False
+
+    def delete_empty_folders(self, file_path):
+        # TODO: Populate this list by loading it from the addon settings
+        ignored_file_types = [".nfo", ".srt", ".tbn", ".jpg", ".png"]
+
+        # TODO: Check if this works on any platform
+        #if not os.path.isdir(file_path):
+        #    file_path = os.path.dirname(file_path)
+
+        folders, files = xbmcvfs.listdir(file_path)
+
+        self.debug("Subfolders:\t" + str(folders) + "\nFiles:\t" + str(files))
+
+        empty = True
+        try:
+            for f in files:
+                _, ext = os.path.splitext(f)
+                self.debug("File extension: " + ext)
+                if ext not in ignored_file_types:
+                    empty = False
+        except Exception, e:
+            empty = False
+
+        # Only delete directories if we found them to be empty (containing no files or filetypes we ignored)
+        if empty:
+            self.debug("Directory is empty and will be removed")
+
+            try:
+                # Recursively delete any subfolders
+                for f in folders:
+                    self.debug("Deleting file at " + str(os.path.join(file_path, f)))
+                    self.delete_empty_folders(os.path.join(file_path, f))
+
+                # Delete any files in the current folder
+                for f in files:
+                    self.debug("Deleting file at " + str(os.path.join(file_path, f)))
+                    xbmcvfs.delete(os.path.join(file_path, f))
+
+                # Finally delete the current folder
+                xbmcvfs.rmdir(file_path)
+            except Exception, e:
+                self.debug("An exception occurred while deleting folders: " + str(e))
+        else:
+            self.debug("Directory is not empty and will not be removed")
 
     def move_file(self, source, destination):
         """Move a file to a new destination. Returns True if the move succeeded, False otherwise.
