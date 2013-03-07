@@ -214,14 +214,16 @@ class Main:
         by_date_played = {"field": "lastplayed", "operator": "notinthelast", "value": "%d" % self.expire_after}
         # TODO add GUI setting for date_added
         by_date_added = {"field": "dateadded", "operator": "notinthelast", "value": "7"}
-        by_rating = {"field": "rating", "operator": "lessthan", "value": "%d" % self.minimum_rating}
+        by_minimum_rating = {"field": "rating", "operator": "lessthan", "value": "%d" % self.minimum_rating}
+        by_no_rating = {"field": "rating", "operator": "isnot", "value": "0"}
         by_artist = {"field": "artist", "operator": "contains", "value": "Muse"}
         by_progress = {"field": "inprogress", "operator": "false", "value": ""}
 
         # link settings and filters together
         settings_and_filters = [
             (self.enable_expiration, by_date_played),
-            (self.delete_when_low_rated, by_rating),
+            (self.delete_when_low_rated, by_minimum_rating),
+            (self.ignore_no_rating, by_no_rating),
             (self.not_in_progress, by_progress)
         ]
 
