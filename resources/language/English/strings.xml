@@ -8,6 +8,8 @@
     <!-- General -->
     <string id="31001">[B]General options used by XBMC File Cleaner[/B]</string>
     <string id="31002">Enable deleting of files</string>
+    <string id="31013">Delete empty folders after cleaning</string>
+    <string id="31014">Ignore files with the following extensions (separate with commas)</string>
     
     <string id="31003">Delayed start (in minutes)</string>
     <string id="31004">Scan interval (in minutes)</string>

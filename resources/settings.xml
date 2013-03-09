@@ -6,19 +6,21 @@
         <setting type="sep" />
         
         <setting id="deleting_enabled" type="bool" label="31002" default="false"/>
+        <setting id="delete_folders" type="bool" label="31013" default="false" visible="eq(-1,true)" />
+        <setting id="ignore_extensions" type="text" label="31014" default=".nfo, .tbn, .srt, .ass" visible="eq(-1,true)" subsetting="true" />
         
-        <setting id="delayed_start" type="slider" label="31003" default="0" range="0,10,120" option="int" visible="eq(-1,true)" />
-        <setting id="scan_interval" type="slider" label="31004" default="30" range="5,5,120" option="int" visible="eq(-2,true)" />
+        <setting id="delayed_start" type="slider" label="31003" default="0" range="0,10,120" option="int" visible="eq(-3,true)" />
+        <setting id="scan_interval" type="slider" label="31004" default="30" range="5,5,120" option="int" visible="eq(-4,true)" />
         
-        <setting id="notifications_enabled" type="bool" label="31005" default="true" visible="eq(-3,true)" />
-        <setting id="notify_when_idle" type="bool" label="31006" subsetting="true" default="true" visible="eq(-4,true)+eq(-1,true)" />
-        <setting id="debugging_enabled" type="bool" label="31007" default="false" visible="eq(-5,true)" />
+        <setting id="notifications_enabled" type="bool" label="31005" default="true" visible="eq(-5,true)" />
+        <setting id="notify_when_idle" type="bool" label="31006" subsetting="true" default="true" visible="eq(-6,true)+eq(-1,true)" />
+        <setting id="debugging_enabled" type="bool" label="31007" default="false" visible="eq(-7,true)" />
         
-        <setting id="clean_xbmc_library" type="bool" label="31008" default="true" visible="eq(-6,true)" />
-        <setting id="delete_movies" type="bool" label="31009" default="false" visible="eq(-7,true)" />
-        <setting id="delete_tv_shows" type="bool" label="31010" default="false" visible="eq(-8,true)" />
-        <setting id="delete_music_videos" type="bool" label="31011" default="false" visible="eq(-9,true)" />
-        <setting id="delete_when_idle" type="bool" label="31012" default="false" visible="eq(-10,true)" />
+        <setting id="clean_xbmc_library" type="bool" label="31008" default="true" visible="eq(-8,true)" />
+        <setting id="delete_movies" type="bool" label="31009" default="false" visible="eq(-9,true)" />
+        <setting id="delete_tv_shows" type="bool" label="31010" default="false" visible="eq(-10,true)" />
+        <setting id="delete_music_videos" type="bool" label="31011" default="false" visible="eq(-11,true)" />
+        <setting id="delete_when_idle" type="bool" label="31012" default="false" visible="eq(-12,true)" />
     </category>
     
     <!-- Conditions Section -->
