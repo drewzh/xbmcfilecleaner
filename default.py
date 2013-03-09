@@ -79,8 +79,6 @@ class Main:
 
             if not self.deleting_enabled:
                 continue
-                #elif  not self.runAsService:
-                #continue
             else:
                 if delayed_completed and ticker >= scanInterval_ticker:
                     self.cleanup()
@@ -267,31 +265,8 @@ class Main:
         except KeyError, ke:
             if "error" in ke:
                 pass  # no error
-
-        good_result = {
-            "id": 1,
-            "jsonrpc": "2.0",
-            "result": {
-                "limits": {
-                    "end": 1,
-                    "start": 0,
-                    "total": 1
-                },
-                "musicvideos": [
-                    {
-                        "file": "E:\\Downloads\\Music Videos\\Biffy Clyro - That Golden Rule.mp4",
-                        "label": "That Golden Rule",
-                        "lastplayed": "",
-                        "musicvideoid": 3,
-                        "playcount": 0,
-                        "resume": {
-                            "position": 0,
-                            "total": 0
-                        }
-                    }
-                ]
-            }
-        }
+            else:
+                raise
 
         self.debug("Building list of expired videos")
         expired_videos = []
