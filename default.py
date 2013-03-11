@@ -389,7 +389,8 @@ class Main:
     def debug(self, message):
         """logs a debug message"""
         if self.debugging_enabled:
-            xbmc.log(__title__ + ": " + message)
+            for line in message.splitlines():
+                xbmc.log(__title__ + ": " + line)
 
 
 run = Main()
