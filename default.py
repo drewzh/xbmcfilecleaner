@@ -33,6 +33,8 @@ class Main:
         ticker = 0
         delayed_completed = False
 
+        self.delete_empty_folders("E:\\Downloads\\TV\\Red Widow")
+
         # TODO should be removed: http://ziade.org/2008/01/08/syssetdefaultencoding-is-evil/
         reload(sys)
         sys.setdefaultencoding("utf-8")
@@ -88,9 +90,11 @@ class Main:
                             if self.holding_enabled:
                                 if self.move_file(abs_path, self.holding_folder):
                                     count += 1
+                                    self.delete_empty_folders(os.path.dirname(abs_path))
                             else:
                                 if self.delete_file(abs_path):
                                     count += 1
+                                    self.delete_empty_folders(os.path.dirname(abs_path))
                         else:
                             self.debug("XBMC could not find the file at %s" % abs_path)
                     if count > 0:
@@ -110,9 +114,11 @@ class Main:
                                     new_path = self.holding_folder
                                 if self.move_file(abs_path, new_path):
                                     count += 1
+                                    self.delete_empty_folders(os.path.dirname(abs_path))
                             else:
                                 if self.delete_file(abs_path):
                                     count += 1
+                                    self.delete_empty_folders(os.path.dirname(abs_path))
                         else:
                             self.debug("XBMC could not find the file at %s" % abs_path)
                     if count > 0:
@@ -129,9 +135,11 @@ class Main:
                             if self.holding_enabled:
                                 if self.move_file(abs_path, self.holding_folder):
                                     count += 1
+                                    self.delete_empty_folders(os.path.dirname(abs_path))
                             else:
                                 if self.delete_file(abs_path):
                                     count += 1
+                                    self.delete_empty_folders(os.path.dirname(abs_path))
                         else:
                             self.debug("XBMC could not find the file at %s" % abs_path)
                     if count > 0:
@@ -228,6 +236,8 @@ class Main:
         __settings__ = xbmcaddon.Addon(__addonID__)
 
         self.deleting_enabled = bool(__settings__.getSetting("deleting_enabled") == "true")
+        self.delete_folders = bool(__settings__.getSetting("delete_folders") == "true")
+        self.ignore_extensions = str(__settings__.getSetting("ignore_extensions"))
         self.delayed_start = float(__settings__.getSetting("delayed_start"))
         self.scan_interval = float(__settings__.getSetting("scan_interval"))
 
@@ -341,6 +351,50 @@ class Main:
         else:
             self.debug("XBMC could not find the file at %s" % location)
             return False
+
+    def delete_empty_folders(self, folder):
+        self.debug("Checking if %s is empty" % folder)
+
+        ignored_file_types = [file_ext.strip() for file_ext in self.ignore_extensions.split(",")]
+
+        self.debug("Ignoring file types %s" % ignored_file_types)
+
+        subfolders, files = xbmcvfs.listdir(folder)
+
+        self.debug("Contents of %s:\nSubfolders:\t%s\nFiles:\t%s" % (folder, subfolders, files))
+
+        empty = True
+        try:
+            for f in files:
+                _, ext = os.path.splitext(f)
+                self.debug("File extension: " + ext)
+                if ext not in ignored_file_types:
+                    self.debug("Found video file %s" % f)
+                    empty = False
+        except OSError, oe:
+            self.debug("Error deriving file extension. Errno " + str(oe.errno))
+            empty = False
+
+        # Only delete directories if we found them to be empty (containing no files or filetypes we ignored)
+        if empty:
+            self.debug("Directory is empty and will be removed")
+            try:
+                # Recursively delete any subfolders
+                for f in subfolders:
+                    self.debug("Deleting file at " + str(os.path.join(folder, f)))
+                    self.delete_empty_folders(os.path.join(folder, f))
+
+                # Delete any files in the current folder
+                for f in files:
+                    self.debug("Deleting file at " + str(os.path.join(folder, f)))
+                    xbmcvfs.delete(os.path.join(folder, f))
+
+                # Finally delete the current folder
+                xbmcvfs.rmdir(folder)
+            except OSError, oe:
+                self.debug("An exception occurred while deleting folders. Errno " + str(oe.errno))
+        else:
+            self.debug("Directory is not empty and will not be removed")
 
     def move_file(self, source, destination):
         """Move a file to a new destination. Returns True if the move succeeded, False otherwise.

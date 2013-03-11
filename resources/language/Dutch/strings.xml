@@ -8,6 +8,8 @@
     <!-- Algemeen -->
     <string id="31001">[B]Algemene opties voor XBMC File Cleaner[/B]</string>
     <string id="31002">Activeer verwijderen van bestanden</string>
+    <string id="31013">Verwijder lege mappen na schoonmaken</string>
+    <string id="31014">Negeer bestanden met de volgende extensies (scheiden met komma's)</string>
     
     <string id="31003">Wachttijd bij opstarten (in minuten)</string>
     <string id="31004">Scan-interval (in minuten)</string>
