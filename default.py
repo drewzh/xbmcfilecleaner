@@ -397,7 +397,7 @@ class Main:
         else:
             self.debug("Directory is not empty and will not be removed")
 
-    def move_file(self, source, destination):
+    def move_file(self, source, dest_folder):
         """Move a file to a new destination. Returns True if the move succeeded, False otherwise.
         Will create destination if it does not exist.
 
@@ -407,22 +407,38 @@ class Main:
         """
         illegal_characters = ["?"]
         for c in illegal_characters:
-            destination = destination.replace(c, "")
+            dest_folder = dest_folder.replace(c, "")
 
-        self.debug("Moving %s to %s" % (os.path.basename(source), destination))
+        self.debug("Moving %s to %s" % (os.path.basename(source), dest_folder))
         if xbmcvfs.exists(source):
-            if not xbmcvfs.exists(destination):
-                self.debug("XBMC could not find destination %s" % destination)
-                self.debug("Creating destination %s" % destination)
-                if xbmcvfs.mkdirs(destination):
-                    self.debug("Successfully created %s" % destination)
+            if not xbmcvfs.exists(dest_folder):
+                self.debug("XBMC could not find destination %s" % dest_folder)
+                self.debug("Creating destination %s" % dest_folder)
+                if xbmcvfs.mkdirs(dest_folder):
+                    self.debug("Successfully created %s" % dest_folder)
                 else:
-                    self.debug("XBMC could not create destination %s" % destination)
+                    self.debug("XBMC could not create destination %s" % dest_folder)
                     return False
 
-            self.debug("Moving %s\nto %s\nNew path: %s" %
-                       (source, destination, os.path.join(destination, os.path.basename(source))))
-            return xbmcvfs.rename(source, os.path.join(destination, os.path.basename(source)))
+            new_path = os.path.join(dest_folder, os.path.basename(source))
+
+            if xbmcvfs.exists(new_path):
+                self.debug("A file with the same name already exists in the holding folder. Checking file sizes.")
+                existing_file = xbmcvfs.File(new_path)
+                file_to_move = xbmcvfs.File(source)
+                if file_to_move.size() > existing_file.size():
+                    self.debug("This file is larger than the existing file. Replacing the existing file with this one.")
+                    existing_file.close()
+                    file_to_move.close()
+                    return xbmcvfs.delete(new_path) and xbmcvfs.rename(source, new_path)
+                else:
+                    self.debug("This file is smaller than the existing file. Deleting this file instead of moving.")
+                    existing_file.close()
+                    file_to_move.close()
+                    return self.delete_file(source)
+            else:
+                self.debug("Moving %s\nto %s\nNew path: %s" % (source, dest_folder, new_path))
+                return xbmcvfs.rename(source, new_path)
         else:
             self.debug("XBMC could not find the file at %s" % source)
             return False
