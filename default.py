@@ -371,6 +371,7 @@ class Main:
                 if ext not in ignored_file_types:
                     self.debug("Found video file %s" % f)
                     empty = False
+                    break
         except OSError, oe:
             self.debug("Error deriving file extension. Errno " + str(oe.errno))
             empty = False
