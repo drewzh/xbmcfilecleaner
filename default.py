@@ -405,10 +405,7 @@ class Main:
         source -- the source path (absolute)
         destination -- the destination path (absolute)
         """
-        illegal_characters = ["?"]
-        for c in illegal_characters:
-            dest_folder = dest_folder.replace(c, "")
-
+        dest_folder = xbmc.makeLegalFilename(dest_folder)
         self.debug("Moving %s to %s" % (os.path.basename(source), dest_folder))
         if xbmcvfs.exists(source):
             if not xbmcvfs.exists(dest_folder):
