@@ -5,11 +5,13 @@ import sys
 import platform
 import time
 import re
+import ctypes
+from sqlite3 import connect, OperationalError
+
 import xbmc
 import xbmcaddon
 import xbmcvfs
-import ctypes
-from sqlite3 import connect, OperationalError
+
 
 # Addon info
 __title__ = "XBMC File Cleaner"
@@ -32,8 +34,6 @@ class Main:
         service_sleep = 10
         ticker = 0
         delayed_completed = False
-
-        self.delete_empty_folders("E:\\Downloads\\TV\\Red Widow")
 
         # TODO should be removed: http://ziade.org/2008/01/08/syssetdefaultencoding-is-evil/
         reload(sys)
@@ -274,30 +274,45 @@ class Main:
         path -- the path to the drive to check (this can be any path of any length on the desired drive).
         If the path doesn't exist, this function returns 100, in order to prevent files from being deleted accidentally.
         """
-        percentage = 100
-        self.debug("path is: " + path)
-        if os.path.exists(path) or r"://" in path:  # os.path.exists() doesn't work for non-UNC network paths
+        # TODO: Check disk space for each file that matches the deleting criteria, and only delete if it frees up space
+        percentage = float(100)
+        self.debug("Checking for disk space on path: %s" % path)
+        if xbmcvfs.exists(path):  # Fails for drive-only paths like "E:\"
             if platform.system() == "Windows":
                 self.debug("We are checking disk space from a Windows file system")
-                self.debug("Stripping " + path + " of all redundant stuff.")
+                self.debug("The current path is %s" % path)
+                self.debug("Stripping the path of all redundant stuff.")
 
                 if r"://" in path:
-                    self.debug("We are dealing with network paths:\n" + path)
-                    # TODO: Verify this regex captures all possible usernames and passwords.
-                    pattern = re.compile("(?P<protocol>smb|nfs)://(?P<user>\w+):(?P<pass>[\w\-]+)@(?P<host>\w+)", re.I)
+                    self.debug("We are dealing with network paths.")
+                    self.debug("Extracting information from share %s" % path)
+
+                    pattern = re.compile("(?P<type>smb|nfs|afp)://(?P<user>\w+):(?P<pass>.+)@(?P<host>.+)",
+                                         flags=re.I | re.U)
                     match = pattern.match(path)
                     share = match.groupdict()
-                    self.debug("Regex result:\nprotocol: %s\nuser: %s\npass: %s\nhost: %s" %
-                               (share['protocol'], share['user'], share['pass'], share['host']))
+
+                    self.debug("Retrieved the following information:")
+                    self.debug("Protocol: %s" % share["type"])
+                    self.debug("User: %s" % share["user"])
+                    self.debug("Pass: %s" % share["pass"])
+                    self.debug("Host: %s" % share["host"])
+
+                    self.debug("Creating UNC paths so Windows understands the shares.")
+
                     path = path[match.end():]
-                    self.debug("Creating UNC paths, so Windows understands the shares, result:\n" + path)
+
+                    self.debug("New path: %s" % path)
+
                     path = os.path.normcase(r"\\" + share["host"] + path)
                     self.debug("os.path.normcase result:\n" + path)
                 else:
                     self.debug("We are dealing with local paths:\n" + path)
 
                 if not isinstance(path, unicode):
-                    path = path.decode('mbcs')
+                    self.debug("Path must be unicode for disk space checks.")
+                    path = path.decode("mbcs")
+                    self.debug("New path: %s" % path)
 
                 totalNumberOfBytes = ctypes.c_ulonglong(0)
                 totalNumberOfFreeBytes = ctypes.c_ulonglong(0)
@@ -305,8 +320,7 @@ class Main:
                 # GetDiskFreeSpaceEx explained:
                 # http://msdn.microsoft.com/en-us/library/windows/desktop/aa364937(v=vs.85).aspx
                 ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(path), ctypes.pointer(totalNumberOfBytes),
-                                                    ctypes.pointer(totalNumberOfFreeBytes), None)
-
+                                                           ctypes.pointer(totalNumberOfFreeBytes), None)
                 free = float(totalNumberOfBytes.value)
                 capacity = float(totalNumberOfFreeBytes.value)
 
