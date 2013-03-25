@@ -1,15 +1,17 @@
-Version 2.1.0
+Version 3.0
 ===============
 - Frodo compatibility
 - Music videos support (use TheAudioDB.com scraper)
+- JSON-RPC is used to find watched videos (backward compatibility with Eden is effectively lost)
 - New option to only delete while not playing video
-- Queries now use databases' views to get expired items
+- New option to not delete videos that are in progress
+- New option to not clean during video playback
+- New option to hide notifications during video playback
 - No more individual notifications, but a summary instead (see logs for more details)
 - New option to delete the parent folder of the file being deleted, if that folder is now empty (configurable)
 - Removed obsolete FAQ section
-- Removed autoexec.py code, since the addon runs as a service since Eden (Dharma autorun no longer supported)
 
-Version 2.0.0
+Version 2.0
 ===============
 - Eden compatibility
 - Addon now runs as a service

@@ -2,7 +2,7 @@
 <addon
     id="script.filecleaner"
     name="XBMC File Cleaner"
-    version="2.1.0"
+    version="3.0"
     provider-name="drewzh"
     >
   <requires>

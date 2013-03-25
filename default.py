@@ -5,13 +5,11 @@ import sys
 import platform
 import time
 import re
+import json
 import ctypes
-from sqlite3 import connect, OperationalError
-
 import xbmc
 import xbmcaddon
 import xbmcvfs
-
 
 # Addon info
 __title__ = "XBMC File Cleaner"
@@ -22,10 +20,41 @@ __settings__ = xbmcaddon.Addon(__addonID__)
 
 
 class Main:
-    # Constants to ensure correct SQL queries
-    MOVIES = "movie"
-    MUSIC_VIDEOS = "musicvideo"
-    TVSHOWS = "episode"
+    # Constants to ensure correct JSON-RPC requests
+    MOVIES = "movies"
+    MUSIC_VIDEOS = "musicvideos"
+    TVSHOWS = "episodes"
+
+    movie_filter_fields = ["title", "plot", "plotoutline", "tagline", "votes", "rating", "time", "writers",
+                           "playcount", "lastplayed", "inprogress", "genre", "country", "year", "director",
+                           "actor", "mpaarating", "top250", "studio", "hastrailer", "filename", "path", "set",
+                           "tag", "dateadded", "videoresolution", "audiochannels", "videocodec", "audiocodec",
+                           "audiolanguage", "subtitlelanguage", "videoaspect", "playlist"]
+    episode_filter_fields = ["title", "tvshow", "plot", "votes", "rating", "time", "writers", "airdate",
+                             "playcount", "lastplayed", "inprogress", "genre", "year", "director", "actor",
+                             "episode", "season", "filename", "path", "studio", "mpaarating", "dateadded",
+                             "videoresolution", "audiochannels", "videocodec", "audiocodec", "audiolanguage",
+                             "subtitlelanguage", "videoaspect", "playlist"]
+    musicvideo_filter_fields = ["title", "genre", "album", "year", "artist", "filename", "path", "playcount",
+                                "lastplayed", "time", "director", "studio", "plot", "dateadded", "videoresolution",
+                                "audiochannels", "videocodec", "audiocodec", "audiolanguage", "subtitlelanguage",
+                                "videoaspect", "playlist"]
+
+    supported_filter_fields = {
+        TVSHOWS: episode_filter_fields,
+        MOVIES: movie_filter_fields,
+        MUSIC_VIDEOS: musicvideo_filter_fields
+    }
+    methods = {
+        TVSHOWS: "VideoLibrary.GetEpisodes",
+        MOVIES: "VideoLibrary.GetMovies",
+        MUSIC_VIDEOS: "VideoLibrary.GetMusicVideos"
+    }
+    properties = {
+        TVSHOWS: ["file", "showtitle", "season"],
+        MOVIES: ["file", "title", "year"],
+        MUSIC_VIDEOS: ["file", "artist"]
+    }
 
     def __init__(self):
         """Create a Main object that performs regular cleaning of watched videos."""
@@ -47,8 +76,6 @@ class Main:
 
             if not self.deleting_enabled:
                 continue
-                #elif  not self.runAsService:
-                #continue
             else:
                 if delayed_completed and ticker >= scanInterval_ticker:
                     self.cleanup()
@@ -80,36 +107,16 @@ class Main:
             summary = "Deleted" if not self.holding_enabled else "Moved"
             cleaning_required = False
             if self.delete_movies:
-                movies = self.get_expired(self.MOVIES)
+                movies = self.get_expired_videos(self.MOVIES)
                 if movies:
                     count = 0
-                    for abs_path in movies:
-                        abs_path = str(*abs_path)  # Convert 1 element tuple into string with scatter
+                    for abs_path, title, year in movies:
+                        # abs_path = str(*abs_path)  # Convert 1 element tuple into string with scatter
                         if xbmcvfs.exists(abs_path):
                             cleaning_required = True
                             if self.holding_enabled:
-                                if self.move_file(abs_path, self.holding_folder):
-                                    count += 1
-                                    self.delete_empty_folders(os.path.dirname(abs_path))
-                            else:
-                                if self.delete_file(abs_path):
-                                    count += 1
-                                    self.delete_empty_folders(os.path.dirname(abs_path))
-                        else:
-                            self.debug("XBMC could not find the file at %s" % abs_path)
-                    if count > 0:
-                        summary += " %d %s(s)" % (count, self.MOVIES)
-
-            if self.delete_tv_shows:
-                episodes = self.get_expired(self.TVSHOWS)
-                if episodes:
-                    count = 0
-                    for abs_path, idFile, show_name, season_number in episodes:
-                        if xbmcvfs.exists(abs_path):
-                            cleaning_required = True
-                            if self.holding_enabled:
-                                if self.create_series_season_dirs:
-                                    new_path = os.path.join(self.holding_folder, show_name, "Season " + season_number)
+                                if self.create_subdirs:
+                                    new_path = os.path.join(self.holding_folder, "%s (%d)" % (title, year))
                                 else:
                                     new_path = self.holding_folder
                                 if self.move_file(abs_path, new_path):
@@ -122,18 +129,21 @@ class Main:
                         else:
                             self.debug("XBMC could not find the file at %s" % abs_path)
                     if count > 0:
-                        summary += " %d %s(s)" % (count, self.TVSHOWS)
+                        summary += " %d %s" % (count, self.MOVIES)
 
-            if self.delete_music_videos:
-                musicvideos = self.get_expired(self.MUSIC_VIDEOS)
-                if musicvideos:
+            if self.delete_tv_shows:
+                episodes = self.get_expired_videos(self.TVSHOWS)
+                if episodes:
                     count = 0
-                    for abs_path in musicvideos:
-                        abs_path = str(*abs_path)  # Convert 1 element tuple into string with scatter
+                    for abs_path, show_name, season_number in episodes:
                         if xbmcvfs.exists(abs_path):
                             cleaning_required = True
                             if self.holding_enabled:
-                                if self.move_file(abs_path, self.holding_folder):
+                                if self.create_subdirs:
+                                    new_path = os.path.join(self.holding_folder, show_name, "Season %d" % season_number)
+                                else:
+                                    new_path = self.holding_folder
+                                if self.move_file(abs_path, new_path):
                                     count += 1
                                     self.delete_empty_folders(os.path.dirname(abs_path))
                             else:
@@ -143,10 +153,36 @@ class Main:
                         else:
                             self.debug("XBMC could not find the file at %s" % abs_path)
                     if count > 0:
-                        summary += " %d %s(s)" % (count, self.MUSIC_VIDEOS)
+                        summary += " %d %s" % (count, self.TVSHOWS)
+
+            if self.delete_music_videos:
+                musicvideos = self.get_expired_videos(self.MUSIC_VIDEOS)  # self.get_expired(self.MUSIC_VIDEOS)
+                if musicvideos:
+                    count = 0
+                    for abs_path, artists in musicvideos:
+                        # abs_path = str(*abs_path)  # Convert 1 element tuple into string with scatter
+                        if xbmcvfs.exists(abs_path):
+                            cleaning_required = True
+                            if self.holding_enabled:
+                                if self.create_subdirs:
+                                    artist = ", ".join(str(a) for a in artists)
+                                    new_path = os.path.join(self.holding_folder, artist)
+                                else:
+                                    new_path = self.holding_folder
+                                if self.move_file(abs_path, new_path):
+                                    count += 1
+                                    self.delete_empty_folders(os.path.dirname(abs_path))
+                            else:
+                                if self.delete_file(abs_path):
+                                    count += 1
+                                    self.delete_empty_folders(os.path.dirname(abs_path))
+                        else:
+                            self.debug("XBMC could not find the file at %s" % abs_path)
+                    if count > 0:
+                        summary += " %d %s" % (count, self.MUSIC_VIDEOS)
 
             # Give a status report if any deletes occurred
-            if not (summary.endswith("ed")):
+            if not summary.endswith("ed"):
                 self.notify(summary)
 
             # Finally clean the library to account for any deleted videos.
@@ -172,64 +208,145 @@ class Main:
 
                 xbmc.executebuiltin("XBMC.CleanLibrary(video)")
 
-    def get_expired(self, option):
-        """Retrieve a list of episodes that have been watched and match any criteria set in the addon's settings.
-
-        Keyword arguments:
-        option -- the type of videos to remove, can be one of the constants MOVIES, TVSHOWS or MUSIC_VIDEOS
+    def get_expired_videos(self, option):
+        """Launch a JSON-RPC to find expired musicvideos
+        :param option: The type of videos to find (one of the globals MOVIES, MUSIC_VIDEOS or TVSHOWS)
+        http://wiki.xbmc.org/index.php?title=JSON-RPC_API
+        To test:
+        http://localhost:8000/jsonrpc?request=...
         """
-        self.debug("Looking for watched videos")
+        # This currently does not do anything and may have to be removed
+        operators = ["contains", "doesnotcontain", "is", "isnot", "startswith", "endswith", "greaterthan", "lessthan",
+                     "after", "before", "inthelast", "notinthelast", "true", "false", "between"]
 
-        results = []
-        margin = 0.000001
+        # A non-exhaustive list of pre-defined filters to use during JSON-RPC requests
+        # These are possible conditions that must be met before a video can be deleted
+        by_playcount = {"field": "playcount", "operator": "greaterthan", "value": "0"}
+        by_date_played = {"field": "lastplayed", "operator": "notinthelast", "value": "%d" % self.expire_after}
+        # TODO add GUI setting for date_added
+        by_date_added = {"field": "dateadded", "operator": "notinthelast", "value": "7"}
+        by_minimum_rating = {"field": "rating", "operator": "lessthan", "value": "%d" % self.minimum_rating}
+        by_no_rating = {"field": "rating", "operator": "isnot", "value": "0"}
+        by_artist = {"field": "artist", "operator": "contains", "value": "Muse"}
+        by_progress = {"field": "inprogress", "operator": "false", "value": ""}
 
-        # First we shall build the query to be executed on the video databases
-        query = "SELECT strPath || strFilename as FullPath"
-        if option == "episode":
-            query += ", idFile, strTitle as Show, c12 as Season"
-        query += " FROM %sview" % option  # episodeview, movieview or musicvideoview
-        query += " WHERE playCount > 0"
+        # link settings and filters together
+        settings_and_filters = [
+            (self.enable_expiration, by_date_played),
+            (self.delete_when_low_rated, by_minimum_rating),
+            (self.ignore_no_rating, by_no_rating),
+            (self.not_in_progress, by_progress)
+        ]
 
-        if self.holding_enabled:
-            query += " AND NOT strPath like '%s%%'" % self.holding_folder
+        enabled_filters = [by_playcount]
+        for s, f in settings_and_filters:
+            if s and f["field"] in self.supported_filter_fields[option]:
+                enabled_filters.append(f)
 
-        if self.enable_expiration:
-            query += " AND lastPlayed < datetime('now', '-%d days', 'localtime')" % self.expire_after
+        self.debug("[%s] Filters enabled: %s" % (self.methods[option], enabled_filters))
 
-        if self.delete_when_low_rated and option is not self.MUSIC_VIDEOS:
-            column = "c05" if option is self.MOVIES else "c03"
-            query += " AND %s BETWEEN %f AND %f" % \
-                     (column, (margin if self.ignore_no_rating else 0), self.minimum_rating - margin)
-            if self.minimum_rating != 10.000000:
-                # somehow 10.000000 is considered to be between 0.000001 and x.999999
-                query += " AND %s <> 10.000000" % column
+        filters = {"and": enabled_filters}
+
+        request = {
+            "jsonrpc": "2.0",
+            "method": self.methods[option],
+            "params": {
+                "properties": self.properties[option],
+                "filter": filters
+            },
+            "id": 1
+        }
+
+        rpc_cmd = json.dumps(request)
+        response = xbmc.executeJSONRPC(rpc_cmd)
+        self.debug("[%s] Response: %s" % (self.methods[option], response))
+        result = json.loads(response)
 
         try:
-            # After building the query we can execute it on any video databases we find
-            _, files, = xbmcvfs.listdir(xbmc.translatePath("special://database/"))
-            for database in files:
-                if database.startswith("MyVideos") and database.endswith(".db"):
-                    con = connect(xbmc.translatePath("special://database/" + database))
-                    cur = con.cursor()
+            error = result["error"]
+            return self.handle_json_error(error)
+        except KeyError, ke:
+            if "error" in ke:
+                pass  # no error
+            else:
+                raise
 
-                    self.debug("Executing query on %s: %s" % (database, query))
-                    cur.execute(query)
-
-                    # Append the results to the list of files to delete.
-                    results += cur.fetchall()
-
-            return results
-        except OSError, e:
-            self.debug("Something went wrong while opening the database folder (errno: %d)" % e.errno)
-            raise
-        except OperationalError, oe:
-            # The video database(s) could not be opened, or the query was invalid
-            self.notify(__settings__.getLocalizedString(34002), 15000)
-            msg = oe.args[0]
-            self.debug("The following error occurred: '%s'" % msg)
+        self.debug("Building list of expired videos")
+        expired_videos = []
+        response = result["result"]
+        try:
+            self.debug("Found %d watched %s matching your conditions" % (response["limits"]["total"], option))
+            self.debug("JSON Response: " + str(response))
+            for video in response[option]:
+                # Gather all properties and add it to this video's information
+                temp = []
+                for p in self.properties[option]:
+                    temp.append(video[p])
+                expired_videos.append(temp)
+        except KeyError, ke:
+            if option in ke:
+                pass  # no expired videos
+            else:
+                self.debug("KeyError: %s not found" % ke)
+                self.handle_json_error(response)
+                raise
         finally:
-            cur.close()
-            con.close()
+            self.debug("Expired videos: " + str(expired_videos))
+            return expired_videos
+
+    def handle_json_error(self, error):
+        """If a JSON-RPC request results in an error, this function will handle it.
+        This function currently only logs the error that occurred, and will not act on it.
+        """
+        error_format = {
+            "code": {
+                "type": "integer",
+                "required": True
+            },
+            "message": {
+                "type": "string",
+                "required": True
+            },
+            "data": {
+                "type": "object",
+                "properties": {
+                    "method": {
+                        "type": "string",
+                        "required": True
+                    },
+                    "stack": {
+                        "type": "object",
+                        "id": "Error.Stack",
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "required": True
+                            },
+                            "type": {
+                                "type": "string",
+                                "required": True
+                            },
+                            "message": {
+                                "type": "string",
+                                "required": True
+                            },
+                            "property": {
+                                "$ref": "Error.Stack"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        code = error["code"]
+        msg = error["message"]
+        details = error["data"] if "data" in error else "No further details"
+
+        self.debug("JSON error occurred.\nError code: %d\nError message: %s\nError details: %s" % (code, msg, details))
+
+        # If we cannot do anything about this error, just log it and stop
+        return None
 
     def reload_settings(self):
         """Retrieve new values for all settings, in order to account for any recent changes."""
@@ -264,8 +381,9 @@ class Main:
 
         self.holding_enabled = bool(__settings__.getSetting("holding_enabled") == "true")
         self.holding_folder = xbmc.translatePath(__settings__.getSetting("holding_folder"))
-        self.create_series_season_dirs = bool(
-            xbmc.translatePath(__settings__.getSetting("create_series_season_dirs")) == "true")
+        self.create_subdirs = bool(xbmc.translatePath(__settings__.getSetting("create_subdirs")) == "true")
+
+        self.not_in_progress = bool(__settings__.getSetting("not_in_progress") == "true")
 
     def get_free_disk_space(self, path):
         """Determine the percentage of free disk space.
@@ -367,6 +485,17 @@ class Main:
             return False
 
     def delete_empty_folders(self, folder):
+        """
+        Deletes the folder if it is empty. Presence of custom file extensions can be ignored while scanning.
+        To achieve this, edit the ignored file types setting in the addon settings.
+        :rtype : bool
+        :param folder: The folder to be deleted
+        :return: True if the folder was deleted, False otherwise
+        """
+        if not self.delete_folders:
+            self.debug("Deleting of folders is disabled.")
+            return False
+
         self.debug("Checking if %s is empty" % folder)
 
         ignored_file_types = [file_ext.strip() for file_ext in self.ignore_extensions.split(",")]
@@ -405,11 +534,13 @@ class Main:
                     xbmcvfs.delete(os.path.join(folder, f))
 
                 # Finally delete the current folder
-                xbmcvfs.rmdir(folder)
+                return xbmcvfs.rmdir(folder)
             except OSError, oe:
                 self.debug("An exception occurred while deleting folders. Errno " + str(oe.errno))
+                return False
         else:
             self.debug("Directory is not empty and will not be removed")
+            return False
 
     def move_file(self, source, dest_folder):
         """Move a file to a new destination. Returns True if the move succeeded, False otherwise.
