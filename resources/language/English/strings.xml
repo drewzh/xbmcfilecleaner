@@ -1,12 +1,12 @@
 <strings>
     <!-- Options Sections -->
-    <string id="31000">General</string>
-    <string id="32000">Conditions</string>
-    <string id="33000">FAQ</string>
+    <string id="31000">Actions</string>
+    <string id="32000">Timing</string>
+    <string id="33000">Conditions</string>
+    <string id="34000">Notifications</string>
 
-
-    <!-- General -->
-    <string id="31001">[B]General options used by XBMC File Cleaner[/B]</string>
+    <!-- Actions section -->
+    <string id="31001">[B]Which videos do you want to delete or move?[/B]</string>
     <string id="31002">Enable deleting of files</string>
     <string id="31013">Delete empty folders after cleaning</string>
     <string id="31014">Ignore files with the following extensions (separate with commas)</string>
@@ -24,43 +24,48 @@
     <string id="31011">Delete music videos</string>
     <string id="31012">Do not clean during video playback</string>
 
+    <!-- Timing section -->
+    <string id="32001">[B]When should we delete or move videos?[/B]</string>
 
-    <!-- Conditions -->
-    <string id="32001">[B]Conditions that must be met before any files are deleted[/B]</string>
-    <string id="32002">Only delete a video after a certain number of days after watching</string>
-    <string id="32003">Days after which a video is considerd to have expired</string>
-    
-    <string id="32004">Only delete a video when it has a low rating</string>
-    <string id="32005">Delete a video when its rating is lower than</string>
-    <string id="32006">Ignore videos without rating</string>
-    <string id="32007">[I]Note that music videos do not have ratings and ignore these settings [/I]</string>
 
-    <string id="32008">Only delete videos if low on disk space</string>
-    <string id="32009">Minimum percentage of free disk space</string>
-    <string id="32010">Path to check for free disk space</string>
+    <!-- Conditions section -->
+    <string id="33001">[B]Which conditions must be met before a video is deleted?[/B]</string>
+    <string id="33002">Only delete a video after a certain number of days after watching</string>
+    <string id="33003">Days after which a video is considerd to have expired</string>
     
-    <string id="32011">Move videos to a holding folder instead</string>
-    <string id="32012">Holding folder location</string>
-    <string id="32013">Create subdirectories (i.e. [I]..\Artist[/I], [I]..\Movie (Year)[/I] and [I]..\Show\Season xx\ [/I]</string>
-    <string id="32014">[I]Note that files in this holding folder will never be deleted automatically [/I]</string>
+    <string id="33004">Only delete a video when it has a low rating</string>
+    <string id="33005">Delete a video when its rating is lower than</string>
+    <string id="33006">Ignore videos without rating</string>
+    <string id="33007">[I]Note that music videos do not have ratings and ignore these settings [/I]</string>
 
-    <string id="32015">Do not delete videos that have not finished playing</string>
-    <string id="32016">[I]Note that music videos cannot be partially played and will ignore this [/I]</string>
+    <string id="33008">Only delete videos if low on disk space</string>
+    <string id="33009">Minimum percentage of free disk space</string>
+    <string id="33010">Path to check for free disk space</string>
+    
+    <string id="33011">Move videos to a holding folder instead</string>
+    <string id="33012">Holding folder location</string>
+    <string id="33013">Create subdirectories (i.e. [I]..\Artist[/I], [I]..\Movie (Year)[/I] and [I]..\Show\Season xx\ [/I]</string>
+    <string id="33014">[I]Note that files in this holding folder will never be deleted automatically [/I]</string>
+
+    <string id="33015">Do not delete videos that have not finished playing</string>
+    <string id="33016">[I]Note that music videos cannot be partially played and will ignore this [/I]</string>
+
+    <!-- Notifications section -->
+    <string id="34001">[B]How much information do you want to get?[/B]</string>
 
     
-    
-    <!-- Notifications and debug -->
-    <string id="34002">Error accessing video library database. Please check your logs.</string>
-    <string id="34003">Moved %s to holding folder</string>
-    <string id="34004">Cleaning library</string>
-    <string id="34005">Starting cleaner</string>
-    <string id="34006">Deleted %s from %s</string>
-    <string id="34007">Received an abort signal. Terminating.</string>
-    <string id="34008">The following error occurred: '%s'</string>
-    <string id="34009">Cannot move file %s as it doesn't exist</string>
-    <string id="34010">Cannot move file, destination %s unavailable</string>
-    <string id="34011">Hard disk capacity is 0. Did you select the correct hard disk to check for free space?</string>
-    <string id="34012">Couldn't access %s</string>
-    <string id="34013">No path selected to check for disk space. Please check your settings.</string>
-    <string id="34014">A video is currently being played. No cleaning will be performed during this interval.</string>
+    <!-- Localization strings for XBMC notifications -->
+    <string id="35002">Error accessing video library database. Please check your logs.</string>
+    <string id="35003">Moved %s to holding folder</string>
+    <string id="35004">Cleaning library</string>
+    <string id="35005">Starting cleaner</string>
+    <string id="35006">Deleted %s from %s</string>
+    <string id="35007">Received an abort signal. Terminating.</string>
+    <string id="35008">The following error occurred: '%s'</string>
+    <string id="35009">Cannot move file %s as it doesn't exist</string>
+    <string id="35010">Cannot move file, destination %s unavailable</string>
+    <string id="35011">Hard disk capacity is 0. Did you select the correct hard disk to check for free space?</string>
+    <string id="35012">Couldn't access %s</string>
+    <string id="35013">No path selected to check for disk space. Please check your settings.</string>
+    <string id="35014">A video is currently being played. No cleaning will be performed during this interval.</string>
 </strings>
