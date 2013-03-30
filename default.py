@@ -222,9 +222,12 @@ class Main:
         settings_and_filters = [
             (self.enable_expiration, by_date_played),
             (self.delete_when_low_rated, by_minimum_rating),
-            (self.ignore_no_rating, by_no_rating),
             (self.not_in_progress, by_progress)
         ]
+
+        # Only check not rated videos if checking for video ratings at all
+        if self.delete_when_low_rated:
+            settings_and_filters.append((self.ignore_no_rating, by_no_rating))
 
         enabled_filters = [by_playcount]
         for s, f in settings_and_filters:
