@@ -1,71 +1,69 @@
 <strings>
     <!-- Options Sections -->
-    <string id="31000">Actions</string>
-    <string id="32000">Timing</string>
-    <string id="33000">Conditions</string>
-    <string id="34000">Notifications</string>
+    <string id="100">Actions</string>
+    <string id="200">Frequency</string>
+    <string id="300">Conditions</string>
+    <string id="400">Notifications</string>
 
     <!-- Actions section -->
-    <string id="31001">[B]Which videos do you want to delete or move?[/B]</string>
-    <string id="31002">Enable deleting of files</string>
-    <string id="31013">Delete empty folders after cleaning</string>
-    <string id="31014">Ignore files with the following extensions (separate with commas)</string>
+    <string id="101">[B]Which videos do you want to delete or move?[/B]</string>
+    <string id="102">Enable deleting of files</string>
+    <string id="113">Delete empty folders after cleaning</string>
+    <string id="114">Ignore files with the following extensions (separate with commas)</string>
     
-    <string id="31003">Delayed start (in minutes)</string>
-    <string id="31004">Scan interval (in minutes)</string>
+    <string id="103">Delayed start (in minutes)</string>
+    <string id="104">Scan interval (in minutes)</string>
+
+    <string id="105">Show notifications</string>
+    <string id="106">Do not show notifications during video playback</string>
+    <string id="107">Enable debug messages</string>
     
-    <string id="31005">Show notifications</string>
-    <string id="31006">Do not show notifications during video playback</string>
-    <string id="31007">Enable debug messages</string>
-    
-    <string id="31008">Clean video library after deleting</string>
-    <string id="31009">Delete movies</string>
-    <string id="31010">Delete TV shows</string>
-    <string id="31011">Delete music videos</string>
-    <string id="31012">Do not clean during video playback</string>
+    <string id="108">Clean video library after deleting</string>
+    <string id="109">Delete movies</string>
+    <string id="110">Delete TV shows</string>
+    <string id="111">Delete music videos</string>
+    <string id="112">Do not clean during video playback</string>
 
     <!-- Timing section -->
-    <string id="32001">[B]When should we delete or move videos?[/B]</string>
-
+    <string id="201">[B]When should we delete or move videos?[/B]</string>
 
     <!-- Conditions section -->
-    <string id="33001">[B]Which conditions must be met before a video is deleted?[/B]</string>
-    <string id="33002">Only delete a video after a certain number of days after watching</string>
-    <string id="33003">Days after which a video is considerd to have expired</string>
+    <string id="301">[B]Which conditions must be met before a video is deleted?[/B]</string>
+    <string id="302">Only delete a video after a certain number of days after watching</string>
+    <string id="303">Days after which a video is considerd to have expired</string>
     
-    <string id="33004">Only delete a video when it has a low rating</string>
-    <string id="33005">Delete a video when its rating is lower than</string>
-    <string id="33006">Ignore videos without rating</string>
-    <string id="33007">[I]Note that music videos do not have ratings and ignore these settings [/I]</string>
+    <string id="304">Only delete a video when it has a low rating</string>
+    <string id="305">Delete a video when its rating is lower than</string>
+    <string id="306">Ignore videos without rating</string>
+    <string id="307">[I]Note that music videos do not have ratings and ignore these settings [/I]</string>
 
-    <string id="33008">Only delete videos if low on disk space</string>
-    <string id="33009">Minimum percentage of free disk space</string>
-    <string id="33010">Path to check for free disk space</string>
+    <string id="308">Only delete videos if low on disk space</string>
+    <string id="309">Minimum percentage of free disk space</string>
+    <string id="310">Path to check for free disk space</string>
     
-    <string id="33011">Move videos to a holding folder instead</string>
-    <string id="33012">Holding folder location</string>
-    <string id="33013">Create subdirectories (i.e. [I]..\Artist[/I], [I]..\Movie (Year)[/I] and [I]..\Show\Season xx\ [/I]</string>
-    <string id="33014">[I]Note that files in this holding folder will never be deleted automatically [/I]</string>
+    <string id="311">Move videos to a holding folder instead</string>
+    <string id="312">Holding folder location</string>
+    <string id="313">Create subdirectories (i.e. [I]..\Artist[/I], [I]..\Movie (Year)[/I] and [I]..\Show\Season xx\ [/I]</string>
+    <string id="314">[I]Note that files in this holding folder will never be deleted automatically [/I]</string>
 
-    <string id="33015">Do not delete videos that have not finished playing</string>
-    <string id="33016">[I]Note that music videos cannot be partially played and will ignore this [/I]</string>
+    <string id="315">Do not delete videos that have not finished playing</string>
+    <string id="316">[I]Note that music videos cannot be partially played and will ignore this [/I]</string>
 
     <!-- Notifications section -->
-    <string id="34001">[B]How much information do you want to get?[/B]</string>
-
+    <string id="401">[B]How much information do you want to get?[/B]</string>
     
     <!-- Localization strings for XBMC notifications -->
-    <string id="35002">Error accessing video library database. Please check your logs.</string>
-    <string id="35003">Moved %s to holding folder</string>
-    <string id="35004">Cleaning library</string>
-    <string id="35005">Starting cleaner</string>
-    <string id="35006">Deleted %s from %s</string>
-    <string id="35007">Received an abort signal. Terminating.</string>
-    <string id="35008">The following error occurred: '%s'</string>
-    <string id="35009">Cannot move file %s as it doesn't exist</string>
-    <string id="35010">Cannot move file, destination %s unavailable</string>
-    <string id="35011">Hard disk capacity is 0. Did you select the correct hard disk to check for free space?</string>
-    <string id="35012">Couldn't access %s</string>
-    <string id="35013">No path selected to check for disk space. Please check your settings.</string>
-    <string id="35014">A video is currently being played. No cleaning will be performed during this interval.</string>
+    <string id="502">Error accessing video library database. Please check your logs.</string>
+    <string id="503">Moved %s to holding folder</string>
+    <string id="504">Cleaning library</string>
+    <string id="505">Starting cleaner</string>
+    <string id="506">Deleted %s from %s</string>
+    <string id="507">Received an abort signal. Terminating.</string>
+    <string id="508">The following error occurred: '%s'</string>
+    <string id="509">Cannot move file %s as it doesn't exist</string>
+    <string id="510">Cannot move file, destination %s unavailable</string>
+    <string id="511">Hard disk capacity is 0. Did you select the correct hard disk to check for free space?</string>
+    <string id="512">Couldn't access %s</string>
+    <string id="513">No path selected to check for disk space. Please check your settings.</string>
+    <string id="514">A video is currently being played. No cleaning will be performed during this interval.</string>
 </strings>

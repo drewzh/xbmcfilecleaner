@@ -89,7 +89,7 @@ class Main:
                 ticker += 1
 
         # Abort is requested by XBMC: terminate
-        self.debug(__settings__.getLocalizedString(35007))
+        self.debug(__settings__.getLocalizedString(507))
 
     def cleanup(self):
         """Delete any watched videos from the XBMC video database.
@@ -447,7 +447,7 @@ class Main:
                     self.debug("Hard disk checks returned the following results:\n%s: %f\n%s: %f\n%s: %f" %
                                ("free", free, "capacity", capacity, "percentage", percentage))
                 except ZeroDivisionError, e:
-                    self.notify(__settings__.getLocalizedString(35011), 15000)
+                    self.notify(__settings__.getLocalizedString(511), 15000)
             else:
                 self.debug("We are checking disk space from a non-Windows file system")
                 self.debug("Stripping " + path + " of all redundant stuff.")
@@ -460,11 +460,11 @@ class Main:
                     self.debug("Hard disk checks returned the following results:\n%s: %f\n%s: %f\n%s: %f" % (
                         "free blocks", diskstats.f_bfree, "total blocks", diskstats.f_blocks, "percentage", percentage))
                 except OSError, e:
-                    self.notify(__settings__.getLocalizedString(35012) % self.disk_space_check_path)
+                    self.notify(__settings__.getLocalizedString(512) % self.disk_space_check_path)
                 except ZeroDivisionError, zde:
-                    self.notify(__settings__.getLocalizedString(35011), 15000)
+                    self.notify(__settings__.getLocalizedString(511), 15000)
         else:
-            self.notify(__settings__.getLocalizedString(35013), 15000)
+            self.notify(__settings__.getLocalizedString(513), 15000)
 
         return percentage
 

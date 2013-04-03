@@ -1,64 +1,69 @@
 <strings>
     <!-- Tabbladen -->
-    <string id="31000">Algemeen</string>
-    <string id="32000">Voorwaarden</string>
-    <string id="33000">Help</string>
+    <string id="100">Acties</string>
+    <string id="200">Frequentie</string>
+    <string id="300">Voorwaarden</string>
+    <string id="400">Meldingen</string>
+
+    <!-- Actiestabblad -->
+    <string id="101">[B]Algemene opties voor XBMC File Cleaner[/B]</string>
+    <string id="102">Activeer verwijderen van bestanden</string>
+    <string id="113">Verwijder lege mappen na schoonmaken</string>
+    <string id="114">Negeer bestanden met de volgende extensies (scheiden met komma's)</string>
     
+    <string id="103">Wachttijd bij opstarten (in minuten)</string>
+    <string id="104">Scan-interval (in minuten)</string>
     
-    <!-- Algemeen -->
-    <string id="31001">[B]Algemene opties voor XBMC File Cleaner[/B]</string>
-    <string id="31002">Activeer verwijderen van bestanden</string>
-    <string id="31013">Verwijder lege mappen na schoonmaken</string>
-    <string id="31014">Negeer bestanden met de volgende extensies (scheiden met komma's)</string>
+    <string id="105">Toon notificaties</string>
+    <string id="106">Toon geen notificaties als er video afgespeeld wordt</string>
+    <string id="107">Toon debuginformatie</string>
     
-    <string id="31003">Wachttijd bij opstarten (in minuten)</string>
-    <string id="31004">Scan-interval (in minuten)</string>
+    <string id="108">Videobibliotheek opschonen na verwijderen</string>
+    <string id="109">Verwijder films</string>
+    <string id="110">Verwijder TV series</string>
+    <string id="111">Verwijder videoclips</string>
+    <string id="112">Maak niet schoon als er video afgespeeld wordt</string>
     
-    <string id="31005">Toon notificaties</string>
-    <string id="31006">Toon geen notificaties als er video afgespeeld wordt</string>
-    <string id="31007">Toon debuginformatie</string>
+    <!-- Tijdstabblad -->
+    <string id="201">[B]Wanneer moeten we videos verwijderen of verplaatsen?[/B]</string>
+
+    <!-- Voorwaardentabblad -->
+    <string id="301">[B]Voorwaarden aan de bestanden die verwijderd moeten worden[/B]</string>
+    <string id="302">Verwijder bestanden pas na een aantal dagen na bekijken</string>
+    <string id="303">Aantal dagen waarna een bestand als verlopen wordt beschouwd</string>
     
-    <string id="31008">Videobibliotheek opschonen na verwijderen</string>
-    <string id="31009">Verwijder films</string>
-    <string id="31010">Verwijder TV series</string>
-    <string id="31011">Verwijder videoclips</string>
-    <string id="31012">Maak niet schoon als er video afgespeeld wordt</string>
+    <string id="304">Verwijder bestanden alleen bij een lage score</string>
+    <string id="305">Verwijder bestand bij een score lager dan</string>
+    <string id="306">Negeer bestanden zonder score</string>
+    <string id="307">[I]Let op: videoclips hebben geen score en negeren deze instellingen [/I]</string>
+
+    <string id="308">Verwijder bestanden pas bij te weinig vrije schrijfruimte</string>
+    <string id="309">Minimaal percentage vrije schijfruimte</string>
+    <string id="310">Locatie om te controleren op vrije schijfruimte</string>
     
+    <string id="311">Gebruik tijdelijke bewaarmap in plaats van verwijderen</string>
+    <string id="312">Locatie bewaarmap</string>
+    <string id="313">Maak serie- en seizoensmappen aan</string>
+    <string id="314">[I]Let op: bestanden in deze bewaarmap worden nooit automatisch verwijderd [/I]</string>
     
-    <!-- Criteria -->
-    <string id="32001">[B]Voorwaarden aan de bestanden die verwijderd moeten worden[/B]</string>
-    <string id="32002">Verwijder bestanden pas na een aantal dagen na bekijken</string>
-    <string id="32003">Aantal dagen waarna een bestand als verlopen wordt beschouwd</string>
-    
-    <string id="32004">Verwijder bestanden alleen bij een lage score</string>
-    <string id="32005">Verwijder bestand bij een score lager dan</string>
-    <string id="32006">Negeer bestanden zonder score</string>
-    <string id="32007">[I]Let op: videoclips hebben geen score en negeren deze instellingen [/I]</string>
-    <string id="32008">Verwijder bestanden pas bij te weinig vrije schrijfruimte</string>
-    <string id="32009">Minimaal percentage vrije schijfruimte</string>
-    <string id="32010">Locatie om te controleren op vrije schijfruimte</string>
-    
-    <string id="32011">Gebruik tijdelijke bewaarmap in plaats van verwijderen</string>
-    <string id="32012">Locatie bewaarmap</string>
-    <string id="32013">Maak serie- en seizoensmappen aan</string>
-    <string id="32014">[I]Let op: bestanden in deze bewaarmap worden nooit automatisch verwijderd [/I]</string>
-    
-    <string id="32015">Verwijder geen bestanden die nog niet klaar zijn met afspelen</string>
-    <string id="32016">[I]Let op: videoclips kunnen niet gedeeltelijk afgespeeld zijn en negeren dit [/I]</string>
-    
-    
-    <!-- Meldingen en logs -->
-    <string id="34002">Fout bij lezen van de videobibliotheek. Controleer de logbestanden voor meer informatie.</string>
-    <string id="34003">%s verplaatst naar bewaarmap</string>
-    <string id="34004">Bibliotheek opschonen</string>
-    <string id="34005">Reiniger opgestart</string>
-    <string id="34006">%s verwijderd uit %s</string>
-    <string id="34007">Stopsignaal ontvangen. Afsluiten.</string>
-    <string id="34008">Er is een fout opgetreden: '%s'</string>
-    <string id="34009">Verplaatsen van bestand mislukt. %s bestaat niet.</string>
-    <string id="34010">Verplaatsen van bestand mislukt. Doelmap %s kan niet worden gevonden.</string>
-    <string id="34011">De harde schijf heeft grootte 0. Heb je de juiste harde schijf geselecteerd in de instellingen?</string>
-    <string id="34012">Fout bij openen van %s. Toegang geweigerd.</string>
-    <string id="34013">Er is geen harde schijf geselecteerd om te controleren op vrije ruimte. Controleer de instellingen.</string>
-    <string id="34014">Er wordt momenteel een video afgespeeld. Er zal niet worden schoongemaakt gedurende dit interval.</string>
+    <string id="215">Verwijder geen bestanden die nog niet klaar zijn met afspelen</string>
+    <string id="216">[I]Let op: videoclips kunnen niet gedeeltelijk afgespeeld zijn en negeren dit [/I]</string>
+
+    <!-- Meldingentabblad -->
+    <string id="401">[B]Hoeveel informatie wil je krijgen?[/B]</string>
+
+    <!-- Gelokaliseerde teksten voor XBMC meldingen -->
+    <string id="502">Fout bij lezen van de videobibliotheek. Controleer de logbestanden voor meer informatie.</string>
+    <string id="503">%s verplaatst naar bewaarmap</string>
+    <string id="504">Bibliotheek opschonen</string>
+    <string id="505">Reiniger opgestart</string>
+    <string id="506">%s verwijderd uit %s</string>
+    <string id="507">Stopsignaal ontvangen. Afsluiten.</string>
+    <string id="508">Er is een fout opgetreden: '%s'</string>
+    <string id="509">Verplaatsen van bestand mislukt. %s bestaat niet.</string>
+    <string id="510">Verplaatsen van bestand mislukt. Doelmap %s kan niet worden gevonden.</string>
+    <string id="511">De harde schijf heeft grootte 0. Heb je de juiste harde schijf geselecteerd in de instellingen?</string>
+    <string id="512">Fout bij openen van %s. Toegang geweigerd.</string>
+    <string id="513">Er is geen harde schijf geselecteerd om te controleren op vrije ruimte. Controleer de instellingen.</string>
+    <string id="514">Er wordt momenteel een video afgespeeld. Er zal niet worden schoongemaakt gedurende dit interval.</string>
 </strings>
