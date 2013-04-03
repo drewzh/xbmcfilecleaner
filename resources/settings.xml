@@ -7,19 +7,19 @@
         <setting type="sep"/>
 
         <setting label="102" id="deleting_enabled" type="bool" default="false" visible="true"/>
-        <setting label="108" id="clean_xbmc_library" type="bool" default="true" subsetting="true" visible="eq(-1,true)"/>
+        <setting label="103" id="clean_xbmc_library" type="bool" default="true" subsetting="true" visible="eq(-1,true)"/>
 
-        <setting label="109" id="delete_movies" type="bool" default="false" visible="true"/>
-        <setting label="110" id="delete_tv_shows" type="bool" default="false" visible="true"/>
-        <setting label="111" id="delete_music_videos" type="bool" default="false" visible="true"/>
+        <setting label="104" id="delete_movies" type="bool" default="false" visible="true"/>
+        <setting label="105" id="delete_tv_shows" type="bool" default="false" visible="true"/>
+        <setting label="106" id="delete_music_videos" type="bool" default="false" visible="true"/>
 
-        <setting label="113" id="delete_folders" type="bool" default="false" subsetting="true" visible="true"/>
-        <setting label="114" id="ignore_extensions" type="text" default=".nfo, .tbn, .srt, .ass" subsetting="true" visible="eq(-1,true)"/>
+        <setting label="107" id="delete_folders" type="bool" default="false" subsetting="true" visible="true"/>
+        <setting label="108" id="ignore_extensions" type="text" default=".nfo, .tbn, .srt, .ass" subsetting="true" visible="eq(-1,true)"/>
 
-        <setting label="311" id="holding_enabled" type="bool" default="false" visible="true"/>
-        <setting label="312" id="holding_folder" type="folder" default="special://temp" option="writeable" subsetting="true" visible="eq(-1,true)"/>
-        <setting label="313" id="create_subdirs" type="bool" default="false" subsetting="true" visible="eq(-2,true)"/>
-        <setting label="314" id="holding_info" type="lsep" subsetting="true" visible="eq(-3,true)"/>
+        <setting label="109" id="holding_enabled" type="bool" default="false" visible="true"/>
+        <setting label="110" id="holding_info" type="lsep" subsetting="true" visible="eq(-1,true)"/>
+        <setting label="111" id="holding_folder" type="folder" default="special://temp" option="writeable" subsetting="true" visible="eq(-2,true)"/>
+        <setting label="112" id="create_subdirs" type="bool" default="false" subsetting="true" visible="eq(-3,true)"/>
     </category>
 
     <!-- Frequency section -->
@@ -28,10 +28,10 @@
         <setting label="201" type="lsep"/>
         <setting type="sep"/>
 
-        <setting label="103" id="delayed_start" type="slider" default="0" range="0,10,120" option="int" visible="true"/>
-        <setting label="104" id="scan_interval" type="slider" default="30" range="5,5,120" option="int" visible="true"/>
+        <setting label="202" id="delayed_start" type="slider" default="0" range="0,10,120" option="int" visible="true"/>
+        <setting label="203" id="scan_interval" type="slider" default="30" range="5,5,120" option="int" visible="true"/>
 
-        <setting label="112" id="delete_when_idle" type="bool" default="false" visible="true"/>
+        <setting label="204" id="delete_when_idle" type="bool" default="false" visible="true"/>
     </category>
 
     <!-- Conditions section -->
@@ -44,16 +44,16 @@
         <setting label="303" id="expire_after" type="slider" default="7" option="int" range="1,1,30" subsetting="true" visible="eq(-1,true)"/>
 
         <setting label="304" id="delete_when_low_rated" type="bool" default="false" visible="true"/>
-        <setting label="307" id="musicvideo_ratings_info" type="lsep" subsetting="true" visible="eq(-1,true)"/>
-        <setting label="305" id="minimum_rating" type="slider" default="6" option="int" range="1,1,10" subsetting="true" visible="eq(-2,true)"/>
-        <setting label="306" id="ignore_no_rating" type="bool" default="true" subsetting="true" visible="eq(-3,true)"/>
+        <setting label="305" id="musicvideo_ratings_info" type="lsep" subsetting="true" visible="eq(-1,true)"/>
+        <setting label="306" id="minimum_rating" type="slider" default="6" option="int" range="1,1,10" subsetting="true" visible="eq(-2,true)"/>
+        <setting label="307" id="ignore_no_rating" type="bool" default="true" subsetting="true" visible="eq(-3,true)"/>
 
         <setting label="308" id="delete_when_low_disk_space" type="bool" default="false" visible="true"/>
         <setting label="309" id="disk_space_threshold" type="slider" default="0" range="5,5,80" subsetting="true" visible="eq(-1,true)"/>
         <setting label="310" id="disk_space_check_path" type="folder" default="special://home" subsetting="true" visible="eq(-2,true)"/>
 
-        <setting label="315" id="not_in_progress" type="bool" default="true" visible="true"/>
-        <setting label="316" id="musicvideo_progress_info" type="lsep" subsetting="true" visible="eq(-1,true)"/>
+        <setting label="311" id="not_in_progress" type="bool" default="true" visible="true"/>
+        <setting label="312" id="musicvideo_progress_info" type="lsep" subsetting="true" visible="eq(-1,true)"/>
     </category>
 
     <!-- Notifications section -->
@@ -62,9 +62,9 @@
         <setting label="401" type="lsep"/>
         <setting type="sep"/>
 
-        <setting label="105" id="notifications_enabled" type="bool" default="true" visible="true"/>
-        <setting label="106" id="notify_when_idle" type="bool" default="true" subsetting="true" visible="eq(-1,true)"/>
+        <setting label="402" id="notifications_enabled" type="bool" default="true" visible="true"/>
+        <setting label="403" id="notify_when_idle" type="bool" default="true" subsetting="true" visible="eq(-1,true)"/>
 
-        <setting label="107" id="debugging_enabled" type="bool" default="false" visible="true"/>
+        <setting label="404" id="debugging_enabled" type="bool" default="false" visible="true"/>
     </category>
 </settings>
