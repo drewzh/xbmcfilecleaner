@@ -74,7 +74,7 @@ class Main:
             scanInterval_ticker = self.scan_interval * 60 / service_sleep
             delayedStart_ticker = self.delayed_start * 60 / service_sleep
 
-            if not self.deleting_enabled:
+            if not self.cleaner_enabled:
                 continue
             else:
                 if delayed_completed and ticker >= scanInterval_ticker:
@@ -104,17 +104,16 @@ class Main:
         # TODO combine these functionalities into a single loop
         if not self.delete_when_low_disk_space or (self.delete_when_low_disk_space and self.disk_space_low()):
             # create stub to summarize cleaning results
-            summary = "Deleted" if not self.holding_enabled else "Moved"
+            summary = "Deleted" if self.delete_files else "Moved"
             cleaning_required = False
             if self.delete_movies:
                 movies = self.get_expired_videos(self.MOVIES)
                 if movies:
                     count = 0
                     for abs_path, title, year in movies:
-                        # abs_path = str(*abs_path)  # Convert 1 element tuple into string with scatter
                         if xbmcvfs.exists(abs_path):
                             cleaning_required = True
-                            if self.holding_enabled:
+                            if not self.delete_files:
                                 if self.create_subdirs:
                                     new_path = os.path.join(self.holding_folder, "%s (%d)" % (title, year))
                                 else:
@@ -138,7 +137,7 @@ class Main:
                     for abs_path, show_name, season_number in episodes:
                         if xbmcvfs.exists(abs_path):
                             cleaning_required = True
-                            if self.holding_enabled:
+                            if not self.delete_files:
                                 if self.create_subdirs:
                                     new_path = os.path.join(self.holding_folder, show_name, "Season %d" % season_number)
                                 else:
@@ -156,14 +155,13 @@ class Main:
                         summary += " %d %s" % (count, self.TVSHOWS)
 
             if self.delete_music_videos:
-                musicvideos = self.get_expired_videos(self.MUSIC_VIDEOS)  # self.get_expired(self.MUSIC_VIDEOS)
+                musicvideos = self.get_expired_videos(self.MUSIC_VIDEOS)
                 if musicvideos:
                     count = 0
                     for abs_path, artists in musicvideos:
-                        # abs_path = str(*abs_path)  # Convert 1 element tuple into string with scatter
                         if xbmcvfs.exists(abs_path):
                             cleaning_required = True
-                            if self.holding_enabled:
+                            if not self.delete_files:
                                 if self.create_subdirs:
                                     artist = ", ".join(str(a) for a in artists)
                                     new_path = os.path.join(self.holding_folder, artist)
@@ -352,7 +350,7 @@ class Main:
         """Retrieve new values for all settings, in order to account for any recent changes."""
         __settings__ = xbmcaddon.Addon(__addonID__)
 
-        self.deleting_enabled = bool(__settings__.getSetting("deleting_enabled") == "true")
+        self.cleaner_enabled = bool(__settings__.getSetting("cleaner_enabled") == "true")
         self.delete_folders = bool(__settings__.getSetting("delete_folders") == "true")
         self.ignore_extensions = str(__settings__.getSetting("ignore_extensions"))
         self.delayed_start = float(__settings__.getSetting("delayed_start"))
@@ -379,7 +377,7 @@ class Main:
         self.disk_space_threshold = float(__settings__.getSetting("disk_space_threshold"))
         self.disk_space_check_path = xbmc.translatePath(__settings__.getSetting("disk_space_check_path"))
 
-        self.holding_enabled = bool(__settings__.getSetting("holding_enabled") == "true")
+        self.delete_files = bool(__settings__.getSetting("delete_files") == "true")
         self.holding_folder = xbmc.translatePath(__settings__.getSetting("holding_folder"))
         self.create_subdirs = bool(xbmc.translatePath(__settings__.getSetting("create_subdirs")) == "true")
 

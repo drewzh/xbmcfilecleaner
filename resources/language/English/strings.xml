@@ -6,38 +6,40 @@
     <string id="400">Notifications</string>
 
     <!-- Actions section -->
-    <string id="101">[B]Which videos do you want to delete or move?[/B]</string>
+    <string id="101">[B]Which videos do you want to delete?[/B]</string>
 
-    <string id="102">Enable deleting of files</string>
-    <string id="103">Clean video library after deleting</string>
+    <string id="102">[B]Enable File Cleaner[/B]</string>
 
-    <string id="104">Delete movies</string>
-    <string id="105">Delete TV shows</string>
-    <string id="106">Delete music videos</string>
+    <string id="103">Delete videos [I]permanently [/I]</string>
+    <string id="104">[I]Please specify where to store watched videos [/I]</string>
+    <string id="105">Holding folder location</string>
+    <string id="106">Create subdirectories (i.e. [B]..\Artist[/B], [B]..\Movie (Year)[/B] and [B]..\Show\Season xx[/B])</string>
 
-    <string id="107">Delete empty folders after cleaning</string>
-    <string id="108">Ignore files with the following extensions (separate with commas)</string>
+    <string id="107">Delete movies</string>
+    <string id="108">Delete TV shows</string>
+    <string id="109">Delete music videos</string>
 
-    <string id="109">Move videos to a holding folder instead</string>
-    <string id="110">[I]Note that files in this holding folder will never be deleted automatically [/I]</string>
-    <string id="111">Holding folder location</string>
-    <string id="112">Create subdirectories (i.e. [I]..\Artist[/I], [I]..\Movie (Year)[/I] and [I]..\Show\Season xx [/I]</string>
+    <string id="110">Clean XBMC video library after cleaning</string>
+    <string id="111">Delete empty folders after cleaning</string>
+    <string id="112">Ignore files with the following extensions (separate with commas)</string>
 
     <!-- Frequency section -->
-    <string id="201">[B]When should videos be deleted or moved?[/B]</string>
+    <string id="201">[B]When should videos be deleted?[/B]</string>
 
     <string id="202">Delayed start (in minutes)</string>
     <string id="203">Scan interval (in minutes)</string>
 
     <string id="204">Do not clean during video playback</string>
 
+    <string id="205">Start cleaning right after playback stops</string>
+
     <!-- Conditions section -->
-    <string id="301">[B]Which conditions must be met before a video is deleted or moved?[/B]</string>
+    <string id="301">[B]Which conditions must be met before a video is deleted?[/B]</string>
 
     <string id="302">Wait a certain number of days after watching before deleting</string>
     <string id="303">Days after which a video is considerd to have expired</string>
     
-    <string id="304">Only delete video's with low ratings</string>
+    <string id="304">Only delete videos with low ratings</string>
     <string id="305">[I]Note that music videos do not have ratings and ignore these settings [/I]</string>
     <string id="306">Delete a video with a rating lower than</string>
     <string id="307">Ignore videos without rating</string>
@@ -46,7 +48,7 @@
     <string id="309">Minimum percentage of free disk space</string>
     <string id="310">Path to check for free disk space</string>
 
-    <string id="311">Do not delete videos that have not finished playing</string>
+    <string id="311">Do not delete videos that are still in progress</string>
     <string id="312">[I]Note that music videos cannot be partially played and will ignore this [/I]</string>
 
     <!-- Notifications section -->

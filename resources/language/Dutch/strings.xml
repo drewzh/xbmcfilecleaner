@@ -6,33 +6,35 @@
     <string id="400">Meldingen</string>
 
     <!-- Actiestabblad -->
-    <string id="101">[B]Welke video's wil je verwijderen of verplaatsen?[/B]</string>
+    <string id="101">[B]Welke video's wil je verwijderen?[/B]</string>
 
-    <string id="102">Activeer verwijderen van bestanden</string>
-    <string id="103">Videobibliotheek opschonen na verwijderen</string>
+    <string id="102">[B]Activeer File Cleaner[/B]</string>
 
-    <string id="104">Verwijder films</string>
-    <string id="105">Verwijder TV series</string>
-    <string id="106">Verwijder videoclips</string>
+    <string id="103">Verwijder video's [I]permanent [/I]</string>
+    <string id="104">[I]Selecteer een map waar bekeken video's bewaard worden[/I]</string>
+    <string id="105">Locatie bewaarmap</string>
+    <string id="106">Maak submappen aan (bv. [B]..\Artiest[/B], [B]..\Film (Jaar)[/B] en [B]..\Serie\Seizoen xx[/B])</string>
 
-    <string id="107">Verwijder lege mappen na schoonmaken</string>
-    <string id="108">Negeer bestanden met de volgende extensies (scheiden met komma's)</string>
+    <string id="107">Verwijder films</string>
+    <string id="108">Verwijder TV series</string>
+    <string id="109">Verwijder videoclips</string>
 
-    <string id="109">Gebruik tijdelijke bewaarmap in plaats van verwijderen</string>
-    <string id="110">[I]Let op: bestanden in deze bewaarmap worden nooit automatisch verwijderd [/I]</string>
-    <string id="111">Locatie bewaarmap</string>
-    <string id="112">Maak submappen aan (bv. [I]..\Artiest[/I], [I]..\Film (Jaar)[/I] en ..\Serie\Seizoen xx [/I])</string>
+    <string id="110">XBMC videobibliotheek opschonen na schoonmaken</string>
+    <string id="111">Verwijder lege mappen na schoonmaken</string>
+    <string id="112">Negeer bestanden met de volgende extensies (scheiden met komma's)</string>
 
     <!-- Frequentietabblad -->
-    <string id="201">[B]Wanneer moeten videos verwijderd of verplaatst worden?[/B]</string>
+    <string id="201">[B]Wanneer moeten videos verwijderd worden?[/B]</string>
 
     <string id="202">Wachttijd bij opstarten (in minuten)</string>
     <string id="203">Scan-interval (in minuten)</string>
 
     <string id="204">Maak niet schoon als er video afgespeeld wordt</string>
 
+    <string id="205">Start opschonen zodra afspelen stopt</string>
+
     <!-- Voorwaardentabblad -->
-    <string id="301">[B]Aan welke voorwaarden moet een video voldoen voor hij verwijderd of verplaatst wordt?[/B]</string>
+    <string id="301">[B]Aan welke voorwaarden moet een video voldoen voor hij verwijderd wordt?[/B]</string>
 
     <string id="302">Verwijder video's pas een aantal dagen na bekijken</string>
     <string id="303">Aantal dagen waarna een bestand als verlopen wordt beschouwd</string>
@@ -42,12 +44,12 @@
     <string id="306">Verwijder video's met een cijfer lager dan</string>
     <string id="307">Negeer video's zonder cijfer</string>
 
-    <string id="308">Verwijder bestanden pas bij te weinig vrije schrijfruimte</string>
+    <string id="308">Verwijder video's pas bij te weinig vrije schrijfruimte</string>
     <string id="309">Minimaal percentage vrije schijfruimte</string>
     <string id="310">Locatie om te controleren op vrije schijfruimte</string>
     
-    <string id="311">Verwijder geen video's die nog niet geheel afgespeeld zijn</string>
-    <string id="312">[I]Let op: videoclips kunnen niet gedeeltelijk afgespeeld zijn en negeren dit [/I]</string>
+    <string id="311">Verwijder geen video's die halverwege gestopt zijn</string>
+    <string id="312">[I]Videoclips onthouden niet tot hoever ze afgespeeld zijn en negeren dit [/I]</string>
 
     <!-- Meldingentabblad -->
     <string id="401">[B]Hoeveel informatie wil je krijgen?[/B]</string>
