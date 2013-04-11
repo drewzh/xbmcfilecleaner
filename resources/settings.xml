@@ -1,52 +1,74 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
-    <!-- General Section -->
-    <category label="31000" id="section_general">
+    <!-- Actions section -->
+    <category label="100" id="actions_section">
         <setting type="sep" />
-        <setting label="31001" type="lsep" />
+        <setting label="101" type="lsep" />
         <setting type="sep" />
-        
-        <setting id="deleting_enabled" type="bool" label="31002" default="false"/>
-        <setting id="delete_folders" type="bool" label="31013" subsetting="true" default="false" visible="eq(-1,true)" />
-        <setting id="ignore_extensions" type="text" label="31014" subsetting="true" default=".nfo, .tbn, .srt, .ass" visible="eq(-1,true)" />
-        
-        <setting id="delayed_start" type="slider" label="31003" default="0" range="0,10,120" option="int" visible="eq(-3,true)" />
-        <setting id="scan_interval" type="slider" label="31004" default="30" range="5,5,120" option="int" visible="eq(-4,true)" />
-        
-        <setting id="notifications_enabled" type="bool" label="31005" default="true" visible="eq(-5,true)" />
-        <setting id="notify_when_idle" type="bool" label="31006" subsetting="true" default="true" visible="eq(-6,true)+eq(-1,true)" />
-        <setting id="debugging_enabled" type="bool" label="31007" default="false" visible="eq(-7,true)" />
-        
-        <setting id="clean_xbmc_library" type="bool" label="31008" default="true" visible="eq(-8,true)" />
-        <setting id="delete_movies" type="bool" label="31009" default="false" visible="eq(-9,true)" />
-        <setting id="delete_tv_shows" type="bool" label="31010" default="false" visible="eq(-10,true)" />
-        <setting id="delete_music_videos" type="bool" label="31011" default="false" visible="eq(-11,true)" />
-        <setting id="delete_when_idle" type="bool" label="31012" default="false" visible="eq(-12,true)" />
+
+        <setting label="102" id="cleaner_enabled" type="bool" default="false" visible="true" />
+
+        <setting label="103" id="delete_files" type="bool" default="true" visible="true" />
+        <setting label="104" id="holding_info" type="lsep" subsetting="true" visible="eq(-1,false)" />
+        <setting label="105" id="holding_folder" type="folder" default="special://temp" option="writeable" subsetting="true" visible="eq(-2,false)" />
+        <setting label="106" id="create_subdirs" type="bool" default="false" subsetting="true" visible="eq(-3,false)" />
+
+        <setting label="107" id="delete_movies" type="bool" default="false" visible="true" />
+        <setting label="108" id="delete_tv_shows" type="bool" default="false" visible="true" />
+        <setting label="109" id="delete_music_videos" type="bool" default="false" visible="true" />
+
+        <setting label="110" id="clean_xbmc_library" type="bool" default="true" visible="true" />
+        <setting label="111" id="delete_folders" type="bool" default="false" visible="true" />
+        <setting label="112" id="ignore_extensions" type="text" default=".nfo, .tbn, .srt, .ass" subsetting="true" visible="eq(-1,true)" />
     </category>
-    
-    <!-- Conditions Section -->
-    <category label="32000" id="section_conditions">
-        <setting type="sep" />
-        <setting label="32001" type="lsep" />
-        <setting type="sep" />
-        
-        <setting id="enable_expiration" type="bool" label="32002" default="false" />
-        <setting id="expire_after" type="slider" label="32003" subsetting="true" default="7" range="1,1,30" option="int" visible="eq(-1,true)" />
-        
-        <setting id="delete_when_low_rated" type="bool" label="32004" default="false" />
-        <setting id="minimum_rating" type="slider" label="32005" subsetting="true" default="6" range="1,1,10" option="int" visible="eq(-1,true)" />
-        <setting id="ignore_no_rating" type="bool" label="32006" subsetting="true" default="true" visible="eq(-2,true)" />
-        <setting id="musicvideo_ratings_info" label="32007" type="lsep" subsetting="true" visible="eq(-3,true)" />
 
-        <setting id="delete_when_low_disk_space" type="bool" label="32008" default="false" />
-        <setting id="disk_space_threshold" type="slider" label="32009" subsetting="true" default="0" range="5,5,80" visible="eq(-1,true)" />
-        <setting id="disk_space_check_path" type="folder" label="32010" subsetting="true" default="special://home" visible="eq(-2,true)" />
-        
-        <setting id="holding_enabled" type="bool" label="32011" default="false" />
-        <setting id="holding_folder" type="folder" label="32012" subsetting="true" default="special://temp" visible="eq(-1,true)" />
-        <setting id="create_subdirs" type="bool" label="32013" subsetting="true" default="false" visible="eq(-2,true)" />
-        <setting id="holding_info" label="32014" type="lsep" subsetting="true" visible="eq(-3,true)" />
+    <!-- Frequency section -->
+    <category label="200" id="timing_section">
+        <setting type="sep" />
+        <setting label="201" type="lsep" />
+        <setting type="sep" />
 
-        <setting id="not_in_progress" type="bool" label="32015" default="true" />
-        <setting id="musicvideo_progress_info" label="32016" type="lsep" subsetting="true" visible="eq(-1,true)" />
+        <!-- This setting is not implemented yet -->
+        <!-- <setting label="205" id="delete_on_stop" type="bool" default="false" visible="true" /> -->
+        <!-- Enabling this should disable interval and delay timings -->
+
+        <setting label="202" id="delayed_start" type="slider" default="0" range="0,10,120" option="int" visible="true" />
+        <setting label="203" id="scan_interval" type="slider" default="30" range="5,5,120" option="int" visible="true" />
+
+        <setting label="204" id="delete_when_idle" type="bool" default="false" visible="true" />
+    </category>
+
+    <!-- Conditions section -->
+    <category label="300" id="conditions_section">
+        <setting type="sep" />
+        <setting label="301" type="lsep" />
+        <setting type="sep" />
+
+        <setting label="302" id="enable_expiration" type="bool" default="false" visible="true" />
+        <setting label="303" id="expire_after" type="slider" default="7" option="int" range="1,1,30" subsetting="true" visible="eq(-1,true)" />
+
+        <setting label="304" id="delete_when_low_rated" type="bool" default="false" visible="true" />
+        <setting label="305" id="musicvideo_ratings_info" type="lsep" subsetting="true" visible="eq(-1,true)" />
+        <setting label="306" id="minimum_rating" type="slider" default="6" option="int" range="1,1,10" subsetting="true" visible="eq(-2,true)" />
+        <setting label="307" id="ignore_no_rating" type="bool" default="true" subsetting="true" visible="eq(-3,true)" />
+
+        <setting label="308" id="delete_when_low_disk_space" type="bool" default="false" visible="true" />
+        <setting label="309" id="disk_space_threshold" type="slider" default="0" range="5,5,80" subsetting="true" visible="eq(-1,true)" />
+        <setting label="310" id="disk_space_check_path" type="folder" default="special://home" subsetting="true" visible="eq(-2,true)" />
+
+        <setting label="311" id="not_in_progress" type="bool" default="true" visible="true" />
+        <setting label="312" id="musicvideo_progress_info" type="lsep" subsetting="true" visible="eq(-1,true)" />
+    </category>
+
+    <!-- Notifications section -->
+    <category label="400" id="notifications_section">
+        <setting type="sep" />
+        <setting label="401" type="lsep" />
+        <setting type="sep" />
+
+        <setting label="402" id="notifications_enabled" type="bool" default="true" visible="true" />
+        <setting label="403" id="notify_when_idle" type="bool" default="true" subsetting="true" visible="eq(-1,true)" />
+
+        <setting label="404" id="debugging_enabled" type="bool" default="false" visible="true" />
     </category>
 </settings>
