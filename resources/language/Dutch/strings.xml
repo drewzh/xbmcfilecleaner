@@ -24,7 +24,7 @@
     <string id="112">Negeer bestanden met de volgende extensies (scheiden met komma's)</string>
 
     <!-- Frequentietabblad -->
-    <string id="201">[B]Wanneer moeten videos verwijderd worden?[/B]</string>
+    <string id="201">[B]Wanneer moeten bekeken videos verwijderd worden?[/B]</string>
 
     <string id="202">Wachttijd bij opstarten (in minuten)</string>
     <string id="203">Scan-interval (in minuten)</string>
@@ -34,7 +34,7 @@
     <string id="205">Start opschonen zodra afspelen stopt</string>
 
     <!-- Voorwaardentabblad -->
-    <string id="301">[B]Aan welke voorwaarden moet een video voldoen voor hij verwijderd wordt?[/B]</string>
+    <string id="301">[B]Aan welke voorwaarden moet een bekeken video voldoen voor hij verwijderd wordt?[/B]</string>
 
     <string id="302">Verwijder video's pas een aantal dagen na bekijken</string>
     <string id="303">Aantal dagen waarna een bestand als verlopen wordt beschouwd</string>
@@ -60,17 +60,8 @@
     <string id="404">Toon debuginformatie</string>
 
     <!-- Gelokaliseerde teksten voor XBMC meldingen -->
-    <!--<string id="502">Fout bij lezen van de videobibliotheek. Controleer de logbestanden voor meer informatie.</string>-->
-    <!--<string id="503">%s verplaatst naar bewaarmap</string>-->
-    <!--<string id="504">Bibliotheek opschonen</string>-->
-    <!--<string id="505">Reiniger opgestart</string>-->
-    <!--<string id="506">%s verwijderd uit %s</string>-->
     <string id="507">Stopsignaal ontvangen. Afsluiten.</string>
-    <!--<string id="508">Er is een fout opgetreden: '%s'</string>-->
-    <!--<string id="509">Verplaatsen van bestand mislukt. %s bestaat niet.</string>-->
-    <!--<string id="510">Verplaatsen van bestand mislukt. Doelmap %s kan niet worden gevonden.</string>-->
     <string id="511">Fout bij lezen van harde schijf. Controleer de instellingen.</string>
     <string id="512">Fout bij openen van %s. Toegang geweigerd.</string>
     <string id="513">Geen harde schijf geselecteerd voor controle op schijfruimte. Controleer de instellingen.</string>
-    <!--<string id="514">Er wordt momenteel een video afgespeeld. Er zal niet worden schoongemaakt gedurende dit interval.</string>-->
 </strings>

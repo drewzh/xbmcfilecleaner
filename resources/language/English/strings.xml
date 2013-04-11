@@ -24,7 +24,7 @@
     <string id="112">Ignore files with the following extensions (separate with commas)</string>
 
     <!-- Frequency section -->
-    <string id="201">[B]When should videos be deleted?[/B]</string>
+    <string id="201">[B]When should watched videos be deleted?[/B]</string>
 
     <string id="202">Delayed start (in minutes)</string>
     <string id="203">Scan interval (in minutes)</string>
@@ -34,7 +34,7 @@
     <string id="205">Start cleaning right after playback stops</string>
 
     <!-- Conditions section -->
-    <string id="301">[B]Which conditions must be met before a video is deleted?[/B]</string>
+    <string id="301">[B]Which conditions must be met before a watched video is deleted?[/B]</string>
 
     <string id="302">Wait a certain number of days after watching before deleting</string>
     <string id="303">Days after which a video is considerd to have expired</string>
@@ -60,17 +60,8 @@
     <string id="404">Enable debug messages</string>
     
     <!-- Localization strings for XBMC notifications -->
-    <!--<string id="502">Error accessing video library database. Please check your logs.</string>-->
-    <!--<string id="503">Moved %s to holding folder</string>-->
-    <!--<string id="504">Cleaning library</string>-->
-    <!--<string id="505">Starting cleaner</string>-->
-    <!--<string id="506">Deleted %s from %s</string>-->
     <string id="507">Received an abort signal. Terminating.</string>
-    <!--<string id="508">The following error occurred: '%s'</string>-->
-    <!--<string id="509">Cannot move file %s as it doesn't exist</string>-->
-    <!--<string id="510">Cannot move file, destination %s unavailable</string>-->
     <string id="511">Error reading hard disk. Please check your settings.</string>
     <string id="512">Could not access %s. Access denied.</string>
     <string id="513">No path selected for disk space checks. Please check your settings.</string>
-    <!--<string id="514">A video is currently being played. No cleaning will be performed during this interval.</string>-->
 </strings>
