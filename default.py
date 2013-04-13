@@ -12,7 +12,7 @@ import xbmcvfs
 
 # Addon info
 __title__ = "XBMC File Cleaner"
-__author__ = "Andrew Higginson <azhigginson@gmail.com>"
+__author__ = "Anthirian"
 __addonID__ = "script.filecleaner"
 __icon__ = "special://home/addons/" + __addonID__ + "/icon.png"
 __settings__ = xbmcaddon.Addon(__addonID__)
