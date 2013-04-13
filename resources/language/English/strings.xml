@@ -60,8 +60,7 @@
     <string id="404">Enable debug messages</string>
     
     <!-- Localization strings for XBMC notifications -->
-    <string id="507">Received an abort signal. Terminating.</string>
     <string id="511">Error reading hard disk. Please check your settings.</string>
-    <string id="512">Could not access %s. Access denied.</string>
-    <string id="513">No path selected for disk space checks. Please check your settings.</string>
+    <string id="512">Could not check disk space. Access denied.</string>
+    <string id="513">Could not check disk space. Path does not exist.</string>
 </strings>

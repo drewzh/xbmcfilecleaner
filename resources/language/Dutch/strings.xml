@@ -60,8 +60,7 @@
     <string id="404">Toon debuginformatie</string>
 
     <!-- Gelokaliseerde teksten voor XBMC meldingen -->
-    <string id="507">Stopsignaal ontvangen. Afsluiten.</string>
     <string id="511">Fout bij lezen van harde schijf. Controleer de instellingen.</string>
-    <string id="512">Fout bij openen van %s. Toegang geweigerd.</string>
-    <string id="513">Geen harde schijf geselecteerd voor controle op schijfruimte. Controleer de instellingen.</string>
+    <string id="512">Schijfruimte kon niet worden gecontroleerd. Toegang geweigerd.</string>
+    <string id="513">Schijfruimte kon niet worden gecontroleerd. Het opgegeven pad bestaat niet.</string>
 </strings>

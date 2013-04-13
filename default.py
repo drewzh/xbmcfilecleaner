@@ -1,12 +1,11 @@
 # encoding: utf-8
-
 import os
-import sys
 import platform
+import locale
 import time
 import re
 import json
-import ctypes
+from ctypes import *
 import xbmc
 import xbmcaddon
 import xbmcvfs
@@ -19,8 +18,17 @@ __icon__ = "special://home/addons/" + __addonID__ + "/icon.png"
 __settings__ = xbmcaddon.Addon(__addonID__)
 
 
-class Main:
-    # Constants to ensure correct JSON-RPC requests
+class Cleaner:
+
+    """
+    The Cleaner class is used in XBMC to identify and delete videos that have been watched by the user. It starts with
+    XBMC and runs until XBMC shuts down. Identification of watched videos can be enhanced with additional criteria,
+    such as recently watched, low rated and based on free disk space. Deleting of videos can be enabled for movies,
+    music videos or tv shows, or any combination of these. Almost all of the methods in this class will be called
+    through the cleanup method.
+    """
+
+    # Constants to ensure correct JSON-RPC requests for XBMC
     MOVIES = "movies"
     MUSIC_VIDEOS = "musicvideos"
     TVSHOWS = "episodes"
@@ -57,16 +65,17 @@ class Main:
     }
 
     def __init__(self):
-        """Create a Main object that performs regular cleaning of watched videos."""
+        """Create a Cleaner object that performs regular cleaning of watched videos."""
+        try:
+            locale.setlocale(locale.LC_ALL, "English_United Kingdom")
+        except locale.Error, le:
+            self.debug("Could not change locale: %s" % le)
+
         self.reload_settings()
 
         service_sleep = 10
         ticker = 0
         delayed_completed = False
-
-        # TODO should be removed: http://ziade.org/2008/01/08/syssetdefaultencoding-is-evil/
-        reload(sys)
-        sys.setdefaultencoding("utf-8")
 
         while not xbmc.abortRequested:
             self.reload_settings()
@@ -88,12 +97,12 @@ class Main:
                 time.sleep(service_sleep)
                 ticker += 1
 
-        # Abort is requested by XBMC: terminate
-        self.debug(__settings__.getLocalizedString(507))
+        self.debug("Abort requested. Terminating.")
 
     def cleanup(self):
-        """Delete any watched videos from the XBMC video database.
-        The videos to be deleted are subject to a number of criteria as can be specified in the addon's settings.
+        """Delete any watched videos from the XBMC video database. The videos to be deleted are subject to a number of
+        criteria as can be specified in the addon's settings.
+        :rtype : None
         """
         self.debug("Starting cleaning routine")
 
@@ -101,7 +110,6 @@ class Main:
             self.debug("A video is currently being played. No cleaning will be performed during this interval.")
             return
 
-        # TODO combine these functionalities into a single loop
         if not self.delete_when_low_disk_space or (self.delete_when_low_disk_space and self.disk_space_low()):
             # create stub to summarize cleaning results
             summary = "Deleted" if self.delete_files else "Moved"
@@ -195,11 +203,12 @@ class Main:
                     xbmc.executebuiltin("XBMC.CleanLibrary(video)")
 
     def get_expired_videos(self, option):
-        """Launch a JSON-RPC to find expired musicvideos
+        """Find videos in the XBMC library that have been watched and satisfy any other conditions as enabled in the
+        addon's settings.
+
+        :type option: str
         :param option: The type of videos to find (one of the globals MOVIES, MUSIC_VIDEOS or TVSHOWS)
-        http://wiki.xbmc.org/index.php?title=JSON-RPC_API
-        To test:
-        http://localhost:8000/jsonrpc?request=...
+        :rtype : list
         """
         # This currently does not do anything and may have to be removed
         operators = ["contains", "doesnotcontain", "is", "isnot", "startswith", "endswith", "greaterthan", "lessthan",
@@ -274,7 +283,7 @@ class Main:
                 expired_videos.append(temp)
         except KeyError, ke:
             if option in ke:
-                pass  # no expired videos
+                pass  # no expired videos found
             else:
                 self.debug("KeyError: %s not found" % ke)
                 self.handle_json_error(response)
@@ -286,6 +295,10 @@ class Main:
     def handle_json_error(self, error):
         """If a JSON-RPC request results in an error, this function will handle it.
         This function currently only logs the error that occurred, and will not act on it.
+
+        :type error: dict
+        :param error: the error to handle
+        :rtype : None
         """
         error_format = {
             "code": {
@@ -332,15 +345,15 @@ class Main:
         msg = error["message"]
         details = error["data"] if "data" in error else "No further details"
 
-        self.debug("JSON error occurred.\nError code: %d\nError message: %s\nError details: %s" % (code, msg, details))
-
         # If we cannot do anything about this error, just log it and stop
+        self.debug("JSON error occurred.\nError code: %d\nError message: %s\nError details: %s" % (code, msg, details))
         return None
 
     def reload_settings(self):
-        """Retrieve new values for all settings, in order to account for any recent changes."""
-        __settings__ = xbmcaddon.Addon(__addonID__)
+        """Retrieve new values for all settings, in order to account for any recent changes.
 
+        :rtype : None
+        """
         self.cleaner_enabled = bool(__settings__.getSetting("cleaner_enabled") == "true")
         self.delete_folders = bool(__settings__.getSetting("delete_folders") == "true")
         self.ignore_extensions = str(__settings__.getSetting("ignore_extensions"))
@@ -377,95 +390,97 @@ class Main:
     def get_free_disk_space(self, path):
         """Determine the percentage of free disk space.
 
-        Keyword arguments:
-        path -- the path to the drive to check (this can be any path of any length on the desired drive).
-        If the path doesn't exist, this function returns 100, in order to prevent files from being deleted accidentally.
+        :type path: str
+        :param path: the path to the drive to check (this can be any path of any depth on the desired drive). If the
+        path doesn't exist, this function returns 100, in order to prevent files from being deleted accidentally
+        :rtype : float
         """
-        # TODO: Check disk space for each file that matches the deleting criteria, and only delete if it frees up space
         percentage = float(100)
         self.debug("Checking for disk space on path: %s" % path)
-        if xbmcvfs.exists(path):  # Fails for drive-only paths like "E:\"
+        dirs, files = xbmcvfs.listdir(path)
+        if dirs or files:  # Workaround for xbmcvfs.exists("C:\")
             if platform.system() == "Windows":
                 self.debug("We are checking disk space from a Windows file system")
-                self.debug("The current path is %s" % path)
-                self.debug("Stripping the path of all redundant stuff.")
+                self.debug("The path to check is %s" % path)
 
                 if r"://" in path:
-                    self.debug("We are dealing with network paths.")
+                    self.debug("We are dealing with network paths")
                     self.debug("Extracting information from share %s" % path)
 
-                    pattern = re.compile("(?P<type>smb|nfs|afp)://(?P<user>\w+):(?P<pass>.+)@(?P<host>.+)",
-                                         flags=re.I | re.U)
+                    regex = "(?P<type>smb|nfs|afp)://(?P<user>\w+):(?P<pass>.+)@(?P<host>.+?)/(?P<share>.+?)/"
+                    pattern = re.compile(regex, flags=re.I | re.U)
                     match = pattern.match(path)
-                    share = match.groupdict()
+                    try:
+                        share = match.groupdict()
+                        self.debug("Protocol: %s, User: %s, Password: %s, Host: %s, Share: %s" %
+                                   (share["type"], share["user"], share["pass"], share["host"], share["share"]))
+                    except AttributeError, ae:
+                        self.debug("%s\nCould not extract required data from %s" % (ae, path))
+                        return percentage
 
-                    self.debug("Retrieved the following information:")
-                    self.debug("Protocol: %s" % share["type"])
-                    self.debug("User: %s" % share["user"])
-                    self.debug("Pass: %s" % share["pass"])
-                    self.debug("Host: %s" % share["host"])
-
-                    self.debug("Creating UNC paths so Windows understands the shares.")
-
-                    path = path[match.end():]
-
-                    self.debug("New path: %s" % path)
-
-                    path = os.path.normcase(r"\\" + share["host"] + path)
-                    self.debug("os.path.normcase result:\n" + path)
+                    self.debug("Creating UNC paths so Windows understands the shares")
+                    path = os.path.normcase(r"\\" + share["host"] + os.sep + share["share"])
+                    self.debug("UNC path: %s" % path)
+                    self.debug("If checks fail because you need credentials, please mount the drive first")
                 else:
-                    self.debug("We are dealing with local paths:\n" + path)
+                    self.debug("We are dealing with local paths")
 
                 if not isinstance(path, unicode):
-                    self.debug("Path must be unicode for disk space checks.")
-                    path = path.decode("mbcs")
+                    self.debug("Converting path to unicode for disk space checks")
+                    path = path.decode("raw_unicode_escape")
                     self.debug("New path: %s" % path)
 
-                totalNumberOfBytes = ctypes.c_ulonglong(0)
-                totalNumberOfFreeBytes = ctypes.c_ulonglong(0)
-
-                # GetDiskFreeSpaceEx explained:
-                # http://msdn.microsoft.com/en-us/library/windows/desktop/aa364937(v=vs.85).aspx
-                ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(path), ctypes.pointer(totalNumberOfBytes),
-                                                           ctypes.pointer(totalNumberOfFreeBytes), None)
-                free = float(totalNumberOfBytes.value)
-                capacity = float(totalNumberOfFreeBytes.value)
+                bytesTotal = c_ulonglong(0)
+                bytesFree = c_ulonglong(0)
+                windll.kernel32.GetDiskFreeSpaceExW(c_wchar_p(path), byref(bytesFree), byref(bytesTotal), None)
 
                 try:
-                    percentage = float(free / capacity * float(100))
-                    self.debug("Hard disk checks returned the following results:\n%s: %f\n%s: %f\n%s: %f" %
-                               ("free", free, "capacity", capacity, "percentage", percentage))
+                    percentage = float(bytesFree.value) / float(bytesTotal.value) * 100
+                    self.debug("Hard disk check results:")
+                    self.debug("Bytes free: %s" % locale.format("%d", bytesFree.value, grouping=True))
+                    self.debug("Bytes total: %s" % locale.format("%d", bytesTotal.value, grouping=True))
                 except ZeroDivisionError, e:
-                    self.notify(__settings__.getLocalizedString(511), 15000)
+                    self.notify(self.translate(511), 15000)
             else:
                 self.debug("We are checking disk space from a non-Windows file system")
                 self.debug("Stripping " + path + " of all redundant stuff.")
-                drive = os.path.normpath(path)
-                self.debug("The path now is " + drive)
+                path = os.path.normpath(path)
+                self.debug("The path now is " + path)
 
                 try:
                     diskstats = os.statvfs(path)
-                    percentage = float(diskstats.f_bfree / diskstats.f_blocks * float(100))
-                    self.debug("Hard disk checks returned the following results:\n%s: %f\n%s: %f\n%s: %f" % (
-                        "free blocks", diskstats.f_bfree, "total blocks", diskstats.f_blocks, "percentage", percentage))
+                    percentage = float(diskstats.f_bfree) / float(diskstats.f_blocks) * 100
+                    self.debug("Hard disk check results:")
+                    self.debug("Bytes free: %s" % locale.format("%d", diskstats.f_bfree, grouping=True))
+                    self.debug("Bytes total: %s" % locale.format("%d", diskstats.f_blocks, grouping=True))
                 except OSError, e:
-                    self.notify(__settings__.getLocalizedString(512) % self.disk_space_check_path)
+                    self.notify(self.translate(512))
                 except ZeroDivisionError, zde:
-                    self.notify(__settings__.getLocalizedString(511), 15000)
+                    self.notify(self.translate(511), 15000)
         else:
-            self.notify(__settings__.getLocalizedString(513), 15000)
+            self.notify(self.translate(513), 15000)
 
+        self.debug("Free space: %0.2f%%" % percentage)
         return percentage
 
     def disk_space_low(self):
         """Check if the disk is running low on free space.
         Returns true if the free space is less than the threshold specified in the addon's settings.
+
         :rtype : Boolean
         """
         return self.get_free_disk_space(self.disk_space_check_path) <= self.disk_space_threshold
 
     def delete_file(self, location):
-        """Delete a file from the file system."""
+        """Delete a file from the file system.
+
+        Example:
+            success = delete_file(location)
+
+        :type location: str
+        :param location: the path to the file you wish to delete
+        :rtype : bool
+        """
         self.debug("Deleting file at %s" % location)
         if xbmcvfs.exists(location):
             return xbmcvfs.delete(location)
@@ -475,11 +490,15 @@ class Main:
 
     def delete_empty_folders(self, folder):
         """
-        Deletes the folder if it is empty. Presence of custom file extensions can be ignored while scanning.
+        Delete the folder if it is empty. Presence of custom file extensions can be ignored while scanning.
         To achieve this, edit the ignored file types setting in the addon settings.
-        :rtype : bool
+
+        Example:
+            success = delete_empty_folders(path)
+
+        :type folder: str
         :param folder: The folder to be deleted
-        :return: True if the folder was deleted, False otherwise
+        :rtype : bool
         """
         if not self.delete_folders:
             self.debug("Deleting of folders is disabled.")
@@ -535,9 +554,14 @@ class Main:
         """Move a file to a new destination. Returns True if the move succeeded, False otherwise.
         Will create destination if it does not exist.
 
-        Keyword arguments:
-        source -- the source path (absolute)
-        destination -- the destination path (absolute)
+        Example:
+            success = move_file(a, b)
+
+        :type source: str
+        :param source: the source path (absolute)
+        :type dest_folder: str
+        :param dest_folder: the destination path (absolute)
+        :rtype : bool
         """
         dest_folder = xbmc.makeLegalFilename(dest_folder)
         self.debug("Moving %s to %s" % (os.path.basename(source), dest_folder))
@@ -574,25 +598,43 @@ class Main:
             self.debug("XBMC could not find the file at %s" % source)
             return False
 
+    def translate(self, msg_id):
+        """
+        Retrieve a localized string by id. Returns the empty string if id is not an int.
+
+        :type msg_id: int
+        :param msg_id: the id of the localized string
+        :rtype : str
+        """
+        if isinstance(msg_id, int):
+            return __settings__.getLocalizedString(msg_id)
+        else:
+            return ""
+
     def notify(self, message, duration=5000, image=__icon__):
         """Display an XBMC notification and log the message.
 
-        Keyword arguments:
-        message -- the message to be displayed and logged
-        duration -- the duration the notification is displayed in milliseconds (default 5000)
-        image -- the path to the image to be displayed on the notification (default "icon.png")
+        :type message: str
+        :param message: the message to be displayed (and logged). You may also use the id (int) for localization.
+        :type duration: int
+        :param duration: the duration the notification is displayed in milliseconds (default 5000)
+        :type image: str
+        :param image: the path to the image to be displayed on the notification (default "icon.png")
+        :rtype : None
         """
         self.debug(message)
-        if self.notifications_enabled:
-            if self.notify_when_idle and xbmc.Player().isPlayingVideo():
-                return
+        if self.notifications_enabled and not (self.notify_when_idle and xbmc.Player().isPlayingVideo()):
             xbmc.executebuiltin("XBMC.Notification(%s, %s, %s, %s)" % (__title__, message, duration, image))
 
     def debug(self, message):
-        """logs a debug message"""
+        """Write a debug message to xbmc.log
+
+        :type message: str
+        :param message: the message to log
+        :rtype : None
+        """
         if self.debugging_enabled:
             for line in message.splitlines():
                 xbmc.log(__title__ + ": " + line)
 
-
-run = Main()
+run = Cleaner()
