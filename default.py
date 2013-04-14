@@ -440,7 +440,7 @@ class Cleaner:
                     self.debug("Bytes free: %s" % locale.format("%d", bytesFree.value, grouping=True))
                     self.debug("Bytes total: %s" % locale.format("%d", bytesTotal.value, grouping=True))
                 except ZeroDivisionError, e:
-                    self.notify(self.translate(511), 15000)
+                    self.notify(self.translate(30511), 15000)
             else:
                 self.debug("We are checking disk space from a non-Windows file system")
                 self.debug("Stripping " + path + " of all redundant stuff.")
@@ -454,11 +454,11 @@ class Cleaner:
                     self.debug("Bytes free: %s" % locale.format("%d", diskstats.f_bfree, grouping=True))
                     self.debug("Bytes total: %s" % locale.format("%d", diskstats.f_blocks, grouping=True))
                 except OSError, e:
-                    self.notify(self.translate(512))
+                    self.notify(self.translate(30512))
                 except ZeroDivisionError, zde:
-                    self.notify(self.translate(511), 15000)
+                    self.notify(self.translate(30511), 15000)
         else:
-            self.notify(self.translate(513), 15000)
+            self.notify(self.translate(30513), 15000)
 
         self.debug("Free space: %0.2f%%" % percentage)
         return percentage

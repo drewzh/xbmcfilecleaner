@@ -1,66 +1,66 @@
 <strings>
     <!-- Tabbladen -->
-    <string id="100">Acties</string>
-    <string id="200">Frequentie</string>
-    <string id="300">Voorwaarden</string>
-    <string id="400">Meldingen</string>
+    <string id="30100">Acties</string>
+    <string id="30200">Frequentie</string>
+    <string id="30300">Voorwaarden</string>
+    <string id="30400">Meldingen</string>
 
     <!-- Actiestabblad -->
-    <string id="101">[B]Welke video's wil je verwijderen?[/B]</string>
+    <string id="30101">[B]Welke video's wil je verwijderen?[/B]</string>
 
-    <string id="102">[B]Activeer File Cleaner[/B]</string>
+    <string id="30102">[B]Activeer File Cleaner[/B]</string>
 
-    <string id="103">Verwijder video's [I]permanent [/I]</string>
-    <string id="104">[I]Selecteer een map waar bekeken video's bewaard worden[/I]</string>
-    <string id="105">Locatie bewaarmap</string>
-    <string id="106">Maak submappen aan (bv. [B]..\Artiest[/B], [B]..\Film (Jaar)[/B] en [B]..\Serie\Seizoen xx[/B])</string>
+    <string id="30103">Verwijder video's [I]permanent [/I]</string>
+    <string id="30104">[I]Selecteer een map waar bekeken video's bewaard worden[/I]</string>
+    <string id="30105">Locatie bewaarmap</string>
+    <string id="30106">Maak submappen aan (bv. [B]..\Artiest[/B], [B]..\Film (Jaar)[/B] en [B]..\Serie\Seizoen xx[/B])</string>
 
-    <string id="107">Verwijder films</string>
-    <string id="108">Verwijder TV series</string>
-    <string id="109">Verwijder videoclips</string>
+    <string id="30107">Verwijder films</string>
+    <string id="30108">Verwijder TV series</string>
+    <string id="30109">Verwijder videoclips</string>
 
-    <string id="110">XBMC videobibliotheek opschonen na schoonmaken</string>
-    <string id="111">Verwijder lege mappen na schoonmaken</string>
-    <string id="112">Negeer bestanden met de volgende extensies (scheiden met komma's)</string>
+    <string id="30110">XBMC videobibliotheek opschonen na schoonmaken</string>
+    <string id="30111">Verwijder lege mappen na schoonmaken</string>
+    <string id="30112">Negeer bestanden met de volgende extensies (scheiden met komma's)</string>
 
     <!-- Frequentietabblad -->
-    <string id="201">[B]Wanneer moeten bekeken videos verwijderd worden?[/B]</string>
+    <string id="30201">[B]Wanneer moeten bekeken videos verwijderd worden?[/B]</string>
 
-    <string id="202">Wachttijd bij opstarten (in minuten)</string>
-    <string id="203">Scan-interval (in minuten)</string>
+    <string id="30202">Wachttijd bij opstarten (in minuten)</string>
+    <string id="30203">Scan-interval (in minuten)</string>
 
-    <string id="204">Maak niet schoon als er video afgespeeld wordt</string>
+    <string id="30204">Maak niet schoon als er video afgespeeld wordt</string>
 
-    <string id="205">Start opschonen zodra afspelen stopt</string>
+    <string id="30205">Start opschonen zodra afspelen stopt</string>
 
     <!-- Voorwaardentabblad -->
-    <string id="301">[B]Aan welke voorwaarden moet een bekeken video voldoen voor hij verwijderd wordt?[/B]</string>
+    <string id="30301">[B]Aan welke voorwaarden moet een bekeken video voldoen voor hij verwijderd wordt?[/B]</string>
 
-    <string id="302">Verwijder video's pas een aantal dagen na bekijken</string>
-    <string id="303">Aantal dagen waarna een bestand als verlopen wordt beschouwd</string>
+    <string id="30302">Verwijder video's pas een aantal dagen na bekijken</string>
+    <string id="30303">Aantal dagen waarna een bestand als verlopen wordt beschouwd</string>
     
-    <string id="304">Verwijder alleen video's met een laag cijfer</string>
-    <string id="305">[I]Let op: videoclips hebben geen cijfers en negeren deze instellingen [/I]</string>
-    <string id="306">Verwijder video's met een cijfer lager dan</string>
-    <string id="307">Negeer video's zonder cijfer</string>
+    <string id="30304">Verwijder alleen video's met een laag cijfer</string>
+    <string id="30305">[I]Let op: videoclips hebben geen cijfers en negeren deze instellingen [/I]</string>
+    <string id="30306">Verwijder video's met een cijfer lager dan</string>
+    <string id="30307">Negeer video's zonder cijfer</string>
 
-    <string id="308">Verwijder video's pas bij te weinig vrije schrijfruimte</string>
-    <string id="309">Minimaal percentage vrije schijfruimte</string>
-    <string id="310">Locatie om te controleren op vrije schijfruimte</string>
+    <string id="30308">Verwijder video's pas bij te weinig vrije schrijfruimte</string>
+    <string id="30309">Minimaal percentage vrije schijfruimte</string>
+    <string id="30310">Locatie om te controleren op vrije schijfruimte</string>
     
-    <string id="311">Verwijder geen video's die halverwege gestopt zijn</string>
-    <string id="312">[I]Videoclips onthouden niet tot hoever ze afgespeeld zijn en negeren dit [/I]</string>
+    <string id="30311">Verwijder geen video's die halverwege gestopt zijn</string>
+    <string id="30312">[I]Videoclips onthouden niet tot hoever ze afgespeeld zijn en negeren dit [/I]</string>
 
     <!-- Meldingentabblad -->
-    <string id="401">[B]Hoeveel informatie wil je krijgen?[/B]</string>
+    <string id="30401">[B]Hoeveel informatie wil je krijgen?[/B]</string>
 
-    <string id="402">Toon meldingen</string>
-    <string id="403">Toon geen meldingen als er video afgespeeld wordt</string>
+    <string id="30402">Toon meldingen</string>
+    <string id="30403">Toon geen meldingen als er video afgespeeld wordt</string>
 
-    <string id="404">Toon debuginformatie</string>
+    <string id="30404">Toon debuginformatie</string>
 
     <!-- Gelokaliseerde teksten voor XBMC meldingen -->
-    <string id="511">Fout bij lezen van harde schijf. Controleer de instellingen.</string>
-    <string id="512">Schijfruimte kon niet worden gecontroleerd. Toegang geweigerd.</string>
-    <string id="513">Schijfruimte kon niet worden gecontroleerd. Het opgegeven pad bestaat niet.</string>
+    <string id="30511">Fout bij lezen van harde schijf. Controleer de instellingen.</string>
+    <string id="30512">Schijfruimte kon niet worden gecontroleerd. Toegang geweigerd.</string>
+    <string id="30513">Schijfruimte kon niet worden gecontroleerd. Het opgegeven pad bestaat niet.</string>
 </strings>

@@ -1,4 +1,4 @@
-Version 3.0
+Version 3.0.0
 ===============
 - Frodo compatibility
 - Music videos support (use TheAudioDB.com scraper)
@@ -11,7 +11,7 @@ Version 3.0
 - Redesigned addon settings
 - JSON-RPC is used to find watched videos (backward compatibility with Eden is effectively lost)
 
-Version 2.0
+Version 2.0.0
 ===============
 - Eden compatibility
 - Addon now runs as a service
