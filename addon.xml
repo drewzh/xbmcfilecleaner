@@ -25,7 +25,7 @@ Deze addon zal automatisch de videobibliotheek scannen op zoek naar bekeken film
         <platform>all</platform>
         <language/>
         <source>https://github.com/Anthirian/script.filecleaner</source>
-        <forum/>
+        <forum>http://forum.xbmc.org/showthread.php?tid=162517</forum>
         <website/>
         <email/>
     </extension>
