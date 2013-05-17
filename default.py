@@ -557,12 +557,14 @@ class Cleaner:
         Example:
             success = move_file(a, b)
 
-        :type source: str
+        :type source: basestring
         :param source: the source path (absolute)
         :type dest_folder: str
         :param dest_folder: the destination path (absolute)
         :rtype : bool
         """
+        if isinstance(source, unicode):
+            source = source.encode("utf-8")
         dest_folder = xbmc.makeLegalFilename(dest_folder)
         self.debug("Moving %s to %s" % (os.path.basename(source), dest_folder))
         if xbmcvfs.exists(source):
@@ -629,11 +631,13 @@ class Cleaner:
     def debug(self, message):
         """Write a debug message to xbmc.log
 
-        :type message: str
+        :type message: basestring
         :param message: the message to log
         :rtype : None
         """
         if self.debugging_enabled:
+            if isinstance(message, unicode):
+                message = message.encode("utf-8")
             for line in message.splitlines():
                 xbmc.log(__title__ + ": " + line)
 
