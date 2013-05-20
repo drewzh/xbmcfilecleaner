@@ -512,7 +512,7 @@ class Cleaner:
 
         subfolders, files = xbmcvfs.listdir(folder)
 
-        self.debug("Contents of %s:\nSubfolders:\t%s\nFiles:\t%s" % (folder, subfolders, files))
+        self.debug("Contents of %s:\nSubfolders: %s\nFiles: %s" % (folder, subfolders, files))
 
         empty = True
         try:
