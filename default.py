@@ -1,6 +1,5 @@
 # encoding: utf-8
 import os
-import platform
 import locale
 import time
 import re
@@ -399,7 +398,8 @@ class Cleaner:
         self.debug("Checking for disk space on path: %s" % path)
         dirs, files = xbmcvfs.listdir(path)
         if dirs or files:  # Workaround for xbmcvfs.exists("C:\")
-            if platform.system() == "Windows":
+            #if platform.system() == "Windows":
+            if xbmc.getCondVisibility("System.Platform.Windows"):
                 self.debug("We are checking disk space from a Windows file system")
                 self.debug("The path to check is %s" % path)
 
