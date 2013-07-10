@@ -71,4 +71,16 @@
 
         <setting label="32404" id="debugging_enabled" type="bool" default="false" visible="true" />
     </category>
+
+    <!-- Exclusions section -->
+    <category label="32500" id="exclusions_section">
+        <setting type="sep" />
+        <setting label="32501" type="lsep" />
+        <setting type="sep" />
+
+        <setting label="32502" id="exclusion_enabled" type="bool" default="false" visible="true" />
+        <setting label="32503" id="exclusion1" type="folder" default="" subsetting="true" visible="eq(-1,true)" />
+        <setting label="32503" id="exclusion2" type="folder" default="" subsetting="true" visible="eq(-2,true)" />
+        <setting label="32503" id="exclusion3" type="folder" default="" subsetting="true" visible="eq(-3,true)" />
+    </category>
 </settings>

@@ -386,6 +386,50 @@ class Cleaner:
 
         self.not_in_progress = bool(__settings__.getSetting("not_in_progress") == "true")
 
+        self.exclusion_enabled = bool(__settings__.getSetting("exclusion_enabled") == "true")
+        self.exclusion1 = xbmc.translatePath(__settings__.getSetting("exclusion1"))
+        self.exclusion2 = xbmc.translatePath(__settings__.getSetting("exclusion2"))
+        self.exclusion3 = xbmc.translatePath(__settings__.getSetting("exclusion3"))
+
+    def check_exclusion(self, full_path):
+        """Check if the file path is part of the excluded sources. Returns True if the file is not part of the excluded
+        sources, False otherwise.
+
+        :type full_path: str
+        :param full_path: the path to the file that should be checked for exclusion
+        :rtype: bool
+        """
+        if not self.exclusion_enabled:
+            self.debug("Path exclusion is disabled.")
+            return True
+
+        if not full_path:
+            self.debug("File path is empty and cannot be checked for exclusions")
+            return True
+
+        self.debug("Checking exclusion settings for '%s'." % full_path)
+
+        # TODO: Use a loop instead
+        if self.exclusion1:
+            self.debug("Excluded path 1 is '%s'" % self.exclusion1)
+            if full_path.startswith(self.exclusion1):
+                self.debug("Found a match with excluded path 1.")
+                return False
+
+        if self.exclusion2:
+            self.debug("Excluded path 2 is '%s'" % self.exclusion2)
+            if full_path.startswith(self.exclusion2):
+                self.debug("Found a match with excluded path 2.")
+                return False
+
+        if self.exclusion3:
+            self.debug("Excluded path 3 is '%s'" % self.exclusion3)
+            if full_path.startswith(self.exclusion3):
+                self.debug("Found a match with excluded path 3.")
+                return False
+
+        return True
+
     def get_free_disk_space(self, path):
         """Determine the percentage of free disk space.
 
@@ -482,6 +526,10 @@ class Cleaner:
         :rtype : bool
         """
         self.debug("Deleting file at %s" % location)
+        if not self.check_exclusion(location):
+            self.debug("This file is found on an excluded path and will not be deleted.")
+            return False
+
         if xbmcvfs.exists(location):
             return xbmcvfs.delete(location)
         else:
@@ -563,6 +611,9 @@ class Cleaner:
         :param dest_folder: the destination path (absolute)
         :rtype : bool
         """
+        if not self.check_exclusion(source):
+            self.debug("This file is found on an excluded path and will not be moved.")
+            return False
         if isinstance(source, unicode):
             source = source.encode("utf-8")
         dest_folder = xbmc.makeLegalFilename(dest_folder)

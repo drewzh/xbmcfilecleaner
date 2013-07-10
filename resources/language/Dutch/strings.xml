@@ -63,4 +63,10 @@
     <string id="32511">Fout bij lezen van harde schijf. Controleer de instellingen.</string>
     <string id="32512">Schijfruimte kon niet worden gecontroleerd. Toegang geweigerd.</string>
     <string id="32513">Schijfruimte kon niet worden gecontroleerd. Het opgegeven pad bestaat niet.</string>
+
+    <!-- Uitzonderingentabblad -->
+    <string id="32500">Uitzonderingen</string>
+    <string id="32501">[B]Welke bestanden mogen niet verwijderd worden?[/B]</string>
+    <string id="32502">Maak een uitzondering</string>
+    <string id="32503">Locatie van uitzondering</string>
 </strings>

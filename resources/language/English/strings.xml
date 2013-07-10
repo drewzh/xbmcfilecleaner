@@ -63,4 +63,10 @@
     <string id="32511">Error reading hard disk. Please check your settings.</string>
     <string id="32512">Could not check disk space. Access denied.</string>
     <string id="32513">Could not check disk space. Path does not exist.</string>
+
+    <!-- Exclusions section -->
+    <string id="32500">Exclusions</string>
+    <string id="32501">[B]Which paths must not be touched?[/B]</string>
+    <string id="32502">Enable exclusions</string>
+    <string id="32503">Path to exclude</string>
 </strings>
