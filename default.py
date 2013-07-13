@@ -143,17 +143,18 @@ class Cleaner:
                     count = 0
                     for abs_path, show_name, season_number in episodes:
                         if xbmcvfs.exists(abs_path):
-                            cleaning_required = True
                             if not self.delete_files:
                                 if self.create_subdirs:
                                     new_path = os.path.join(self.holding_folder, show_name, "Season %d" % season_number)
                                 else:
                                     new_path = self.holding_folder
                                 if self.move_file(abs_path, new_path):
+                                    cleaning_required = True
                                     count += 1
                                     self.delete_empty_folders(os.path.dirname(abs_path))
                             else:
                                 if self.delete_file(abs_path):
+                                    cleaning_required = True
                                     count += 1
                                     self.delete_empty_folders(os.path.dirname(abs_path))
                         else:
