@@ -409,23 +409,10 @@ class Cleaner:
 
         self.debug("Checking exclusion settings for '%s'." % full_path)
 
-        # TODO: Use a loop instead
-        if self.exclusion1:
-            self.debug("Excluded path 1 is '%s'" % self.exclusion1)
-            if full_path.startswith(self.exclusion1):
-                self.debug("Found a match with excluded path 1.")
-                return False
-
-        if self.exclusion2:
-            self.debug("Excluded path 2 is '%s'" % self.exclusion2)
-            if full_path.startswith(self.exclusion2):
-                self.debug("Found a match with excluded path 2.")
-                return False
-
-        if self.exclusion3:
-            self.debug("Excluded path 3 is '%s'" % self.exclusion3)
-            if full_path.startswith(self.exclusion3):
-                self.debug("Found a match with excluded path 3.")
+        exclusions = [self.exclusion1, self.exclusion2, self.exclusion3]
+        for ex in exclusions:
+            if ex and full_path.startswith(ex):
+                self.debug("Found a match with one of your excluded paths.")
                 return False
 
         return True
