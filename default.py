@@ -400,6 +400,8 @@ class Cleaner:
         :param full_path: the path to the file that should be checked for exclusion
         :rtype: bool
         """
+        # TODO: Swap return values and rename function to "is_excluded()" for better readability
+
         if not self.exclusion_enabled:
             self.debug("Path exclusion is disabled.")
             return True
@@ -408,15 +410,53 @@ class Cleaner:
             self.debug("File path is empty and cannot be checked for exclusions")
             return True
 
-        self.debug("Checking exclusion settings for '%s'." % full_path)
-
         exclusions = [self.exclusion1, self.exclusion2, self.exclusion3]
-        for ex in exclusions:
-            if ex and full_path.startswith(ex):
-                self.debug("Found a match with one of your excluded paths.")
-                return False
 
-        return True
+        if r"://" in full_path:
+            self.debug("Detected a network path")
+            pattern = re.compile("(?:smb|afp|nfs|upnp)://(?:(?:.+):(?:.+)@)?(?:.+?)/(?P<tail>.*)$", flags=re.U | re.I)
+
+            self.debug("Converting exclusion paths for easier comparison")
+            normalized_exclusions = []
+            for ex in exclusions:
+                # Strip everything but the folder structure
+                try:
+                    normalized_exclusions.append(pattern.match(ex).group("tail"))
+                except (AttributeError, IndexError, KeyError):
+                    self.debug("Could not parse the excluded network path '%s'" % ex, xbmc.LOGWARNING)
+                    return False
+
+            self.debug("Conversion result: %s" % normalized_exclusions)
+
+            self.debug("Proceeding to match a file with the exclusion paths")
+            self.debug("The file to match is '%s'" % full_path)
+            result = pattern.match(full_path)
+
+            try:
+                self.debug("Converting file path for easier comparison.")
+                converted_path = result.group("tail")
+                self.debug("Result: '%s'" % converted_path)
+                for ex in normalized_exclusions:
+                    self.debug("Checking against exclusion '%s'" % ex)
+                    if converted_path.startswith(ex):
+                        self.debug("File '%s' matches excluded path '%s'." % (converted_path, ex))
+                        return False
+
+                self.debug("No match was found with an excluded path.")
+                return True
+
+            except (AttributeError, IndexError, KeyError):
+                self.debug("Error converting '%s'. No files will be deleted" % full_path, xbmc.LOGWARNING)
+                return False
+        else:
+            self.debug("Detected a local path")
+            for ex in exclusions:
+                if ex and full_path.startswith(ex):
+                    self.debug("File '%s' matches excluded path '%s'." % (full_path, ex))
+                    return False
+
+            self.debug("No match was found with an excluded path.")
+            return True
 
     def get_free_disk_space(self, path):
         """Determine the percentage of free disk space.
