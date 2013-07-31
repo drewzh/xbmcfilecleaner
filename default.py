@@ -421,7 +421,9 @@ class Cleaner:
             for ex in exclusions:
                 # Strip everything but the folder structure
                 try:
-                    normalized_exclusions.append(pattern.match(ex).group("tail"))
+                    if ex:
+                        # Only normalize non-empty excluded paths
+                        normalized_exclusions.append(pattern.match(ex).group("tail"))
                 except (AttributeError, IndexError, KeyError):
                     self.debug("Could not parse the excluded network path '%s'" % ex, xbmc.LOGWARNING)
                     return False
