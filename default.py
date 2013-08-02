@@ -414,12 +414,12 @@ class Cleaner:
             self.debug("Detected a network path")
             pattern = re.compile("(?:smb|afp|nfs|upnp)://(?:(?:.+):(?:.+)@)?(?:.+?)/(?P<tail>.*)$", flags=re.U | re.I)
 
-            self.debug("Converting exclusion paths for easier comparison")
+            self.debug("Converting excluded network paths for easier comparison")
             normalized_exclusions = []
             for ex in exclusions:
                 # Strip everything but the folder structure
                 try:
-                    if ex:
+                    if ex and r"://" in ex:
                         # Only normalize non-empty excluded paths
                         normalized_exclusions.append(pattern.match(ex).group("tail"))
                 except (AttributeError, IndexError, KeyError):
