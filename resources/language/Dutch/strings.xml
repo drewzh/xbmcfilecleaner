@@ -55,7 +55,8 @@
     <!-- Uitzonderingentabblad -->
     <string id="32401">[B]Welke bestanden mogen niet verwijderd worden?[/B]</string>
     <string id="32402">Maak een uitzondering</string>
-    <string id="32403">Locatie van uitzondering</string>
+    <string id="32403">[I]Gebruik hetzelfde soort paden (lokaal, NFS, SMB) als voor de bibliotheek [I]</string>
+    <string id="32404">Locatie van uitzondering</string>
 
     <!-- Meldingentabblad -->
     <string id="32501">[B]Hoeveel informatie wil je krijgen?[/B]</string>

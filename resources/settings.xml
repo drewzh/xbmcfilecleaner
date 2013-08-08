@@ -67,9 +67,10 @@
         <setting type="sep" />
 
         <setting label="32402" id="exclusion_enabled" type="bool" default="false" visible="true" />
-        <setting label="32403" id="exclusion1" type="folder" default="" subsetting="true" visible="eq(-1,true)" />
-        <setting label="32403" id="exclusion2" type="folder" default="" subsetting="true" visible="eq(-2,true)" />
-        <setting label="32403" id="exclusion3" type="folder" default="" subsetting="true" visible="eq(-3,true)" />
+        <setting label="32403" type="lsep" subsetting="true" visible="eq(-1,true)" />
+        <setting label="32404" id="exclusion1" type="folder" default="" subsetting="true" visible="eq(-2,true)" />
+        <setting label="32404" id="exclusion2" type="folder" default="" subsetting="true" visible="eq(-3,true)" />
+        <setting label="32404" id="exclusion3" type="folder" default="" subsetting="true" visible="eq(-4,true)" />
     </category>
 
     <!-- Notifications section -->

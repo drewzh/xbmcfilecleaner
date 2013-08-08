@@ -55,7 +55,8 @@
     <!-- Exclusions section -->
     <string id="32401">[B]Which paths must not be touched?[/B]</string>
     <string id="32402">Enable exclusions</string>
-    <string id="32403">Path to exclude</string>
+    <string id="32403">[I]Use the same type of path (local, NFS, SMB) you use for the library [/I]</string>
+    <string id="32404">Path to exclude</string>
 
     <!-- Notifications section -->
     <string id="32501">[B]How much information do you want to get?[/B]</string>
