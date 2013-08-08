@@ -412,7 +412,7 @@ class Cleaner:
 
         if r"://" in full_path:
             self.debug("Detected a network path")
-            pattern = re.compile("(?:smb|afp|nfs)://(?:(?:.+):(?:.+)@)?(?:.+?)/(?P<tail>.*)$", flags=re.U | re.I)
+            pattern = re.compile("(?:smb|afp|nfs)://(?:(?:.+):(?:.+)@)?(?P<tail>.*)$", flags=re.U | re.I)
 
             self.debug("Converting excluded network paths for easier comparison")
             normalized_exclusions = []
@@ -421,7 +421,7 @@ class Cleaner:
                 try:
                     if ex and r"://" in ex:
                         # Only normalize non-empty excluded paths
-                        normalized_exclusions.append(pattern.match(ex).group("tail"))
+                        normalized_exclusions.append(pattern.match(ex).group("tail").lower())
                 except (AttributeError, IndexError, KeyError):
                     self.debug("Could not parse the excluded network path '%s'" % ex, xbmc.LOGWARNING)
                     return True
@@ -434,7 +434,7 @@ class Cleaner:
 
             try:
                 self.debug("Converting file path for easier comparison.")
-                converted_path = result.group("tail")
+                converted_path = result.group("tail").lower()
                 self.debug("Result: '%s'" % converted_path)
                 for ex in normalized_exclusions:
                     self.debug("Checking against exclusion '%s'" % ex)
