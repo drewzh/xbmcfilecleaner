@@ -559,6 +559,14 @@ class Cleaner:
             return False
 
         if xbmcvfs.exists(location):
+            path, name = os.path.split(location)
+            name, ext = os.path.splitext(name)
+
+            for extra_file in xbmcvfs.listdir(path)[1]:
+                if extra_file.startswith(name):
+                    extra_file_path = os.path.join(path, extra_file)
+                    xbmcvfs.delete(extra_file_path)
+
             return xbmcvfs.delete(location)
         else:
             self.debug("XBMC could not find the file at %s" % location, xbmc.LOGERROR)
