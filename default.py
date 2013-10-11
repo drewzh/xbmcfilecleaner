@@ -684,6 +684,15 @@ class Cleaner:
                     return self.delete_file(source)
             else:
                 self.debug("Moving %s\nto %s\nNew path: %s" % (source, dest_folder, new_path))
+                if self.delete_related:
+                    path, name = os.path.split(source)
+                    name, ext = os.path.splitext(name)
+
+                    for extra_file in xbmcvfs.listdir(path)[1]:
+                        if extra_file.startswith(name):
+                            extra_file_path = os.path.join(path, extra_file)
+                            xbmcvfs.rename(extra_file_path, new_path)
+
                 return xbmcvfs.rename(source, new_path)
         else:
             self.debug("XBMC could not find the file at %s" % source, xbmc.LOGWARNING)
