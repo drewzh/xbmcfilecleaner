@@ -479,7 +479,7 @@ class Cleaner:
                     self.debug("We are dealing with network paths")
                     self.debug("Extracting information from share %s" % path)
 
-                    regex = "(?P<type>smb|nfs|afp)://(?P<user>\w+):(?P<pass>.+)@(?P<host>.+?)/(?P<share>.+?)/"
+                    regex = "(?P<type>smb|nfs|afp)://(?:(?P<user>.+):(?P<pass>.+)@)?(?P<host>.+?)/(?P<share>.+?).*$"
                     pattern = re.compile(regex, flags=re.I | re.U)
                     match = pattern.match(path)
                     try:
@@ -493,7 +493,7 @@ class Cleaner:
                     self.debug("Creating UNC paths so Windows understands the shares")
                     path = os.path.normcase(r"\\" + share["host"] + os.sep + share["share"])
                     self.debug("UNC path: %s" % path)
-                    self.debug("If checks fail because you need credentials, please mount the drive first")
+                    self.debug("If checks fail because you need credentials, please mount the share first")
                 else:
                     self.debug("We are dealing with local paths")
 
