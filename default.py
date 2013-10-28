@@ -357,7 +357,7 @@ class Cleaner:
         self.cleaner_enabled = bool(__settings__.getSetting("cleaner_enabled") == "true")
         self.delete_folders = bool(__settings__.getSetting("delete_folders") == "true")
         self.ignore_extensions = str(__settings__.getSetting("ignore_extensions"))
-        self.delete_related = str(__settings__.getSetting("delete_related"))
+        self.delete_related = str(__settings__.getSetting("delete_related") == " true")
         self.delayed_start = float(__settings__.getSetting("delayed_start"))
         self.scan_interval = float(__settings__.getSetting("scan_interval"))
 
@@ -562,7 +562,7 @@ class Cleaner:
         if xbmcvfs.exists(location):
             if self.delete_related:
                 path, name = os.path.split(location)
-                name, ext = os.path.splitext(name)
+                name, _ = os.path.splitext(name)
 
                 for extra_file in xbmcvfs.listdir(path)[1]:
                     if extra_file.startswith(name):
