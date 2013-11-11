@@ -567,7 +567,9 @@ class Cleaner:
                 for extra_file in xbmcvfs.listdir(path)[1]:
                     if extra_file.startswith(name):
                         extra_file_path = os.path.join(path, extra_file)
-                        xbmcvfs.delete(extra_file_path)
+                        if extra_file_path != location:
+                            self.debug('Deleting %r' % extra_file_path)
+                            xbmcvfs.delete(extra_file_path)
 
             return xbmcvfs.delete(location)
         else:
@@ -691,7 +693,13 @@ class Cleaner:
                     for extra_file in xbmcvfs.listdir(path)[1]:
                         if extra_file.startswith(name):
                             extra_file_path = os.path.join(path, extra_file)
-                            xbmcvfs.rename(extra_file_path, new_path)
+                            new_extra_path = os.path.join(
+                                dest_folder, os.path.basename(extra_file))
+
+                            if new_extra_path != new_path:
+                                self.debug('Renaming %r to %r' % (
+                                    extra_file_path, new_extra_path))
+                                xbmcvfs.rename(extra_file_path, new_extra_path)
 
                 return xbmcvfs.rename(source, new_path)
         else:
