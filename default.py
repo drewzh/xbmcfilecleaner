@@ -70,7 +70,7 @@ class Cleaner:
         try:
             locale.setlocale(locale.LC_ALL, "English_United Kingdom")
         except locale.Error, le:
-            self.debug("Could not change locale: %s" % le, xbmc.LOGWARNING)
+            self.debug("Could not change locale: %r" % le, xbmc.LOGWARNING)
 
         service_sleep = 10
         ticker = 0
@@ -133,7 +133,7 @@ class Cleaner:
                                     count += 1
                                     self.delete_empty_folders(os.path.dirname(abs_path))
                         else:
-                            self.debug("XBMC could not find the file at %s" % abs_path, xbmc.LOGWARNING)
+                            self.debug("XBMC could not find the file at %r" % abs_path, xbmc.LOGWARNING)
                     if count > 0:
                         summary += " %d %s" % (count, self.MOVIES)
 
@@ -158,7 +158,7 @@ class Cleaner:
                                     count += 1
                                     self.delete_empty_folders(os.path.dirname(abs_path))
                         else:
-                            self.debug("XBMC could not find the file at %s" % abs_path, xbmc.LOGWARNING)
+                            self.debug("XBMC could not find the file at %r" % abs_path, xbmc.LOGWARNING)
                     if count > 0:
                         summary += " %d %s" % (count, self.TVSHOWS)
 
@@ -183,7 +183,7 @@ class Cleaner:
                                     count += 1
                                     self.delete_empty_folders(os.path.dirname(abs_path))
                         else:
-                            self.debug("XBMC could not find the file at %s" % abs_path, xbmc.LOGWARNING)
+                            self.debug("XBMC could not find the file at %r" % abs_path, xbmc.LOGWARNING)
                     if count > 0:
                         summary += " %d %s" % (count, self.MUSIC_VIDEOS)
 
@@ -241,7 +241,7 @@ class Cleaner:
             if s and f["field"] in self.supported_filter_fields[option]:
                 enabled_filters.append(f)
 
-        self.debug("[%s] Filters enabled: %s" % (self.methods[option], enabled_filters))
+        self.debug("[%s] Filters enabled: %r" % (self.methods[option], enabled_filters))
 
         filters = {"and": enabled_filters}
 
@@ -257,7 +257,7 @@ class Cleaner:
 
         rpc_cmd = json.dumps(request)
         response = xbmc.executeJSONRPC(rpc_cmd)
-        self.debug("[%s] Response: %s" % (self.methods[option], response))
+        self.debug("[%s] Response: %r" % (self.methods[option], response))
         result = json.loads(response)
 
         try:
@@ -285,7 +285,7 @@ class Cleaner:
             if option in ke:
                 pass  # no expired videos found
             else:
-                self.debug("KeyError: %s not found" % ke, xbmc.LOGWARNING)
+                self.debug("KeyError: %r not found" % ke, xbmc.LOGWARNING)
                 self.handle_json_error(response)
                 raise
         finally:
@@ -346,7 +346,7 @@ class Cleaner:
         details = error["data"] if "data" in error else "No further details"
 
         # If we cannot do anything about this error, just log it and stop
-        self.debug("JSON error occurred.\nCode: %d\nMessage: %s\nDetails: %s" % (code, msg, details), xbmc.LOGERROR)
+        self.debug("JSON error occurred.\nCode: %d\nMessage: %r\nDetails: %r" % (code, msg, details), xbmc.LOGERROR)
         return None
 
     def reload_settings(self):
@@ -357,7 +357,7 @@ class Cleaner:
         self.cleaner_enabled = bool(__settings__.getSetting("cleaner_enabled") == "true")
         self.delete_folders = bool(__settings__.getSetting("delete_folders") == "true")
         self.ignore_extensions = str(__settings__.getSetting("ignore_extensions"))
-        self.delete_related = bool(__settings__.getSetting("delete_related") == " true")
+        self.delete_related = bool(__settings__.getSetting("delete_related") == "true")
         self.delayed_start = float(__settings__.getSetting("delayed_start"))
         self.scan_interval = float(__settings__.getSetting("scan_interval"))
 
@@ -424,36 +424,36 @@ class Cleaner:
                         # Only normalize non-empty excluded paths
                         normalized_exclusions.append(pattern.match(ex).group("tail").lower())
                 except (AttributeError, IndexError, KeyError):
-                    self.debug("Could not parse the excluded network path '%s'" % ex, xbmc.LOGWARNING)
+                    self.debug("Could not parse the excluded network path %r" % ex, xbmc.LOGWARNING)
                     return True
 
-            self.debug("Conversion result: %s" % normalized_exclusions)
+            self.debug("Conversion result: %r" % normalized_exclusions)
 
             self.debug("Proceeding to match a file with the exclusion paths")
-            self.debug("The file to match is '%s'" % full_path)
+            self.debug("The file to match is %r" % full_path)
             result = pattern.match(full_path)
 
             try:
                 self.debug("Converting file path for easier comparison.")
                 converted_path = result.group("tail").lower()
-                self.debug("Result: '%s'" % converted_path)
+                self.debug("Result: %r" % converted_path)
                 for ex in normalized_exclusions:
-                    self.debug("Checking against exclusion '%s'" % ex)
+                    self.debug("Checking against exclusion %r." % ex)
                     if converted_path.startswith(ex):
-                        self.debug("File '%s' matches excluded path '%s'." % (converted_path, ex))
+                        self.debug("File %r matches excluded path %r." % (converted_path, ex))
                         return True
 
                 self.debug("No match was found with an excluded path.")
                 return False
 
             except (AttributeError, IndexError, KeyError):
-                self.debug("Error converting '%s'. No files will be deleted" % full_path, xbmc.LOGWARNING)
+                self.debug("Error converting %r. No files will be deleted." % full_path, xbmc.LOGWARNING)
                 return True
         else:
             self.debug("Detected a local path")
             for ex in exclusions:
                 if ex and full_path.startswith(ex):
-                    self.debug("File '%s' matches excluded path '%s'." % (full_path, ex))
+                    self.debug("File %r matches excluded path %r." % (full_path, ex))
                     return True
 
             self.debug("No match was found with an excluded path.")
@@ -468,32 +468,32 @@ class Cleaner:
         :rtype : float
         """
         percentage = float(100)
-        self.debug("Checking for disk space on path: %s" % path)
+        self.debug("Checking for disk space on path: %r" % path)
         dirs, files = xbmcvfs.listdir(path)
         if dirs or files:  # Workaround for xbmcvfs.exists("C:\")
             #if platform.system() == "Windows":
             if xbmc.getCondVisibility("System.Platform.Windows"):
                 self.debug("We are checking disk space from a Windows file system")
-                self.debug("The path to check is %s" % path)
+                self.debug("The path to check is %r" % path)
 
                 if r"://" in path:
                     self.debug("We are dealing with network paths")
-                    self.debug("Extracting information from share %s" % path)
+                    self.debug("Extracting information from share %r" % path)
 
                     regex = "(?P<type>smb|nfs|afp)://(?:(?P<user>.+):(?P<pass>.+)@)?(?P<host>.+?)/(?P<share>.+?).*$"
                     pattern = re.compile(regex, flags=re.I | re.U)
                     match = pattern.match(path)
                     try:
                         share = match.groupdict()
-                        self.debug("Protocol: %s, User: %s, Password: %s, Host: %s, Share: %s" %
+                        self.debug("Protocol: %r, User: %r, Password: %r, Host: %r, Share: %r" %
                                    (share["type"], share["user"], share["pass"], share["host"], share["share"]))
                     except AttributeError, ae:
-                        self.debug("%s\nCould not extract required data from %s" % (ae, path), xbmc.LOGERROR)
+                        self.debug("%r\nCould not extract required data from %r" % (ae, path), xbmc.LOGERROR)
                         return percentage
 
                     self.debug("Creating UNC paths so Windows understands the shares")
                     path = os.path.normcase(r"\\" + share["host"] + os.sep + share["share"])
-                    self.debug("UNC path: %s" % path)
+                    self.debug("UNC path: %r" % path)
                     self.debug("If checks fail because you need credentials, please mount the share first")
                 else:
                     self.debug("We are dealing with local paths")
@@ -501,7 +501,7 @@ class Cleaner:
                 if not isinstance(path, unicode):
                     self.debug("Converting path to unicode for disk space checks")
                     path = path.decode("mbcs")
-                    self.debug("New path: %s" % path)
+                    self.debug("New path: %r" % path)
 
                 bytesTotal = c_ulonglong(0)
                 bytesFree = c_ulonglong(0)
@@ -526,8 +526,9 @@ class Cleaner:
                     self.debug("Hard disk check results:")
                     self.debug("Bytes free: %s" % locale.format("%d", diskstats.f_bfree, grouping=True))
                     self.debug("Bytes total: %s" % locale.format("%d", diskstats.f_blocks, grouping=True))
-                except OSError:
+                except OSError, ose:
                     self.notify(self.translate(32512), 15000, level=xbmc.LOGERROR)
+                    self.debug("Error accessing %r: %r" % (path, ose))
                 except ZeroDivisionError:
                     self.notify(self.translate(32511), 15000, level=xbmc.LOGERROR)
         else:
@@ -554,7 +555,7 @@ class Cleaner:
         :param location: the path to the file you wish to delete
         :rtype : bool
         """
-        self.debug("Deleting file at %s" % location)
+        self.debug("Deleting file at %r" % location)
         if self.is_excluded(location):
             self.debug("This file is found on an excluded path and will not be deleted.")
             return False
@@ -573,7 +574,7 @@ class Cleaner:
 
             return xbmcvfs.delete(location)
         else:
-            self.debug("XBMC could not find the file at %s" % location, xbmc.LOGERROR)
+            self.debug("XBMC could not find the file at %r" % location, xbmc.LOGERROR)
             return False
 
     def delete_empty_folders(self, folder):
@@ -592,15 +593,15 @@ class Cleaner:
             self.debug("Deleting of folders is disabled.")
             return False
 
-        self.debug("Checking if %s is empty" % folder)
+        self.debug("Checking if %r is empty" % folder)
 
         ignored_file_types = [file_ext.strip() for file_ext in self.ignore_extensions.split(",")]
 
-        self.debug("Ignoring file types %s" % ignored_file_types)
+        self.debug("Ignoring file types %r" % ignored_file_types)
 
         subfolders, files = xbmcvfs.listdir(folder)
 
-        self.debug("Contents of %s:\nSubfolders: %s\nFiles: %s" % (folder, subfolders, files))
+        self.debug("Contents of %r:\nSubfolders: %r\nFiles: %r" % (folder, subfolders, files))
 
         empty = True
         try:
@@ -608,7 +609,7 @@ class Cleaner:
                 _, ext = os.path.splitext(f)
                 self.debug("File extension: " + ext)
                 if ext not in ignored_file_types:
-                    self.debug("Found non-ignored file type %s" % ext)
+                    self.debug("Found non-ignored file type %r" % ext)
                     empty = False
                     break
         except OSError, oe:
@@ -657,15 +658,15 @@ class Cleaner:
         if isinstance(source, unicode):
             source = source.encode("utf-8")
         dest_folder = xbmc.makeLegalFilename(dest_folder)
-        self.debug("Moving %s to %s" % (os.path.basename(source), dest_folder))
+        self.debug("Moving %r to %r" % (os.path.basename(source), dest_folder))
         if xbmcvfs.exists(source):
             if not xbmcvfs.exists(dest_folder):
-                self.debug("XBMC could not find destination %s" % dest_folder)
-                self.debug("Creating destination %s" % dest_folder)
+                self.debug("Destination %r does not exist yet." % dest_folder)
+                self.debug("Creating destination %r." % dest_folder)
                 if xbmcvfs.mkdirs(dest_folder):
-                    self.debug("Successfully created %s" % dest_folder)
+                    self.debug("Successfully created %r." % dest_folder)
                 else:
-                    self.debug("XBMC could not create destination %s" % dest_folder, xbmc.LOGERROR)
+                    self.debug("Destination %r could not be created." % dest_folder, xbmc.LOGERROR)
                     return False
 
             new_path = os.path.join(dest_folder, os.path.basename(source))
@@ -685,7 +686,7 @@ class Cleaner:
                     file_to_move.close()
                     return self.delete_file(source)
             else:
-                self.debug("Moving %s\nto %s\nNew path: %s" % (source, dest_folder, new_path))
+                self.debug("Moving %r to %r." % (source, new_path))
                 if self.delete_related:
                     path, name = os.path.split(source)
                     name, ext = os.path.splitext(name)
@@ -693,17 +694,15 @@ class Cleaner:
                     for extra_file in xbmcvfs.listdir(path)[1]:
                         if extra_file.startswith(name):
                             extra_file_path = os.path.join(path, extra_file)
-                            new_extra_path = os.path.join(
-                                dest_folder, os.path.basename(extra_file))
+                            new_extra_path = os.path.join(dest_folder, os.path.basename(extra_file))
 
                             if new_extra_path != new_path:
-                                self.debug('Renaming %r to %r' % (
-                                    extra_file_path, new_extra_path))
+                                self.debug("Renaming %r to %r." % (extra_file_path, new_extra_path))
                                 xbmcvfs.rename(extra_file_path, new_extra_path)
 
                 return xbmcvfs.rename(source, new_path)
         else:
-            self.debug("XBMC could not find the file at %s" % source, xbmc.LOGWARNING)
+            self.debug("XBMC could not find the file at %r" % source, xbmc.LOGWARNING)
             return False
 
     def translate(self, msg_id):
