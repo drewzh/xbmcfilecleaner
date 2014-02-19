@@ -1,3 +1,8 @@
+Version 3.2.1
+==============
+- Bug fix for related files
+- Added .png, .jpg and .txt to ignored file types while checking for empty folders
+
 Version 3.2.0
 ==============
 - New option to delete related files with similar names (e.g. subtitles) (thanks WoLpH)
