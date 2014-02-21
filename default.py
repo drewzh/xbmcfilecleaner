@@ -118,22 +118,25 @@ class Cleaner:
                 if movies:
                     count = 0
                     for abs_path, title, year in movies:
-                        if xbmcvfs.exists(abs_path):
-                            cleaning_required = True
-                            if not self.delete_files:
-                                if self.create_subdirs:
-                                    new_path = os.path.join(self.holding_folder, "%s (%d)" % (title, year))
+                        for unstacked_path in self.unstack(abs_path):
+                            self.debug("%r %r %r" % (unstacked_path, title, year))
+                            if xbmcvfs.exists(unstacked_path):
+                                cleaning_required = True
+                                if not self.delete_files:
+                                    if self.create_subdirs:
+                                        new_path = os.path.join(self.holding_folder, "%s (%d)" % (title, year))
+                                    else:
+                                        new_path = self.holding_folder
+                                    if self.move_file(unstacked_path, new_path):
+                                        count += 1
+                                        self.delete_empty_folders(os.path.dirname(unstacked_path))
                                 else:
-                                    new_path = self.holding_folder
-                                if self.move_file(abs_path, new_path):
-                                    count += 1
-                                    self.delete_empty_folders(os.path.dirname(abs_path))
+                                    if self.delete_file(unstacked_path):
+                                        count += 1
+                                        self.delete_empty_folders(os.path.dirname(unstacked_path))
                             else:
-                                if self.delete_file(abs_path):
-                                    count += 1
-                                    self.delete_empty_folders(os.path.dirname(abs_path))
-                        else:
-                            self.debug("XBMC could not find the file at %r" % abs_path, xbmc.LOGWARNING)
+                                self.debug("XBMC could not find the file at %r" % unstacked_path, xbmc.LOGWARNING)
+                    # TODO: Count gets increased for every file, not movie. This causes problems with stacked movies.
                     if count > 0:
                         summary += " %d %s" % (count, self.MOVIES)
 
@@ -545,6 +548,19 @@ class Cleaner:
         """
         return self.get_free_disk_space(self.disk_space_check_path) <= self.disk_space_threshold
 
+    def unstack(self, path):
+        """Unstack path if it is a stacked movie. See http://wiki.xbmc.org/index.php?title=File_stacking for more info.
+        Returns a list of paths, even if the path is not a stacked movie.
+
+        :rtype : list
+        """
+        if path.startswith("stack://"):
+            self.debug("Unstacking %r." % path)
+            return path.replace("stack://", "").split(" , ")
+        else:
+            self.debug("Unstacking %r is not needed." % path)
+            return [path]
+
     def delete_file(self, location):
         """Delete a file from the file system.
 
@@ -574,7 +590,7 @@ class Cleaner:
 
             return xbmcvfs.delete(location)
         else:
-            self.debug("XBMC could not find the file at %r" % location, xbmc.LOGERROR)
+            self.debug("File %r no longer exists." % location, xbmc.LOGERROR)
             return False
 
     def delete_empty_folders(self, folder):
@@ -688,11 +704,13 @@ class Cleaner:
             else:
                 self.debug("Moving %r to %r." % (source, new_path))
                 if self.delete_related:
+                    self.debug("Looking for related files.")
                     path, name = os.path.split(source)
                     name, ext = os.path.splitext(name)
 
                     for extra_file in xbmcvfs.listdir(path)[1]:
                         if extra_file.startswith(name):
+                            # TODO: Might cause problems with stacked files
                             extra_file_path = os.path.join(path, extra_file)
                             new_extra_path = os.path.join(dest_folder, os.path.basename(extra_file))
 
@@ -702,7 +720,7 @@ class Cleaner:
 
                 return xbmcvfs.rename(source, new_path)
         else:
-            self.debug("XBMC could not find the file at %r" % source, xbmc.LOGWARNING)
+            self.debug("File %r no longer exists." % source, xbmc.LOGWARNING)
             return False
 
     def translate(self, msg_id):
