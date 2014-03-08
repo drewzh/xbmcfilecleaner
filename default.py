@@ -62,6 +62,7 @@ class Cleaner:
         MOVIES: ["file", "title", "year"],
         MUSIC_VIDEOS: ["file", "artist"]
     }
+    stacking_extensions = ["part", "pt", "cd", "dvd", "disk", "disc"]
 
     def __init__(self):
         """Create a Cleaner object that performs regular cleaning of watched videos."""
@@ -117,6 +118,7 @@ class Cleaner:
                 movies = self.get_expired_videos(self.MOVIES)
                 if movies:
                     count = 0
+                    seen_before = False
                     for abs_path, title, year in movies:
                         for unstacked_path in self.unstack(abs_path):
                             self.debug("%r %r %r" % (unstacked_path, title, year))
@@ -128,11 +130,19 @@ class Cleaner:
                                     else:
                                         new_path = self.holding_folder
                                     if self.move_file(unstacked_path, new_path):
-                                        count += 1
+                                        if any([x in unstacked_path for x in self.stacking_extensions]):
+                                            # This may not work if a non-stacked movie title contains "pt", "cd", etc.
+                                            if not seen_before:
+                                                count += 1
+                                                seen_before = True
                                         self.delete_empty_folders(os.path.dirname(unstacked_path))
                                 else:
                                     if self.delete_file(unstacked_path):
-                                        count += 1
+                                        if any([x in unstacked_path for x in self.stacking_extensions]):
+                                            # This may not work if a non-stacked movie title contains "pt", "cd", etc.
+                                            if not seen_before:
+                                                count += 1
+                                                seen_before = True
                                         self.delete_empty_folders(os.path.dirname(unstacked_path))
                             else:
                                 self.debug("XBMC could not find the file at %r" % unstacked_path, xbmc.LOGWARNING)
