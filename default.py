@@ -118,36 +118,23 @@ class Cleaner:
                 movies = self.get_expired_videos(self.MOVIES)
                 if movies:
                     count = 0
-                    seen_before = False
                     for abs_path, title, year in movies:
-                        for unstacked_path in self.unstack(abs_path):
-                            self.debug("%r %r %r" % (unstacked_path, title, year))
-                            if xbmcvfs.exists(unstacked_path):
-                                cleaning_required = True
-                                if not self.delete_files:
-                                    if self.create_subdirs:
-                                        new_path = os.path.join(self.holding_folder, "%s (%d)" % (title, year))
-                                    else:
-                                        new_path = self.holding_folder
-                                    if self.move_file(unstacked_path, new_path):
-                                        if any([x in unstacked_path for x in self.stacking_extensions]):
-                                            # This may not work if a non-stacked movie title contains "pt", "cd", etc.
-                                            if not seen_before:
-                                                count += 1
-                                                seen_before = True
-                                        self.delete_empty_folders(os.path.dirname(unstacked_path))
-                                else:
-                                    if self.delete_file(unstacked_path):
-                                        if any([x in unstacked_path for x in self.stacking_extensions]):
-                                            # This may not work if a non-stacked movie title contains "pt", "cd", etc.
-                                            if not seen_before:
-                                                count += 1
-                                                seen_before = True
-                                        self.delete_empty_folders(os.path.dirname(unstacked_path))
+                        if not self.delete_files:
+                            if self.create_subdirs:
+                                new_path = os.path.join(self.holding_folder, "%s (%d)" % (title, year))
                             else:
-                                self.debug("XBMC could not find the file at %r" % unstacked_path, xbmc.LOGWARNING)
-                    # TODO: Count gets increased for every file, not movie. This causes problems with stacked movies.
+                                new_path = self.holding_folder
+                            if self.move_file(abs_path, new_path):
+                                count += 1
+                                # TODO Causes issues with stacked files
+                                self.delete_empty_folders(abs_path)
+                        else:
+                            if self.delete_file(abs_path):
+                                count += 1
+                                # TODO Causes issues with stacked files
+                                self.delete_empty_folders(abs_path)
                     if count > 0:
+                        cleaning_required = True
                         summary += " %d %s" % (count, self.MOVIES)
 
             if self.delete_tv_shows:
@@ -572,7 +559,7 @@ class Cleaner:
             return [path]
 
     def delete_file(self, location):
-        """Delete a file from the file system.
+        """Delete a file from the file system. Also supports stacked movie files.
 
         Example:
             success = delete_file(location)
@@ -581,29 +568,50 @@ class Cleaner:
         :param location: the path to the file you wish to delete
         :rtype : bool
         """
-        self.debug("Deleting file at %r" % location)
-        if self.is_excluded(location):
-            self.debug("This file is found on an excluded path and will not be deleted.")
-            return False
+        self.debug("Attempting to delete %r" % location)
 
-        if xbmcvfs.exists(location):
-            if self.delete_related:
-                path, name = os.path.split(location)
+        paths = self.unstack(location)
+        success = []
+
+        for p in paths:
+            if self.is_excluded(p):
+                self.debug("This file is found on an excluded path and will not be deleted.")
+                success.append(False)
+                break
+            if xbmcvfs.exists(p):
+                success.append(xbmcvfs.delete(p))
+            else:
+                self.debug("File %r no longer exists." % p, xbmc.LOGERROR)
+                success.append(False)
+
+        if self.delete_related:
+            self.debug("Looking for related files.")
+
+            path, name = os.path.split(paths[0])
+            if location.startswith("stack://"):
+                # TODO: move this to a separate method
+                name = os.path.basename(os.path.commonprefix(paths))
+                for e in self.stacking_extensions:
+                    if name.endswith(e):
+                        name = name[:-len(e)].rstrip("._-")
+                        break
+            else:
                 name, _ = os.path.splitext(name)
 
-                for extra_file in xbmcvfs.listdir(path)[1]:
-                    if extra_file.startswith(name):
-                        extra_file_path = os.path.join(path, extra_file)
-                        if extra_file_path != location:
-                            self.debug('Deleting %r' % extra_file_path)
-                            xbmcvfs.delete(extra_file_path)
+            self.debug("Attempting to match related files in %r with prefix %r" % (path, name))
 
-            return xbmcvfs.delete(location)
-        else:
-            self.debug("File %r no longer exists." % location, xbmc.LOGERROR)
-            return False
+            for extra_file in xbmcvfs.listdir(path)[1]:
+                if extra_file.startswith(name):
+                    self.debug("%r starts with %r" % (extra_file, name))
+                    extra_file_path = os.path.join(path, extra_file)
+                    self.debug("Extra file path: %r" % extra_file_path)
+                    if extra_file_path not in paths:
+                        self.debug('Deleting %r' % extra_file_path)
+                        xbmcvfs.delete(extra_file_path)
+        self.debug("Return statuses: %r" % success)
+        return all(success)
 
-    def delete_empty_folders(self, folder):
+    def delete_empty_folders(self, location):
         """
         Delete the folder if it is empty. Presence of custom file extensions can be ignored while scanning.
         To achieve this, edit the ignored file types setting in the addon settings.
@@ -619,14 +627,12 @@ class Cleaner:
             self.debug("Deleting of folders is disabled.")
             return False
 
+        folder = os.path.dirname(self.unstack(location)[0])  # Stacked movies should be in the same folder
         self.debug("Checking if %r is empty" % folder)
-
         ignored_file_types = [file_ext.strip() for file_ext in self.ignore_extensions.split(",")]
-
         self.debug("Ignoring file types %r" % ignored_file_types)
 
         subfolders, files = xbmcvfs.listdir(folder)
-
         self.debug("Contents of %r:\nSubfolders: %r\nFiles: %r" % (folder, subfolders, files))
 
         empty = True
