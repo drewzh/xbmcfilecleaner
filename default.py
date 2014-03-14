@@ -126,12 +126,10 @@ class Cleaner:
                                 new_path = self.holding_folder
                             if self.move_file(abs_path, new_path):
                                 count += 1
-                                # TODO Causes issues with stacked files
                                 self.delete_empty_folders(abs_path)
                         else:
                             if self.delete_file(abs_path):
                                 count += 1
-                                # TODO Causes issues with stacked files
                                 self.delete_empty_folders(abs_path)
                     if count > 0:
                         cleaning_required = True
@@ -586,26 +584,27 @@ class Cleaner:
             success = delete_file(location)
 
         :type location: str
-        :param location: the path to the file you wish to delete
+        :param location: the path to the file you wish to delete.
         :rtype: bool
-        :return: True if all files were deleted successfully, False otherwise
+        :return: True if (at least one) file was deleted successfully, False otherwise.
         """
         self.debug("Attempting to delete %r" % location)
 
         paths = self.unstack(location)
         success = []
 
+        if self.is_excluded(paths[0]):
+            self.debug("Detected a file on an excluded path. Aborting.")
+            return False
+
         for p in paths:
-            if self.is_excluded(p):
-                self.debug("This file is found on an excluded path and will not be deleted.")
-                success.append(False)
-                break
             if xbmcvfs.exists(p):
-                success.append(xbmcvfs.delete(p))
+                success.append(bool(xbmcvfs.delete(p)))
             else:
                 self.debug("File %r no longer exists." % p, xbmc.LOGERROR)
                 success.append(False)
 
+        # TODO: Create a separate method to delete related files and call it from cleanup()
         if self.delete_related:
             self.debug("Looking for related files.")
 
@@ -623,10 +622,10 @@ class Cleaner:
                     extra_file_path = os.path.join(path, extra_file)
                     self.debug("Extra file path: %r" % extra_file_path)
                     if extra_file_path not in paths:
-                        self.debug('Deleting %r' % extra_file_path)
+                        self.debug("Deleting %r" % extra_file_path)
                         xbmcvfs.delete(extra_file_path)
         self.debug("Return statuses: %r" % success)
-        return all(success)
+        return any(success)
 
     def delete_empty_folders(self, location):
         """
@@ -696,67 +695,78 @@ class Cleaner:
         Example:
             success = move_file(a, b)
 
-        :type source: str
+        :type p: str
         :param source: the source path (absolute)
         :type dest_folder: str
         :param dest_folder: the destination path (absolute)
         :rtype: bool
-        :return: True if the file was moved successfully, False otherwise.
+        :return: True if (at least one) file was moved successfully, False otherwise.
         """
-        if self.is_excluded(source):
-            self.debug("This file is found on an excluded path and will not be moved.")
-            return False
         if isinstance(source, unicode):
             source = source.encode("utf-8")
+
+        paths = self.unstack(source)
+        success = []
         dest_folder = xbmc.makeLegalFilename(dest_folder)
-        self.debug("Moving %r to %r" % (os.path.basename(source), dest_folder))
-        if xbmcvfs.exists(source):
-            if not xbmcvfs.exists(dest_folder):
-                self.debug("Destination %r does not exist yet." % dest_folder)
-                self.debug("Creating destination %r." % dest_folder)
-                if xbmcvfs.mkdirs(dest_folder):
-                    self.debug("Successfully created %r." % dest_folder)
-                else:
-                    self.debug("Destination %r could not be created." % dest_folder, xbmc.LOGERROR)
-                    return False
 
-            new_path = os.path.join(dest_folder, os.path.basename(source))
-
-            if xbmcvfs.exists(new_path):
-                self.debug("A file with the same name already exists in the holding folder. Checking file sizes.")
-                existing_file = xbmcvfs.File(new_path)
-                file_to_move = xbmcvfs.File(source)
-                if file_to_move.size() > existing_file.size():
-                    self.debug("This file is larger than the existing file. Replacing the existing file with this one.")
-                    existing_file.close()
-                    file_to_move.close()
-                    return xbmcvfs.delete(new_path) and xbmcvfs.rename(source, new_path)
-                else:
-                    self.debug("This file is smaller than the existing file. Deleting this file instead of moving.")
-                    existing_file.close()
-                    file_to_move.close()
-                    return self.delete_file(source)
-            else:
-                self.debug("Moving %r to %r." % (source, new_path))
-                if self.delete_related:
-                    self.debug("Looking for related files.")
-                    path, name = os.path.split(source)
-                    name, ext = os.path.splitext(name)
-
-                    for extra_file in xbmcvfs.listdir(path)[1]:
-                        if extra_file.startswith(name):
-                            # TODO: Might cause problems with stacked files
-                            extra_file_path = os.path.join(path, extra_file)
-                            new_extra_path = os.path.join(dest_folder, os.path.basename(extra_file))
-
-                            if new_extra_path != new_path:
-                                self.debug("Renaming %r to %r." % (extra_file_path, new_extra_path))
-                                xbmcvfs.rename(extra_file_path, new_extra_path)
-
-                return xbmcvfs.rename(source, new_path)
-        else:
-            self.debug("File %r no longer exists." % source, xbmc.LOGWARNING)
+        if self.is_excluded(paths[0]):
+            self.debug("Detected a file on an excluded path. Aborting.")
             return False
+
+        for p in paths:
+            self.debug("Attempting to move %r to %r." % (p, dest_folder))
+            if xbmcvfs.exists(p):
+                if not xbmcvfs.exists(dest_folder):
+                    if xbmcvfs.mkdirs(dest_folder):
+                        self.debug("Created destination %r." % dest_folder)
+                    else:
+                        self.debug("Destination %r could not be created." % dest_folder, xbmc.LOGERROR)
+                        return False
+
+                new_path = os.path.join(dest_folder, os.path.basename(p))
+
+                if xbmcvfs.exists(new_path):
+                    self.debug("A file with the same name already exists in the holding folder. Checking file sizes.")
+                    existing_file = xbmcvfs.File(new_path)
+                    file_to_move = xbmcvfs.File(p)
+                    if file_to_move.size() > existing_file.size():
+                        self.debug("This file is larger than the existing file. Replacing it with this one.")
+                        existing_file.close()
+                        file_to_move.close()
+                        success.append(bool(xbmcvfs.delete(new_path) and xbmcvfs.rename(p, new_path)))
+                    else:
+                        self.debug("This file isn't larger than the existing file. Deleting it instead of moving.")
+                        existing_file.close()
+                        file_to_move.close()
+                        success.append(bool(xbmcvfs.delete(p)))
+                else:
+                    self.debug("Moving %r to %r." % (p, new_path))
+                    success.append(bool(xbmcvfs.rename(p, new_path)))
+            else:
+                self.debug("File %r no longer exists." % p, xbmc.LOGWARNING)
+                success.append(False)
+
+        # TODO: Create a separate method to delete related files and call it from cleanup()
+        if self.delete_related:
+            path, name = os.path.split(paths[0])
+            if source.startswith("stack://"):
+                name = self.get_stack_bare_title(paths)
+            else:
+                name, ext = os.path.splitext(name)
+
+            self.debug("Attempting to match related files in %r with prefix %r" % (path, name))
+
+            for extra_file in xbmcvfs.listdir(path)[1]:
+                if extra_file.startswith(name):
+                    self.debug("%r starts with %r" % (extra_file, name))
+                    extra_file_path = os.path.join(path, extra_file)
+                    self.debug("Extra file path: %r" % extra_file_path)
+                    new_extra_path = os.path.join(dest_folder, os.path.basename(extra_file))
+                    if new_extra_path not in paths:
+                        self.debug("Renaming %r to %r." % (extra_file_path, new_extra_path))
+                        xbmcvfs.rename(extra_file_path, new_extra_path)
+
+        return any(success)
 
     def translate(self, msg_id):
         """
