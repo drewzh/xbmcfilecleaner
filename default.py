@@ -18,9 +18,7 @@ __settings__ = xbmcaddon.Addon(__addonID__)
 
 
 class Cleaner:
-
-    """
-    The Cleaner class is used in XBMC to identify and delete videos that have been watched by the user. It starts with
+    """The Cleaner class is used in XBMC to identify and delete videos that have been watched by the user. It starts with
     XBMC and runs until XBMC shuts down. Identification of watched videos can be enhanced with additional criteria,
     such as recently watched, low rated and based on free disk space. Deleting of videos can be enabled for movies,
     music videos or tv shows, or any combination of these. Almost all of the methods in this class will be called
@@ -62,7 +60,7 @@ class Cleaner:
         MOVIES: ["file", "title", "year"],
         MUSIC_VIDEOS: ["file", "artist"]
     }
-    stacking_extensions = ["part", "pt", "cd", "dvd", "disk", "disc"]
+    stacking_indicators = ["part", "pt", "cd", "dvd", "disk", "disc"]
 
     def __init__(self):
         """Create a Cleaner object that performs regular cleaning of watched videos."""
@@ -126,10 +124,12 @@ class Cleaner:
                                 new_path = self.holding_folder
                             if self.move_file(abs_path, new_path):
                                 count += 1
+                                self.clean_related_files(abs_path, new_path)
                                 self.delete_empty_folders(abs_path)
                         else:
                             if self.delete_file(abs_path):
                                 count += 1
+                                self.clean_related_files(abs_path)
                                 self.delete_empty_folders(abs_path)
                     if count > 0:
                         cleaning_required = True
@@ -147,17 +147,18 @@ class Cleaner:
                                 else:
                                     new_path = self.holding_folder
                                 if self.move_file(abs_path, new_path):
-                                    cleaning_required = True
                                     count += 1
-                                    self.delete_empty_folders(os.path.dirname(abs_path))
+                                    self.clean_related_files(abs_path, new_path)
+                                    self.delete_empty_folders(abs_path)
                             else:
                                 if self.delete_file(abs_path):
-                                    cleaning_required = True
                                     count += 1
-                                    self.delete_empty_folders(os.path.dirname(abs_path))
+                                    self.clean_related_files(abs_path)
+                                    self.delete_empty_folders(abs_path)
                         else:
                             self.debug("XBMC could not find the file at %r" % abs_path, xbmc.LOGWARNING)
                     if count > 0:
+                        cleaning_required = True
                         summary += " %d %s" % (count, self.TVSHOWS)
 
             if self.delete_music_videos:
@@ -175,14 +176,17 @@ class Cleaner:
                                     new_path = self.holding_folder
                                 if self.move_file(abs_path, new_path):
                                     count += 1
+                                    self.clean_related_files(abs_path, new_path)
                                     self.delete_empty_folders(os.path.dirname(abs_path))
                             else:
                                 if self.delete_file(abs_path):
                                     count += 1
+                                    self.clean_related_files(abs_path)
                                     self.delete_empty_folders(os.path.dirname(abs_path))
                         else:
                             self.debug("XBMC could not find the file at %r" % abs_path, xbmc.LOGWARNING)
                     if count > 0:
+                        cleaning_required = True
                         summary += " %d %s" % (count, self.MUSIC_VIDEOS)
 
             # Give a status report if any deletes occurred
@@ -570,7 +574,7 @@ class Cleaner:
         :return: common title of file names part of a stack
         """
         title = os.path.basename(os.path.commonprefix(filenames))
-        for e in self.stacking_extensions:
+        for e in self.stacking_indicators:
             if title.endswith(e):
                 title = title[:-len(e)].rstrip("._-")
                 break
@@ -604,26 +608,7 @@ class Cleaner:
                 self.debug("File %r no longer exists." % p, xbmc.LOGERROR)
                 success.append(False)
 
-        # TODO: Create a separate method to delete related files and call it from cleanup()
-        if self.delete_related:
-            self.debug("Looking for related files.")
 
-            path, name = os.path.split(paths[0])
-            if location.startswith("stack://"):
-                name = self.get_stack_bare_title(paths)
-            else:
-                name, _ = os.path.splitext(name)
-
-            self.debug("Attempting to match related files in %r with prefix %r" % (path, name))
-
-            for extra_file in xbmcvfs.listdir(path)[1]:
-                if extra_file.startswith(name):
-                    self.debug("%r starts with %r" % (extra_file, name))
-                    extra_file_path = os.path.join(path, extra_file)
-                    self.debug("Extra file path: %r" % extra_file_path)
-                    if extra_file_path not in paths:
-                        self.debug("Deleting %r" % extra_file_path)
-                        xbmcvfs.delete(extra_file_path)
         self.debug("Return statuses: %r" % success)
         return any(success)
 
@@ -689,6 +674,46 @@ class Cleaner:
             self.debug("Directory is not empty and will not be removed")
             return False
 
+    def clean_related_files(self, source, dest_folder=None):
+        """Clean files related to another file based on the user's preferences.
+
+        Related files are files that only differ by extension, or that share a prefix in case of stacked movies.
+
+        Examples of related files include NFO files, thumbnails, subtitles, fanart, etc.
+
+        :type source: str
+        :param source: Location of the file whose related files should be cleaned.
+        :type dest_folder: str
+        :param dest_folder: (Optional) The folder where related files should be moved to. Not needed when deleting.
+        """
+        if self.delete_related:
+            self.debug("Cleaning related files.")
+
+            paths = self.unstack(source)
+            path, name = os.path.split(paths[0])  # Because stacked movies are in the same folder, only check one path
+            if source.startswith("stack://"):
+                name = self.get_stack_bare_title(paths)
+            else:
+                name, ext = os.path.splitext(name)
+
+            self.debug("Attempting to match related files in %r with prefix %r" % (path, name))
+            for extra_file in xbmcvfs.listdir(path)[1]:
+                if extra_file.startswith(name):
+                    self.debug("%r starts with %r." % (extra_file, name))
+                    extra_file_path = os.path.join(path, extra_file)
+                    if self.delete_files:
+                        if extra_file_path not in paths:
+                            self.debug("Deleting %r." % extra_file_path)
+                            xbmcvfs.delete(extra_file_path)
+                    else:
+                        new_extra_path = os.path.join(dest_folder, os.path.basename(extra_file))
+                        if new_extra_path not in paths:
+                            self.debug("Moving %r to %r." % (extra_file_path, new_extra_path))
+                            xbmcvfs.rename(extra_file_path, new_extra_path)
+            self.debug("Finished searching for related files.")
+        else:
+            self.debug("Cleaning of related files is disabled.")
+
     def move_file(self, source, dest_folder):
         """Move a file to a new destination. Will create destination if it does not exist.
 
@@ -745,26 +770,6 @@ class Cleaner:
             else:
                 self.debug("File %r no longer exists." % p, xbmc.LOGWARNING)
                 success.append(False)
-
-        # TODO: Create a separate method to delete related files and call it from cleanup()
-        if self.delete_related:
-            path, name = os.path.split(paths[0])
-            if source.startswith("stack://"):
-                name = self.get_stack_bare_title(paths)
-            else:
-                name, ext = os.path.splitext(name)
-
-            self.debug("Attempting to match related files in %r with prefix %r" % (path, name))
-
-            for extra_file in xbmcvfs.listdir(path)[1]:
-                if extra_file.startswith(name):
-                    self.debug("%r starts with %r" % (extra_file, name))
-                    extra_file_path = os.path.join(path, extra_file)
-                    self.debug("Extra file path: %r" % extra_file_path)
-                    new_extra_path = os.path.join(dest_folder, os.path.basename(extra_file))
-                    if new_extra_path not in paths:
-                        self.debug("Renaming %r to %r." % (extra_file_path, new_extra_path))
-                        xbmcvfs.rename(extra_file_path, new_extra_path)
 
         return any(success)
 
