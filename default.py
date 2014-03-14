@@ -538,18 +538,20 @@ class Cleaner:
         return percentage
 
     def disk_space_low(self):
-        """Check if the disk is running low on free space.
-        Returns true if the free space is less than the threshold specified in the addon's settings.
+        """Check whether the disk is running low on free space.
 
-        :rtype : Boolean
+        :rtype: bool
+        :return: True if disk space is below threshold (set through addon settings), False otherwise.
         """
         return self.get_free_disk_space(self.disk_space_check_path) <= self.disk_space_threshold
 
     def unstack(self, path):
         """Unstack path if it is a stacked movie. See http://wiki.xbmc.org/index.php?title=File_stacking for more info.
-        Returns a list of paths, even if the path is not a stacked movie.
 
-        :rtype : list
+        :type path: str
+        :param path: The path that should be unstacked.
+        :rtype: list
+        :return: A list of paths that are part of the stack. If it is no stacked movie, a one-element list is returned.
         """
         if path.startswith("stack://"):
             self.debug("Unstacking %r." % path)
@@ -558,15 +560,35 @@ class Cleaner:
             self.debug("Unstacking %r is not needed." % path)
             return [path]
 
+    def get_stack_bare_title(self, filenames):
+        """Find the common title of files part of a stack, minus the volume and file extension.
+
+        Example:
+            ["Movie_Title_part1.ext", "Movie_Title_part2.ext"] yields "Movie_Title"
+
+        :type filenames: list
+        :param filenames: a list of file names that are part of a stack. Use unstack() to find these file names.
+        :rtype: str
+        :return: common title of file names part of a stack
+        """
+        title = os.path.basename(os.path.commonprefix(filenames))
+        for e in self.stacking_extensions:
+            if title.endswith(e):
+                title = title[:-len(e)].rstrip("._-")
+                break
+        return title
+
     def delete_file(self, location):
-        """Delete a file from the file system. Also supports stacked movie files.
+        """
+        Delete a file from the file system. Also supports stacked movie files.
 
         Example:
             success = delete_file(location)
 
         :type location: str
         :param location: the path to the file you wish to delete
-        :rtype : bool
+        :rtype: bool
+        :return: True if all files were deleted successfully, False otherwise
         """
         self.debug("Attempting to delete %r" % location)
 
@@ -589,12 +611,7 @@ class Cleaner:
 
             path, name = os.path.split(paths[0])
             if location.startswith("stack://"):
-                # TODO: move this to a separate method
-                name = os.path.basename(os.path.commonprefix(paths))
-                for e in self.stacking_extensions:
-                    if name.endswith(e):
-                        name = name[:-len(e)].rstrip("._-")
-                        break
+                name = self.get_stack_bare_title(paths)
             else:
                 name, _ = os.path.splitext(name)
 
@@ -614,20 +631,22 @@ class Cleaner:
     def delete_empty_folders(self, location):
         """
         Delete the folder if it is empty. Presence of custom file extensions can be ignored while scanning.
+
         To achieve this, edit the ignored file types setting in the addon settings.
 
         Example:
             success = delete_empty_folders(path)
 
-        :type folder: str
-        :param folder: The folder to be deleted
-        :rtype : bool
+        :type location: str
+        :param location: The path to the folder to be deleted.
+        :rtype: bool
+        :return: True if the folder was deleted successfully, False otherwise.
         """
         if not self.delete_folders:
             self.debug("Deleting of folders is disabled.")
             return False
 
-        folder = os.path.dirname(self.unstack(location)[0])  # Stacked movies should be in the same folder
+        folder = os.path.dirname(self.unstack(location)[0])  # Stacked paths should have the same parent, use any
         self.debug("Checking if %r is empty" % folder)
         ignored_file_types = [file_ext.strip() for file_ext in self.ignore_extensions.split(",")]
         self.debug("Ignoring file types %r" % ignored_file_types)
@@ -672,17 +691,17 @@ class Cleaner:
             return False
 
     def move_file(self, source, dest_folder):
-        """Move a file to a new destination. Returns True if the move succeeded, False otherwise.
-        Will create destination if it does not exist.
+        """Move a file to a new destination. Will create destination if it does not exist.
 
         Example:
             success = move_file(a, b)
 
-        :type source: basestring
+        :type source: str
         :param source: the source path (absolute)
         :type dest_folder: str
         :param dest_folder: the destination path (absolute)
-        :rtype : bool
+        :rtype: bool
+        :return: True if the file was moved successfully, False otherwise.
         """
         if self.is_excluded(source):
             self.debug("This file is found on an excluded path and will not be moved.")
