@@ -1,6 +1,5 @@
 # encoding: utf-8
 import os
-import locale
 import time
 import re
 import json
@@ -66,11 +65,6 @@ class Cleaner:
         """Create a Cleaner object that performs regular cleaning of watched videos."""
         self.reload_settings()
 
-        try:
-            locale.setlocale(locale.LC_ALL, "English_United Kingdom")
-        except locale.Error, le:
-            self.debug("Could not change locale: %r" % le, xbmc.LOGWARNING)
-
         service_sleep = 10
         ticker = 0
         delayed_completed = False
@@ -78,16 +72,16 @@ class Cleaner:
         while not xbmc.abortRequested:
             self.reload_settings()
 
-            scanInterval_ticker = self.scan_interval * 60 / service_sleep
-            delayedStart_ticker = self.delayed_start * 60 / service_sleep
+            scan_interval_ticker = self.scan_interval * 60 / service_sleep
+            delayed_start_ticker = self.delayed_start * 60 / service_sleep
 
             if not self.cleaner_enabled:
                 continue
             else:
-                if delayed_completed and ticker >= scanInterval_ticker:
+                if delayed_completed and ticker >= scan_interval_ticker:
                     self.cleanup()
                     ticker = 0
-                elif not delayed_completed and ticker >= delayedStart_ticker:
+                elif not delayed_completed and ticker >= delayed_start_ticker:
                     delayed_completed = True
                     self.cleanup()
                     ticker = 0
@@ -100,7 +94,6 @@ class Cleaner:
     def cleanup(self):
         """Delete any watched videos from the XBMC video database. The videos to be deleted are subject to a number of
         criteria as can be specified in the addon's settings.
-        :rtype : None
         """
         self.debug("Starting cleaning routine")
 
@@ -205,16 +198,15 @@ class Cleaner:
                     xbmc.executebuiltin("XBMC.CleanLibrary(video)")
 
     def get_expired_videos(self, option):
-        """Find videos in the XBMC library that have been watched and satisfy any other conditions as enabled in the
-        addon's settings.
+        """Find videos in the XBMC library that have been watched.
+
+        Respects any other conditions user enables in the addon's settings.
 
         :type option: str
-        :param option: The type of videos to find (one of the globals MOVIES, MUSIC_VIDEOS or TVSHOWS)
-        :rtype : list
+        :param option: The type of videos to find (one of the globals MOVIES, MUSIC_VIDEOS or TVSHOWS).
+        :rtype: list
+        :return: A list of expired videos, along with a number of extra attributes specific to the video type.
         """
-        # This currently does not do anything and may have to be removed
-        operators = ["contains", "doesnotcontain", "is", "isnot", "startswith", "endswith", "greaterthan", "lessthan",
-                     "after", "before", "inthelast", "notinthelast", "true", "false", "between"]
 
         # A non-exhaustive list of pre-defined filters to use during JSON-RPC requests
         # These are possible conditions that must be met before a video can be deleted
@@ -352,10 +344,7 @@ class Cleaner:
         return None
 
     def reload_settings(self):
-        """Retrieve new values for all settings, in order to account for any recent changes.
-
-        :rtype : None
-        """
+        """Retrieve new values for all settings, in order to account for any recent changes."""
         self.cleaner_enabled = bool(__settings__.getSetting("cleaner_enabled") == "true")
         self.delete_folders = bool(__settings__.getSetting("delete_folders") == "true")
         self.ignore_extensions = str(__settings__.getSetting("ignore_extensions"))
@@ -396,12 +385,12 @@ class Cleaner:
         self.exclusion3 = xbmc.translatePath(__settings__.getSetting("exclusion3"))
 
     def is_excluded(self, full_path):
-        """Check if the file path is part of the excluded sources. Returns True if the file is part of the excluded
-        sources, False otherwise. Also returns False when an error occurs to prevent data loss.
+        """Check if the file path is part of the excluded sources.
 
         :type full_path: str
         :param full_path: the path to the file that should be checked for exclusion
         :rtype: bool
+        :return: True if the path matches a user-set excluded path, False otherwise.
         """
         if not self.exclusion_enabled:
             self.debug("Path exclusion is disabled.")
@@ -465,9 +454,9 @@ class Cleaner:
         """Determine the percentage of free disk space.
 
         :type path: str
-        :param path: the path to the drive to check (this can be any path of any depth on the desired drive). If the
-        path doesn't exist, this function returns 100, in order to prevent files from being deleted accidentally
-        :rtype : float
+        :param path: The path to the drive to check. This can be any path of any depth on the desired drive.
+        :rtype: float
+        :return: The percentage of free space on the disk; 100% if errors occur.
         """
         percentage = float(100)
         self.debug("Checking for disk space on path: %r" % path)
@@ -505,15 +494,15 @@ class Cleaner:
                     path = path.decode("mbcs")
                     self.debug("New path: %r" % path)
 
-                bytesTotal = c_ulonglong(0)
-                bytesFree = c_ulonglong(0)
-                windll.kernel32.GetDiskFreeSpaceExW(c_wchar_p(path), byref(bytesFree), byref(bytesTotal), None)
+                bytes_total = c_ulonglong(0)
+                bytes_free = c_ulonglong(0)
+                windll.kernel32.GetDiskFreeSpaceExW(c_wchar_p(path), byref(bytes_free), byref(bytes_total), None)
 
                 try:
-                    percentage = float(bytesFree.value) / float(bytesTotal.value) * 100
+                    percentage = float(bytes_free.value) / float(bytes_total.value) * 100
                     self.debug("Hard disk check results:")
-                    self.debug("Bytes free: %s" % locale.format("%d", bytesFree.value, grouping=True))
-                    self.debug("Bytes total: %s" % locale.format("%d", bytesTotal.value, grouping=True))
+                    self.debug("Bytes free: %s" % bytes_free.value)
+                    self.debug("Bytes total: %s" % bytes_total.value)
                 except ZeroDivisionError:
                     self.notify(self.translate(32511), 15000, level=xbmc.LOGERROR)
             else:
@@ -526,8 +515,8 @@ class Cleaner:
                     diskstats = os.statvfs(path)
                     percentage = float(diskstats.f_bfree) / float(diskstats.f_blocks) * 100
                     self.debug("Hard disk check results:")
-                    self.debug("Bytes free: %s" % locale.format("%d", diskstats.f_bfree, grouping=True))
-                    self.debug("Bytes total: %s" % locale.format("%d", diskstats.f_blocks, grouping=True))
+                    self.debug("Bytes free: %r" % diskstats.f_bfree)
+                    self.debug("Bytes total: %r" % diskstats.f_blocks)
                 except OSError, ose:
                     self.notify(self.translate(32512), 15000, level=xbmc.LOGERROR)
                     self.debug("Error accessing %r: %r" % (path, ose))
@@ -792,12 +781,11 @@ class Cleaner:
         :type message: str
         :param message: the message to be displayed (and logged). You may also use the id (int) for localization.
         :type duration: int
-        :param duration: the duration the notification is displayed in milliseconds (default 5000)
+        :param duration: (Optional) The duration the notification is displayed in milliseconds (default 5000).
         :type image: str
-        :param image: the path to the image to be displayed on the notification (default "icon.png")
+        :param image: (Optional) The path to the image to be displayed on the notification (default "icon.png").
         :type level: int
-        :param level: (Optional) the log level (supported values are found at xbmc.LOG...)
-        :rtype : None
+        :param level: (Optional) The log level (e.g. xbmc.LOGERROR).
         """
         self.debug(message, level)
         if self.notifications_enabled and not (self.notify_when_idle and xbmc.Player().isPlayingVideo()):
@@ -806,11 +794,10 @@ class Cleaner:
     def debug(self, message, level=xbmc.LOGNOTICE):
         """Write a debug message to xbmc.log
 
-        :type message: basestring
-        :param message: the message to log
+        :type message: str
+        :param message: The message to log.
         :type level: int
-        :param level: (Optional) the log level (supported values are found at xbmc.LOG...)
-        :rtype : None
+        :param level: (Optional) The log level (e.g. xbmc.LOGERROR).
         """
         if self.debugging_enabled:
             if isinstance(message, unicode):
