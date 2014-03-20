@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from xbmc import translatePath
-from xbmcaddon import Addon
 from utils import debug
+from xbmcaddon import Addon
 
 # Addon info
 __addonID__ = "script.filecleaner"
@@ -61,7 +61,7 @@ paths = [disk_space_check_path, holding_folder, create_subdirs, exclusion1, excl
 available_settings = bools + strings + numbers + paths
 
 
-def get(setting):
+def get_setting(setting):
     """
     Get the value for a specified setting.
 
@@ -71,7 +71,7 @@ def get(setting):
     :return: The value corresponding to the provided setting. This can be a float, a bool, a string or None.
     """
     if setting in bools:
-        return bool(__addon__.getSetting(setting))
+        return bool(__addon__.getSetting(setting) == "true")
     elif setting in numbers:
         return float(__addon__.getSetting(setting))
     elif setting in strings:
@@ -95,5 +95,5 @@ def load_all():
     settings = dict()
     for s in bools + strings + numbers + paths:
         print s
-        settings[s] = get(s)
+        settings[s] = get_setting(s)
     return settings
