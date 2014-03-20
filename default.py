@@ -11,7 +11,7 @@ from ctypes import *
 import xbmc
 import xbmcvfs
 from settings import *
-from utils import translate, notify, debug
+from utils import translate, notify, debug, write_to_log
 
 
 # Addon info
@@ -111,9 +111,10 @@ class Cleaner:
             return
 
         if not get_setting(delete_when_low_disk_space) or (get_setting(delete_when_low_disk_space) and
-                                                            self.disk_space_low()):
+                                                           self.disk_space_low()):
             # create stub to summarize cleaning results
             summary = "Deleted" if get_setting(delete_files) else "Moved"
+            cleaned_files = []
             cleaning_required = False
             if get_setting(delete_movies):
                 movies = self.get_expired_videos(self.MOVIES)
@@ -129,10 +130,12 @@ class Cleaner:
                                     new_path = get_setting(holding_folder)
                                 if self.move_file(abs_path, new_path):
                                     count += 1
+                                    cleaned_files.append(abs_path)
                                     self.delete_empty_folders(os.path.dirname(abs_path))
                             else:
                                 if self.delete_file(abs_path):
                                     count += 1
+                                    cleaned_files.append(abs_path)
                                     self.delete_empty_folders(os.path.dirname(abs_path))
                         else:
                             debug("XBMC could not find the file at %r" % abs_path, xbmc.LOGWARNING)
@@ -153,11 +156,13 @@ class Cleaner:
                                 if self.move_file(abs_path, new_path):
                                     cleaning_required = True
                                     count += 1
+                                    cleaned_files.append(abs_path)
                                     self.delete_empty_folders(os.path.dirname(abs_path))
                             else:
                                 if self.delete_file(abs_path):
                                     cleaning_required = True
                                     count += 1
+                                    cleaned_files.append(abs_path)
                                     self.delete_empty_folders(os.path.dirname(abs_path))
                         else:
                             debug("XBMC could not find the file at %r" % abs_path, xbmc.LOGWARNING)
@@ -179,15 +184,19 @@ class Cleaner:
                                     new_path = get_setting(holding_folder)
                                 if self.move_file(abs_path, new_path):
                                     count += 1
+                                    cleaned_files.append(abs_path)
                                     self.delete_empty_folders(os.path.dirname(abs_path))
                             else:
                                 if self.delete_file(abs_path):
                                     count += 1
+                                    cleaned_files.append(abs_path)
                                     self.delete_empty_folders(os.path.dirname(abs_path))
                         else:
                             debug("XBMC could not find the file at %r" % abs_path, xbmc.LOGWARNING)
                     if count > 0:
                         summary += " %d %s" % (count, self.MUSIC_VIDEOS)
+
+            write_to_log(cleaned_files)
 
             # Give a status report if any deletes occurred
             if not summary.endswith("ed"):

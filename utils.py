@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import os
+import time
 import xbmc
 from xbmcaddon import Addon
 import settings  # TODO: No idea why I can't use "from settings import *" here.
@@ -10,8 +12,35 @@ import settings  # TODO: No idea why I can't use "from settings import *" here.
 __addonID__ = "script.filecleaner"
 __addon__ = Addon(__addonID__)
 __title__ = __addon__.getAddonInfo("name")
+__profile__ = xbmc.translatePath(__addon__.getAddonInfo('profile')).decode('utf-8')
 __author__ = "Anthirian, drewzh"
 __icon__ = "special://home/addons/" + __addonID__ + "/icon.png"
+__logfile__ = os.path.join(__profile__, "cleaner.log")
+
+
+def write_to_log(data):
+    # Save old log data
+    try:
+        f = open(__logfile__, "a+")  # use append mode to make sure it is created if non-existent
+        previous_data = f.read()
+    except (IOError, OSError) as err:
+        debug("%s" % err, xbmc.LOGERROR)
+    else:
+        f.close()
+
+        # Prepend new log data
+        try:
+            f = open(__logfile__, "w")
+            if data:
+                f.write("[B][%s][/B]\n" % time.strftime("%d/%m/%Y \t %H:%M:%S"))
+                for line in data:
+                    f.write("\t-%s\n" % line)
+            f.write("\n")
+            f.writelines(previous_data)
+        except (IOError, OSError) as err:
+            debug("%s" % err, xbmc.LOGERROR)
+        else:
+            f.close()
 
 
 def translate(msg_id):
