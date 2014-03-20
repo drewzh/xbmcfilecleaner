@@ -5,6 +5,7 @@
     <string id="32300">Conditions</string>
     <string id="32400">Exclusions</string>
     <string id="32500">Notifications</string>
+    <string id="32600">History</string>
 
     <!-- Actions section -->
     <string id="32101">[B]Which videos do you want to delete?[/B]</string>
@@ -71,4 +72,8 @@
     <string id="32511">Error reading hard disk. Please check your settings.</string>
     <string id="32512">Could not check disk space. Access denied.</string>
     <string id="32513">Could not check disk space. Path does not exist.</string>
+
+    <!-- Log section -->
+    <string id="32601">[B]Cleaning history[/B]</string>
+    <string id="32602">View cleaning history</string>
 </strings>

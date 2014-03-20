@@ -85,4 +85,11 @@
 
         <setting label="32504" id="debugging_enabled" type="bool" default="false" visible="true" />
     </category>
+
+    <category label="32600" id="log_section">
+        <setting type="sep" />
+        <setting label="32601" type="lsep" />
+        <setting type="sep" />
+        <setting label="32602" type="action"    action="RunScript($CWD/viewer.py, cleaninglog)" />
+    </category>
 </settings>

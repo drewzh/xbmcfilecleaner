@@ -1,4 +1,6 @@
-# encoding: utf-8
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import os
 import locale
 import time
@@ -6,15 +8,15 @@ import re
 import json
 from ctypes import *
 import xbmc
-import xbmcaddon
+from xbmcaddon import Addon
 import xbmcvfs
 
 # Addon info
-__title__ = "XBMC File Cleaner"
-__author__ = "Anthirian"
 __addonID__ = "script.filecleaner"
+__addon__ = Addon(__addonID__)
+__title__ = __addon__.getAddonInfo("name")
+__author__ = "Anthirian, drewzh"
 __icon__ = "special://home/addons/" + __addonID__ + "/icon.png"
-__settings__ = xbmcaddon.Addon(__addonID__)
 
 
 class Cleaner:
@@ -354,44 +356,44 @@ class Cleaner:
 
         :rtype : None
         """
-        self.cleaner_enabled = bool(__settings__.getSetting("cleaner_enabled") == "true")
-        self.delete_folders = bool(__settings__.getSetting("delete_folders") == "true")
-        self.ignore_extensions = str(__settings__.getSetting("ignore_extensions"))
-        self.delete_related = bool(__settings__.getSetting("delete_related") == "true")
-        self.delayed_start = float(__settings__.getSetting("delayed_start"))
-        self.scan_interval = float(__settings__.getSetting("scan_interval"))
+        self.cleaner_enabled = bool(__addon__.getSetting("cleaner_enabled") == "true")
+        self.delete_folders = bool(__addon__.getSetting("delete_folders") == "true")
+        self.ignore_extensions = str(__addon__.getSetting("ignore_extensions"))
+        self.delete_related = bool(__addon__.getSetting("delete_related") == "true")
+        self.delayed_start = float(__addon__.getSetting("delayed_start"))
+        self.scan_interval = float(__addon__.getSetting("scan_interval"))
 
-        self.notifications_enabled = bool(__settings__.getSetting("notifications_enabled") == "true")
-        self.notify_when_idle = bool(__settings__.getSetting("notify_when_idle") == "true")
-        self.debugging_enabled = bool(xbmc.translatePath(__settings__.getSetting("debugging_enabled")) == "true")
+        self.notifications_enabled = bool(__addon__.getSetting("notifications_enabled") == "true")
+        self.notify_when_idle = bool(__addon__.getSetting("notify_when_idle") == "true")
+        self.debugging_enabled = bool(xbmc.translatePath(__addon__.getSetting("debugging_enabled")) == "true")
 
-        self.clean_xbmc_library = bool(__settings__.getSetting("clean_xbmc_library") == "true")
-        self.delete_movies = bool(__settings__.getSetting("delete_movies") == "true")
-        self.delete_tv_shows = bool(__settings__.getSetting("delete_tv_shows") == "true")
-        self.delete_music_videos = bool(__settings__.getSetting("delete_music_videos") == "true")
-        self.delete_when_idle = bool(xbmc.translatePath(__settings__.getSetting("delete_when_idle")) == "true")
+        self.clean_xbmc_library = bool(__addon__.getSetting("clean_xbmc_library") == "true")
+        self.delete_movies = bool(__addon__.getSetting("delete_movies") == "true")
+        self.delete_tv_shows = bool(__addon__.getSetting("delete_tv_shows") == "true")
+        self.delete_music_videos = bool(__addon__.getSetting("delete_music_videos") == "true")
+        self.delete_when_idle = bool(xbmc.translatePath(__addon__.getSetting("delete_when_idle")) == "true")
 
-        self.enable_expiration = bool(__settings__.getSetting("enable_expiration") == "true")
-        self.expire_after = float(__settings__.getSetting("expire_after"))
+        self.enable_expiration = bool(__addon__.getSetting("enable_expiration") == "true")
+        self.expire_after = float(__addon__.getSetting("expire_after"))
 
-        self.delete_when_low_rated = bool(__settings__.getSetting("delete_when_low_rated") == "true")
-        self.minimum_rating = float(__settings__.getSetting("minimum_rating"))
-        self.ignore_no_rating = bool(__settings__.getSetting("ignore_no_rating") == "true")
+        self.delete_when_low_rated = bool(__addon__.getSetting("delete_when_low_rated") == "true")
+        self.minimum_rating = float(__addon__.getSetting("minimum_rating"))
+        self.ignore_no_rating = bool(__addon__.getSetting("ignore_no_rating") == "true")
 
-        self.delete_when_low_disk_space = bool(__settings__.getSetting("delete_when_low_disk_space") == "true")
-        self.disk_space_threshold = float(__settings__.getSetting("disk_space_threshold"))
-        self.disk_space_check_path = xbmc.translatePath(__settings__.getSetting("disk_space_check_path"))
+        self.delete_when_low_disk_space = bool(__addon__.getSetting("delete_when_low_disk_space") == "true")
+        self.disk_space_threshold = float(__addon__.getSetting("disk_space_threshold"))
+        self.disk_space_check_path = xbmc.translatePath(__addon__.getSetting("disk_space_check_path"))
 
-        self.delete_files = bool(__settings__.getSetting("delete_files") == "true")
-        self.holding_folder = xbmc.translatePath(__settings__.getSetting("holding_folder"))
-        self.create_subdirs = bool(xbmc.translatePath(__settings__.getSetting("create_subdirs")) == "true")
+        self.delete_files = bool(__addon__.getSetting("delete_files") == "true")
+        self.holding_folder = xbmc.translatePath(__addon__.getSetting("holding_folder"))
+        self.create_subdirs = bool(xbmc.translatePath(__addon__.getSetting("create_subdirs")) == "true")
 
-        self.not_in_progress = bool(__settings__.getSetting("not_in_progress") == "true")
+        self.not_in_progress = bool(__addon__.getSetting("not_in_progress") == "true")
 
-        self.exclusion_enabled = bool(__settings__.getSetting("exclusion_enabled") == "true")
-        self.exclusion1 = xbmc.translatePath(__settings__.getSetting("exclusion1"))
-        self.exclusion2 = xbmc.translatePath(__settings__.getSetting("exclusion2"))
-        self.exclusion3 = xbmc.translatePath(__settings__.getSetting("exclusion3"))
+        self.exclusion_enabled = bool(__addon__.getSetting("exclusion_enabled") == "true")
+        self.exclusion1 = xbmc.translatePath(__addon__.getSetting("exclusion1"))
+        self.exclusion2 = xbmc.translatePath(__addon__.getSetting("exclusion2"))
+        self.exclusion3 = xbmc.translatePath(__addon__.getSetting("exclusion3"))
 
     def is_excluded(self, full_path):
         """Check if the file path is part of the excluded sources. Returns True if the file is part of the excluded
@@ -714,7 +716,7 @@ class Cleaner:
         :rtype : str
         """
         if isinstance(msg_id, int):
-            return __settings__.getLocalizedString(msg_id)
+            return __addon__.getLocalizedString(msg_id)
         else:
             return ""
 
