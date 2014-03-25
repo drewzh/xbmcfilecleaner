@@ -2,44 +2,49 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
 import xbmc
+import xbmcgui
 from xbmcaddon import Addon
+from utils import debug, notify
 
 # Addon info
 __addonID__ = "script.filecleaner"
 __addon__ = Addon(__addonID__)
 __title__ = __addon__.getAddonInfo("name")
-__profile__ = xbmc.translatePath(__addon__.getAddonInfo('profile')).decode('utf-8')
+__profile__ = xbmc.translatePath(__addon__.getAddonInfo("profile")).decode("utf-8")
 __author__ = "Anthirian, drewzh"
-__icon__ = "special://home/addons/" + __addonID__ + "/icon.png"
+__icon__ = xbmc.translatePath(__addon__.getAddonInfo("icon")).decode("utf-8")
 __logfile__ = os.path.join(__profile__, "cleaner.log")
 
 
-class Viewer:
-    # constants
-    WINDOW = 10147
-    CONTROL_LABEL = 1
-    CONTROL_TEXTBOX = 5
-
+class LogViewer(xbmcgui.WindowXMLDialog):
     def __init__(self, *args, **kwargs):
-        xbmc.executebuiltin("ActivateWindow(%d)" % (self.WINDOW,))
-        self.window = xbmcgui.Window(self.WINDOW)
-        xbmc.sleep(100)  # give window time to initialize
-        self.populate_window()
+        self.caption = kwargs.get("caption", "")
+        self.text = kwargs.get("text", "")
+        xbmcgui.WindowXMLDialog.__init__(self)
 
-    def populate_window(self):
-        heading = "Cleaning log"
-        try:
-            f = open(__logfile__)
-        except (IOError, OSError) as error:
-            xbmc.log("%s: %s" % (__title__, error), xbmc.LOGERROR)
-        else:
-            self.window.getControl(self.CONTROL_LABEL).setLabel("%s - %s" % (heading, __title__,))
-            self.window.getControl(self.CONTROL_TEXTBOX).setText(f.read())
-            f.close()
+    def onInit(self):
+        self.getControl(101).setLabel(self.caption)
+        self.getControl(201).setText(self.text)
 
-if __name__ == "__main__":
-    try:
-        Viewer()
-    except Exception, ex:
-        xbmc.log("%s: %s" % (__addonname__, ex), xbmc.LOGERROR)
+
+def show_logviewer(windowtitle, text):
+    path = __addon__.getAddonInfo("path")
+    win = LogViewer("DialogLogViewer.xml", path, "Default", caption=windowtitle, text=text)
+    win.doModal()
+    del win
+
+#The following will actually display the dialog
+
+try:
+    f = open(__logfile__)
+except (IOError, OSError) as error:
+    xbmc.log("%s: %s" % (__title__, error), xbmc.LOGERROR)
+else:
+    # TODO: Extra argumenten mee geven en op basis daarvan een actie bepalen
+    caption = "Cleaning Log"
+    if len(sys.argv) > 1:
+        caption += " - %s" % sys.argv[1]
+    show_logviewer(caption, f.read())
+    f.close()

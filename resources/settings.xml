@@ -90,6 +90,6 @@
         <setting type="sep" />
         <setting label="32601" type="lsep" />
         <setting type="sep" />
-        <setting label="32602" type="action"    action="RunScript($CWD/viewer.py, cleaninglog)" />
+        <setting label="32602" type="action" action="RunScript($CWD/viewer.py, show)" />
     </category>
 </settings>
