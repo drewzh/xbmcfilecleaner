@@ -1,50 +1,53 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import os
 import sys
+
 import xbmc
 import xbmcgui
 from xbmcaddon import Addon
-from utils import debug, notify
+from utils import Log, notify
+
 
 # Addon info
 __addonID__ = "script.filecleaner"
 __addon__ = Addon(__addonID__)
 __title__ = __addon__.getAddonInfo("name")
 __profile__ = xbmc.translatePath(__addon__.getAddonInfo("profile")).decode("utf-8")
-__author__ = "Anthirian, drewzh"
-__icon__ = xbmc.translatePath(__addon__.getAddonInfo("icon")).decode("utf-8")
-__logfile__ = os.path.join(__profile__, "cleaner.log")
 
 
-class LogViewer(xbmcgui.WindowXMLDialog):
+class LogViewerDialog(xbmcgui.WindowXMLDialog):
+    CAPTIONID = 101
+    TEXTBOXID = 201
+
     def __init__(self, *args, **kwargs):
-        self.caption = kwargs.get("caption", "")
-        self.text = kwargs.get("text", "")
+        self.log = Log()
+        self.caption = "Cleaning Log"
         xbmcgui.WindowXMLDialog.__init__(self)
 
     def onInit(self):
-        self.getControl(101).setLabel(self.caption)
-        self.getControl(201).setText(self.text)
+        self.getControl(self.CAPTIONID).setLabel(self.caption)
+        if len(sys.argv) > 1:
+            if sys.argv[1] == "show":
+                self.getControl(self.TEXTBOXID).setText(self.log.get())
+            elif sys.argv[1] == "trim":
+                # TODO: File is not trimmed yet
+                self.getControl(self.TEXTBOXID).setText(self.log.trim())
+            elif sys.argv[1] == "clear":
+                self.getControl(self.TEXTBOXID).setText(self.log.clear())
+            else:
+                self.getControl(self.TEXTBOXID).setText("Unknown argument %r" % sys.argv[1])
+        else:
+            self.getControl(self.TEXTBOXID).setText("Too few arguments")
 
 
-def show_logviewer(windowtitle, text):
+def show_logviewer():
     path = __addon__.getAddonInfo("path")
-    win = LogViewer("DialogLogViewer.xml", path, "Default", caption=windowtitle, text=text)
+    win = LogViewerDialog("DialogLogViewer.xml", path, "Default")
     win.doModal()
     del win
 
-#The following will actually display the dialog
 
-try:
-    f = open(__logfile__)
-except (IOError, OSError) as error:
-    xbmc.log("%s: %s" % (__title__, error), xbmc.LOGERROR)
-else:
-    # TODO: Extra argumenten mee geven en op basis daarvan een actie bepalen
-    caption = "Cleaning Log"
-    if len(sys.argv) > 1:
-        caption += " - %s" % sys.argv[1]
-    show_logviewer(caption, f.read())
-    f.close()
+if __name__ == "__main__":
+    # TODO: Reuse window when buttons are pressed
+    show_logviewer()
