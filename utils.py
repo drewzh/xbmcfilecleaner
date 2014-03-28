@@ -12,35 +12,95 @@ import settings  # TODO: No idea why I can't use "from settings import *" here.
 __addonID__ = "script.filecleaner"
 __addon__ = Addon(__addonID__)
 __title__ = __addon__.getAddonInfo("name")
-__profile__ = xbmc.translatePath(__addon__.getAddonInfo('profile')).decode('utf-8')
-__author__ = "Anthirian, drewzh"
-__icon__ = "special://home/addons/" + __addonID__ + "/icon.png"
-__logfile__ = os.path.join(__profile__, "cleaner.log")
+__profile__ = xbmc.translatePath(__addon__.getAddonInfo("profile")).decode("utf-8")
+__icon__ = xbmc.translatePath(__addon__.getAddonInfo("icon")).decode("utf-8")
 
 
-def write_to_log(data):
-    # Save old log data
-    try:
-        f = open(__logfile__, "a+")  # use append mode to make sure it is created if non-existent
-        previous_data = f.read()
-    except (IOError, OSError) as err:
-        debug("%s" % err, xbmc.LOGERROR)
-    else:
-        f.close()
+class Log(object):
+    def __init__(self):
+        self.logpath = os.path.join(__profile__, "cleaner.log")
 
-        # Prepend new log data
+    def prepend(self, data):
+        """
+        Prepend the given data to the current log file. Will create a new log file if none exists.
+
+        :type data: list
+        :param data: A list of strings to prepend to the log file.
+        """
         try:
-            f = open(__logfile__, "w")
-            if data:
-                f.write("[B][%s][/B]\n" % time.strftime("%d/%m/%Y \t %H:%M:%S"))
-                for line in data:
-                    f.write("\t-%s\n" % line)
-            f.write("\n")
-            f.writelines(previous_data)
+            f = open(self.logpath, "a+")  # use append mode to make sure it is created if non-existent
+            previous_data = f.read()
         except (IOError, OSError) as err:
             debug("%s" % err, xbmc.LOGERROR)
         else:
             f.close()
+
+            # Prepend new log data
+            try:
+                f = open(self.logpath, "w")
+                if data:
+                    f.write("[B][%s][/B]\n" % time.strftime("%d/%m/%Y \t %H:%M:%S"))
+                    for line in data:
+                        f.write("\t-\t%s\n" % line)
+                    f.write("\n")
+                f.writelines(previous_data)
+            except (IOError, OSError) as err:
+                debug("%s" % err, xbmc.LOGERROR)
+            else:
+                f.close()
+
+    def trim(self, lines_to_keep=15):
+        """
+        Trim the log file to contain a maximum number of lines.
+
+        :type lines_to_keep: int
+        :param lines_to_keep: The number of lines to preserve. Any lines below this number get erased. Defaults to 15.
+        :rtype: str
+        :return: The contents of the log file after trimming.
+        """
+        try:
+            f = open(self.logpath, "r+")
+            lines = []
+            for i in xrange(lines_to_keep):
+                lines.append(f.readline())  # voegt "" toe aan lijst als er te weinig regels zijn in de log
+
+            debug("Keeping the following log: %s" % lines)
+            f.seek(0, 0)
+            f.writelines(lines)
+            debug("Wrote lines to log")
+        except (IOError, OSError) as err:
+            notify("%s" % err)
+            debug("%s" % err, xbmc.LOGERROR)
+        else:
+            f.close()
+            return self.get()
+
+    def clear(self):
+        """
+        Erase the contents of the log file.
+        """
+        try:
+            f = open(self.logpath, "r+")
+            f.truncate()
+        except (IOError, OSError) as err:
+            debug("%s" % err, xbmc.LOGERROR)
+        else:
+            f.close()
+            return self.get()
+
+    def get(self):
+        """
+        Retrieve the contents of the log file.
+
+        :rtype: str
+        :return: The contents of the log file.
+        """
+        try:
+            f = open(self.logpath, "r")
+        except (IOError, OSError) as err:
+            debug("%s" % err, xbmc.LOGERROR)
+        else:
+            return f.read()
 
 
 def translate(msg_id):

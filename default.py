@@ -11,7 +11,7 @@ from ctypes import *
 import xbmc
 import xbmcvfs
 from settings import *
-from utils import translate, notify, debug, write_to_log
+from utils import translate, notify, debug, Log
 
 
 # Addon info
@@ -196,7 +196,7 @@ class Cleaner:
                     if count > 0:
                         summary += " %d %s" % (count, self.MUSIC_VIDEOS)
 
-            write_to_log(cleaned_files)
+            Log().prepend(cleaned_files)
 
             # Give a status report if any deletes occurred
             if not summary.endswith("ed"):
