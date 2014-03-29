@@ -296,68 +296,11 @@ class Cleaner:
                 pass  # no expired videos found
             else:
                 debug("KeyError: %r not found" % ke, xbmc.LOGWARNING)
-                self.handle_json_error(response)
+                debug("%r" % response, xbmc.LOGWARNING)
                 raise
         finally:
             debug("Expired videos: " + str(expired_videos))
             return expired_videos
-
-    def handle_json_error(self, error):
-        """If a JSON-RPC request results in an error, this function will handle it.
-        This function currently only logs the error that occurred, and will not act on it.
-
-        :type error: dict
-        :param error: the error to handle
-        :rtype : None
-        """
-        error_format = {
-            "code": {
-                "type": "integer",
-                "required": True
-            },
-            "message": {
-                "type": "string",
-                "required": True
-            },
-            "data": {
-                "type": "object",
-                "properties": {
-                    "method": {
-                        "type": "string",
-                        "required": True
-                    },
-                    "stack": {
-                        "type": "object",
-                        "id": "Error.Stack",
-                        "properties": {
-                            "name": {
-                                "type": "string",
-                                "required": True
-                            },
-                            "type": {
-                                "type": "string",
-                                "required": True
-                            },
-                            "message": {
-                                "type": "string",
-                                "required": True
-                            },
-                            "property": {
-                                "$ref": "Error.Stack"
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        code = error["code"]
-        msg = error["message"]
-        details = error["data"] if "data" in error else "No further details"
-
-        # If we cannot do anything about this error, just log it and stop
-        debug("JSON error occurred.\nCode: %d\nMessage: %r\nDetails: %r" % (code, msg, details), xbmc.LOGERROR)
-        return None
 
     def is_excluded(self, full_path):
         """Check if the file path is part of the excluded sources.
@@ -614,7 +557,7 @@ class Cleaner:
         Example:
             success = move_file(a, b)
 
-        :type source: basestring
+        :type source: str
         :param source: the source path (absolute)
         :type dest_folder: str
         :param dest_folder: the destination path (absolute)
