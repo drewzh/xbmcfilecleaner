@@ -28,6 +28,8 @@ class Log(object):
         :param data: A list of strings to prepend to the log file.
         """
         try:
+            debug("Prepending the log file with new data.")
+            debug("Backing up current log.")
             f = open(self.logpath, "a+")  # use append mode to make sure it is created if non-existent
             previous_data = f.read()
         except (IOError, OSError) as err:
@@ -35,14 +37,19 @@ class Log(object):
         else:
             f.close()
 
-            # Prepend new log data
             try:
+                debug("Writing new log data.")
                 f = open(self.logpath, "w")
                 if data:
                     f.write("[B][%s][/B]\n" % time.strftime("%d/%m/%Y \t %H:%M:%S"))
                     for line in data:
                         f.write("\t-\t%s\n" % line)
                     f.write("\n")
+                    debug("New data written to log file.")
+                else:
+                    debug("No data to write. Stopping.")
+
+                debug("Appending previous log file contents.")
                 f.writelines(previous_data)
             except (IOError, OSError) as err:
                 debug("%s" % err, xbmc.LOGERROR)
@@ -59,17 +66,15 @@ class Log(object):
         :return: The contents of the log file after trimming.
         """
         try:
+            debug("Trimming log file contents. Keeping the top %d lines" % lines_to_keep)
             f = open(self.logpath, "r+")
             lines = []
             for i in xrange(lines_to_keep):
-                lines.append(f.readline())  # voegt "" toe aan lijst als er te weinig regels zijn in de log
+                lines.append(f.readline())
 
-            debug("Keeping the following log: %s" % lines)
-            f.seek(0, 0)
+            f.truncate()
             f.writelines(lines)
-            debug("Wrote lines to log")
         except (IOError, OSError) as err:
-            notify("%s" % err)
             debug("%s" % err, xbmc.LOGERROR)
         else:
             f.close()
@@ -78,8 +83,12 @@ class Log(object):
     def clear(self):
         """
         Erase the contents of the log file.
+
+        :rtype: str
+        :return: An empty string if clearing succeeded.
         """
         try:
+            debug("Clearing log file contents.")
             f = open(self.logpath, "r+")
             f.truncate()
         except (IOError, OSError) as err:
@@ -96,11 +105,14 @@ class Log(object):
         :return: The contents of the log file.
         """
         try:
+            debug("Retrieving log file contents.")
             f = open(self.logpath, "r")
         except (IOError, OSError) as err:
             debug("%s" % err, xbmc.LOGERROR)
         else:
-            return f.read()
+            contents = f.read()
+            f.close()
+            return contents
 
 
 def translate(msg_id):
