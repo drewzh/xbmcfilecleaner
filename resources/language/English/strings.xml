@@ -15,7 +15,7 @@
     <string id="32103">Delete videos [I]permanently [/I]</string>
     <string id="32104">[I]Please specify where to store watched videos [/I]</string>
     <string id="32105">Holding folder location</string>
-    <string id="32106">Create subdirectories (i.e. [B]..\Artist[/B], [B]..\Movie (Year)[/B] and [B]..\Show\Season xx[/B])</string>
+    <string id="32106">Create subdirectories (i.e. [B]../Artist[/B], [B]../Movie (Year)[/B] and [B]../Show/Season xx[/B])</string>
 
     <string id="32107">Delete movies</string>
     <string id="32108">Delete TV shows</string>
