@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
     <!-- Actions section -->
-    <category label="30100" id="actions_section">
+    <category label="32100" id="actions_section">
         <setting type="sep" />
-        <setting label="30101" type="lsep" />
+        <setting label="32101" type="lsep" />
         <setting type="sep" />
 
         <setting label="32102" id="cleaner_enabled" type="bool" default="false" visible="true" />
@@ -90,6 +90,6 @@
         <setting type="sep" />
         <setting label="32601" type="lsep" />
         <setting type="sep" />
-        <setting label="32602" type="action" action="RunScript($CWD/viewer.py, show)" />
+        <setting label="32602" type="action" action="RunScript(special://home/addons/script.filecleaner/viewer.py)" />
     </category>
 </settings>
