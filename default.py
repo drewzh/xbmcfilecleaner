@@ -17,9 +17,9 @@ from utils import translate, notify, debug, Log
 # Addon info
 __addonID__ = "script.filecleaner"
 __addon__ = Addon(__addonID__)
-__title__ = __addon__.getAddonInfo("name")
+__title__ = xbmc.translatePath(__addon__.getAddonInfo("name")).decode("utf-8")
 __author__ = "Anthirian, drewzh"
-__icon__ = "special://home/addons/" + __addonID__ + "/icon.png"
+__icon__ = xbmc.translatePath(__addon__.getAddonInfo("icon")).decode("utf-8")
 
 
 class Cleaner:
