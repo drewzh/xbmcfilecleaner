@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from xbmc import translatePath
+import xbmc
 from utils import debug
 from xbmcaddon import Addon
 
@@ -77,7 +77,7 @@ def get_setting(setting):
     elif setting in strings:
         return str(__addon__.getSetting(setting))
     elif setting in paths:
-        return translatePath(__addon__.getSetting(setting))
+        return xbmc.translatePath(__addon__.getSetting(setting))
     else:
         debug("Could not retrieve the value of %r. The type is unknown.", xbmc.LOGWARNING)
         return None
