@@ -4,40 +4,31 @@
     <animation effect="fade" time="350">WindowOpen</animation>
     <animation effect="fade" time="350">WindowClose</animation>
     <zorder>1</zorder>
-    <coordinates>
-        <system>1</system>
-        <posx>25</posx>
-        <posy>25</posy>
-    </coordinates>
     <controls>
-        <control type="image" id="1">
-            <posy>-25</posy>
+        <control type="image" id="100">
             <description>Background</description>
-            <width>1235</width>
-            <height>715</height>
+            <width>1280</width>
+            <height>720</height>
             <visible>true</visible>
             <colordiffuse>FFFFFFFF</colordiffuse>
             <texture>osd_settings_back_round.png</texture>
         </control>
         <control type="label" id="101">
             <description>Window Title</description>
-            <posx>30</posx>
-            <posy>0</posy>
-            <width>1150</width>
-            <height>60</height>
-            <visible>true</visible>
-            <align>center</align>
+            <posx>565</posx> <!-- window width / 2 - label width / 2 -->
+            <posy>40</posy>
+            <width>150</width>
+            <height>20</height>
             <aligny>center</aligny>
-            <font>font28_title</font>
             <textcolor>FFB2D4F5</textcolor>
-            <shadowcolor>ff000000</shadowcolor>
+            <shadowcolor>FF000000</shadowcolor>
         </control>
         <control type="textbox" id="201">
             <description>Log Contents</description>
             <posx>30</posx>
-            <posy>60</posy>
-            <width>1150</width>
-            <height>530</height>
+            <posy>70</posy>
+            <width>1210</width>
+            <height>560</height>
             <align>left</align>
             <visible>true</visible>
             <colordiffuse>FFFFFFFF</colordiffuse>
@@ -48,10 +39,10 @@
         </control>
         <control type="scrollbar" id="202">
             <description>Scrollbar for Log</description>
-            <posx>1180</posx>
-            <posy>60</posy>
+            <posx>1220</posx>
+            <posy>70</posy>
             <width>50</width>
-            <height>530</height>
+            <height>560</height>
             <visible>true</visible>
             <texturesliderbackground>scrollbarbacklist.png</texturesliderbackground>
             <textureslidernib>scrollbar_nofocus.png</textureslidernib>
@@ -64,39 +55,35 @@
             <onleft>302</onleft>
             <onright>301</onright>
         </control>
-        <control type="group" id="300">
-            <description>Button Bar</description>
-            <posx>50</posx>
-            <posy>110r</posy> <!-- positie verschilt per skin. 310 voor Confluence, 110 voor de rest -->
-            <width>875</width>
-            <control type="button" id="301">
-                <id>301</id>
-                <description>Trim Button</description>
-                <posx>300</posx>
-                <width>250</width>
-                <height>40</height>
-                <align>center</align>
-                <label>Trim</label>
-                <texturenofocus>button-nofocus-solid.png</texturenofocus>
-                <onright>302</onright>
-                <onleft>202</onleft>
-                <onup>202</onup>
-                <ondown>202</ondown>
-            </control>
-            <control type="button" id="302">
-                <id>302</id>
-                <description>Clear Button</description>
-                <posx>300r</posx>
-                <width>250</width>
-                <height>40</height>
-                <align>center</align>
-                <label>Clear</label>
-                <texturenofocus>button-nofocus-solid.png</texturenofocus>
-                <onright>202</onright>
-                <onleft>301</onleft>
-                <onup>202</onup>
-                <ondown>202</ondown>
-            </control>
+        <control type="button" id="301">
+            <id>301</id>
+            <description>Trim Button</description>
+            <posx>320</posx>
+            <posy>75r</posy>
+            <width>250</width>
+            <height>40</height>
+            <align>center</align>
+            <label>Trim</label>
+            <texturenofocus>button-nofocus-solid.png</texturenofocus>
+            <onright>302</onright>
+            <onleft>202</onleft>
+            <onup>202</onup>
+            <ondown>202</ondown>
+        </control>
+        <control type="button" id="302">
+            <id>302</id>
+            <description>Clear Button</description>
+            <posx>580r</posx>
+            <posy>75r</posy>
+            <width>250</width>
+            <height>40</height>
+            <align>center</align>
+            <label>Clear</label>
+            <texturenofocus>button-nofocus-solid.png</texturenofocus>
+            <onright>202</onright>
+            <onleft>301</onleft>
+            <onup>202</onup>
+            <ondown>202</ondown>
         </control>
     </controls>
 </window>
