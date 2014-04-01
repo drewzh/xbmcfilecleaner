@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="script.filecleaner" name="XBMC File Cleaner" version="3.2.1" provider-name="Anthirian, drewzh">
     <requires>
-        <import addon="xbmc.python" version="2.1.0"/>
-        <import addon="xbmc.json" version="6.0.0"/>
+        <import addon="xbmc.python" version="2.1.0" />
+        <import addon="xbmc.json" version="6.0.0" />
+        <import addon="xbmc.gui" version="4.0.0" />
     </requires>
-    <extension point="xbmc.service" library="default.py" start="login"/>
+    <extension point="xbmc.service" library="default.py" start="login" />
     <extension point="xbmc.addon.metadata">
-        <summary lang="en">Regularly deletes old movies, tv show episodes and music videos</summary>
+        <summary lang="en">Regularly deletes old movies, TV show episodes and music videos</summary>
         <description lang="en">[B][I]READ BEFORE PROCEEDING[/I][/B]
 This addon has the potential to wipe your entire video collection! Please make sure you understand exactly what this addon is designed to do before enabling cleaning in the settings. I will not be held responsible for loss of data due to user error.
 
 [B][I]DESCRIPTION[/I][/B]
 This addon will automatically scan your library for watched movies, TV show episodes and music videos, and delete them from the file system based on numerous critia such as age, rating, free disk space, etc. All these options and more can be configured via the addon's settings. Also make sure you set the correct path to the disk you wish to check for free space, especially when you store your videos on a secondary drive or a network share.
 
-Original Developer: drewzh (xbmcfilecleaner@drewzh.com)
+Original developer: drewzh (xbmcfilecleaner@drewzh.com)
         </description>
         <summary lang="nl">Verwijdert regelmatig oude films, afleveringen van TV-series en videoclips</summary>
         <description lang="nl">[B][I]LEES DIT VOOR JE VERDER GAAT[/I][/B]
