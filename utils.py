@@ -41,7 +41,7 @@ class Log(object):
                 debug("Writing new log data.")
                 f = open(self.logpath, "w")
                 if data:
-                    f.write("[B][%s][/B]\n" % time.strftime("%d/%m/%Y \t %H:%M:%S"))
+                    f.write("[B][%s][/B]\n" % time.strftime("%d/%m/%Y\t-\t%H:%M:%S"))
                     for line in data:
                         f.write("\t-\t%s\n" % line)
                     f.write("\n")
@@ -61,24 +61,32 @@ class Log(object):
         Trim the log file to contain a maximum number of lines.
 
         :type lines_to_keep: int
-        :param lines_to_keep: The number of lines to preserve. Any lines below this number get erased. Defaults to 15.
+        :param lines_to_keep: The number of lines to preserve. Any lines beyond this number get erased. Defaults to 15.
         :rtype: str
         :return: The contents of the log file after trimming.
         """
         try:
-            debug("Trimming log file contents. Keeping the top %d lines" % lines_to_keep)
-            f = open(self.logpath, "r+")
+            debug("Trimming log file contents.")
+            f = open(self.logpath, "r")
+            debug("Saving the top %d lines." % lines_to_keep)
             lines = []
             for i in xrange(lines_to_keep):
                 lines.append(f.readline())
-
-            f.truncate()
-            f.writelines(lines)
         except (IOError, OSError) as err:
             debug("%s" % err, xbmc.LOGERROR)
         else:
             f.close()
-            return self.get()
+
+            try:
+                debug("Removing all log contents.")
+                f = open(self.logpath, "w")
+                debug("Restoring saved log contents.")
+                f.writelines(lines)
+            except (IOError, OSError) as err:
+                debug("%s" % err, xbmc.LOGERROR)
+            else:
+                f.close()
+                return self.get()
 
     def clear(self):
         """
@@ -143,7 +151,8 @@ def notify(message, duration=5000, image=__icon__, level=xbmc.LOGNOTICE):
     :param level: (Optional) the log level (supported values are found at xbmc.LOG...)
     """
     debug(message, level)
-    if settings.get_setting(settings.notifications_enabled) and not (settings.get_setting(settings.notify_when_idle) and xbmc.Player().isPlayingVideo()):
+    if settings.get_setting(settings.notifications_enabled) and not (settings.get_setting(settings.notify_when_idle) and
+                                                                     xbmc.Player().isPlayingVideo()):
         xbmc.executebuiltin("XBMC.Notification(%s, %s, %s, %s)" % (__title__, message, duration, image))
 
 
