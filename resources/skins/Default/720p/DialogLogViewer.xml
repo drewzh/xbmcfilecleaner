@@ -11,7 +11,7 @@
             <height>720</height>
             <visible>true</visible>
             <colordiffuse>FF43C6DB</colordiffuse>
-            <texture>osd_settings_back_round.png</texture>
+            <texture>window_back.png</texture>
         </control>
         <control type="label" id="101">
             <description>Window Title</description>
@@ -43,7 +43,7 @@
             <width>50</width>
             <height>560</height>
             <visible>true</visible>
-            <texturesliderbackground>scrollbarbacklist.png</texturesliderbackground>
+            <texturesliderbackground>scrollbar_gutter.png</texturesliderbackground>
             <textureslidernib>scrollbar_nofocus.png</textureslidernib>
             <textureslidernibfocus>scrollbar_focus.png</textureslidernibfocus>
             <texturesliderbar>-</texturesliderbar>
@@ -64,7 +64,7 @@
             <height>40</height>
             <align>center</align>
             <label>Trim</label>
-            <texturenofocus>button-nofocus-solid.png</texturenofocus>
+            <texturenofocus>button.png</texturenofocus>
             <colordiffuse>FF43C6DB</colordiffuse>
             <onright>302</onright>
             <onleft>202</onleft>
@@ -80,7 +80,7 @@
             <height>40</height>
             <align>center</align>
             <label>Clear</label>
-            <texturenofocus>button-nofocus-solid.png</texturenofocus>
+            <texturenofocus>button.png</texturenofocus>
             <colordiffuse>FF43C6DB</colordiffuse>
             <onright>202</onright>
             <onleft>301</onleft>
