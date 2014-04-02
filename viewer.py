@@ -4,7 +4,7 @@
 import xbmc
 import xbmcgui
 from xbmcaddon import Addon
-from utils import Log, debug
+import utils
 
 
 # Addon info
@@ -21,7 +21,7 @@ class LogViewerDialog(xbmcgui.WindowXMLDialog):
     CLEARBUTTONID = 302
 
     def __init__(self, xml_filename, script_path, default_skin="Default", default_res="720p", *args, **kwargs):
-        self.log = Log()
+        self.log = utils.Log()
         self.caption = "Cleaning Log"
         xbmcgui.WindowXMLDialog.__init__(self)
 
@@ -31,11 +31,15 @@ class LogViewerDialog(xbmcgui.WindowXMLDialog):
 
     def onClick(self, control_id, *args):
         if control_id == self.TRIMBUTTONID:
-            self.getControl(self.TEXTBOXID).setText(self.log.trim())
+            if xbmcgui.Dialog().yesno("Are you sure?", "This will trim the log file, keeping the first 15 lines.",
+                                      "This action is irreversible. Do you wish to continue?"):
+                self.getControl(self.TEXTBOXID).setText(self.log.trim())
         elif control_id == self.CLEARBUTTONID:
-            self.getControl(self.TEXTBOXID).setText(self.log.clear())
+            if xbmcgui.Dialog().yesno("Are you sure?", "This will delete the entire contents of the log file.",
+                                      "This action is irreversible. Do you wish to continue?"):
+                self.getControl(self.TEXTBOXID).setText(self.log.clear())
         else:
-            debug("Unknown button pressed", xbmc.LOGERROR)
+            utils.debug("Unknown button pressed", xbmc.LOGERROR)
 
 
 if __name__ == "__main__":
