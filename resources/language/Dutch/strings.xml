@@ -78,7 +78,7 @@
     <string id="32602">Bekijk schoonmaakgeschiedenis</string>
     <string id="32603">[B]Schoonmaakgeschiedenis[/B]</string>
     <string id="32604">Weet je het zeker?</string>
-    <string id="32605">Hiermee kort je het logbestand in tot de bovenste 15 regels.</string>
+    <string id="32605">Hiermee kort je het logbestand in tot de bovenste 25 regels.</string>
     <string id="32606">Hiermee verwijder je de gehele inhoud van het logbestand.</string>
     <string id="32607">Deze actie is permanent. Wil je doorgaan?</string>
 </strings>

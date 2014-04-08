@@ -56,12 +56,12 @@ class Log(object):
             else:
                 f.close()
 
-    def trim(self, lines_to_keep=15):
+    def trim(self, lines_to_keep=25):
         """
         Trim the log file to contain a maximum number of lines.
 
         :type lines_to_keep: int
-        :param lines_to_keep: The number of lines to preserve. Any lines beyond this number get erased. Defaults to 15.
+        :param lines_to_keep: The number of lines to preserve. Any lines beyond this number get erased. Defaults to 25.
         :rtype: str
         :return: The contents of the log file after trimming.
         """

@@ -15,8 +15,8 @@ __profile__ = xbmc.translatePath(__addon__.getAddonInfo("profile")).decode("utf-
 
 
 class LogViewerDialog(xbmcgui.WindowXMLDialog):
-    CAPTIONID = 101
-    TEXTBOXID = 201
+    CAPTIONID = 201
+    TEXTBOXID = 202
     TRIMBUTTONID = 301
     CLEARBUTTONID = 302
 

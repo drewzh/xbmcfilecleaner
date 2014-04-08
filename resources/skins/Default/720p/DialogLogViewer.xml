@@ -1,54 +1,66 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <window>
-    <defaultcontrol>202</defaultcontrol>
+    <defaultcontrol>203</defaultcontrol>
     <animation effect="fade" time="350">WindowOpen</animation>
     <animation effect="fade" time="350">WindowClose</animation>
     <zorder>1</zorder>
     <controls>
-        <control type="image" id="100">
+        <control type="image" id="101">
             <description>Background</description>
             <width>1280</width>
             <height>720</height>
             <visible>true</visible>
             <colordiffuse>FF43C6DB</colordiffuse>
-            <texture>window_back.png</texture>
+            <!--<texture>window_back.png</texture>-->
+            <texture border="40">DialogBack2.png</texture>
         </control>
-        <control type="label" id="101">
+        <control type="image" id="102">
+            <description>Dialog Header image</description>
+            <posx>40</posx>
+            <posy>16</posy>
+            <width>1280</width>
+            <height>50</height>
+            <texture>dialogheader.png</texture>
+        </control>
+        <control type="image" id="103">
+            <description>Separator</description>
+            <posx>40</posx>
+            <posy>80r</posy>
+            <width>1225</width>
+            <texture>separator.png</texture>
+        </control>
+        <control type="label" id="201">
             <description>Window Title</description>
             <posx>565</posx> <!-- window width / 2 - label width / 2 -->
-            <posy>40</posy>
+            <posy>32</posy>
             <width>150</width>
             <height>20</height>
             <aligny>center</aligny>
-            <textcolor>FF43C6DB</textcolor>
         </control>
-        <control type="textbox" id="201">
+        <control type="textbox" id="202">
             <description>Log Contents</description>
             <posx>30</posx>
             <posy>70</posy>
             <width>1210</width>
-            <height>560</height>
+            <height>570</height>
             <align>left</align>
-            <visible>true</visible>
             <colordiffuse>FFFFFFFF</colordiffuse>
-            <font>font13</font>
             <textcolor>CCFFFFFF</textcolor>
-            <pagecontrol>202</pagecontrol>
-            <autoscroll delay="3000" time="1000" repeat="10000">!Control.HasFocus(202)</autoscroll>
+            <pagecontrol>203</pagecontrol>
+            <autoscroll delay="3000" time="1000" repeat="10000">!Control.HasFocus(203)</autoscroll>
         </control>
-        <control type="scrollbar" id="202">
+        <control type="scrollbar" id="203">
             <description>Scrollbar for Log</description>
-            <posx>1220</posx>
+            <posx>1240</posx>
             <posy>70</posy>
-            <width>50</width>
-            <height>560</height>
-            <visible>true</visible>
-            <texturesliderbackground>scrollbar_gutter.png</texturesliderbackground>
-            <textureslidernib>scrollbar_nofocus.png</textureslidernib>
-            <textureslidernibfocus>scrollbar_focus.png</textureslidernibfocus>
-            <texturesliderbar>-</texturesliderbar>
-            <texturesliderbarfocus>-</texturesliderbarfocus>
-            <colordiffuse>FF43C6DB</colordiffuse>
+            <width>25</width>
+            <height>570</height>
+            <texturesliderbackground border="0,14,0,14">ScrollBarV.png</texturesliderbackground>
+            <texturesliderbar border="0,14,0,14">ScrollBarV_bar.png</texturesliderbar>
+            <texturesliderbarfocus border="0,14,0,14">ScrollBarV_bar_focus.png</texturesliderbarfocus>
+            <textureslidernib>ScrollBarNib.png</textureslidernib>
+            <textureslidernibfocus>ScrollBarNib.png</textureslidernibfocus>
+            <colordiffuse>FFCCCCCC</colordiffuse>
             <pulseonselect>True</pulseonselect>
             <orientation>vertical</orientation>
             <showonepage>true</showonepage>
@@ -59,33 +71,34 @@
             <id>301</id>
             <description>Trim Button</description>
             <posx>320</posx>
-            <posy>75r</posy>
+            <posy>65r</posy>
             <width>250</width>
             <height>40</height>
             <align>center</align>
             <label>Trim</label>
-            <texturenofocus>button.png</texturenofocus>
+            <texturenofocus border="5">button-nofocus.png</texturenofocus>
+            <texturefocus border="5">button-focus.png</texturefocus>
             <colordiffuse>FF43C6DB</colordiffuse>
             <onright>302</onright>
-            <onleft>202</onleft>
-            <onup>202</onup>
-            <ondown>202</ondown>
+            <onleft>203</onleft>
+            <onup>203</onup>
+            <ondown>203</ondown>
         </control>
         <control type="button" id="302">
             <id>302</id>
             <description>Clear Button</description>
             <posx>580r</posx>
-            <posy>75r</posy>
+            <posy>65r</posy>
             <width>250</width>
             <height>40</height>
             <align>center</align>
             <label>Clear</label>
-            <texturenofocus>button.png</texturenofocus>
-            <colordiffuse>FF43C6DB</colordiffuse>
-            <onright>202</onright>
+            <texturenofocus border="5">button-nofocus.png</texturenofocus>
+            <texturefocus border="5">button-focus.png</texturefocus>
+            <onright>203</onright>
             <onleft>301</onleft>
-            <onup>202</onup>
-            <ondown>202</ondown>
+            <onup>203</onup>
+            <ondown>203</ondown>
         </control>
     </controls>
 </window>

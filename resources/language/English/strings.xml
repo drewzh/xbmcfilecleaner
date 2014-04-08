@@ -78,7 +78,7 @@
     <string id="32602">View cleaning history</string>
     <string id="32603">[B]Cleaning Log[/B]</string>
     <string id="32604">Are you sure?</string>
-    <string id="32605">This will trim the log file, keeping the first 15 lines.</string>
+    <string id="32605">This will trim the log file, keeping the first 25 lines.</string>
     <string id="32606">This will delete the entire contents of the log file.</string>
     <string id="32607">This action is irreversible. Do you wish to continue?</string>
 </strings>
