@@ -196,10 +196,8 @@ class Cleaner:
                     if count > 0:
                         summary += " %d %s" % (count, self.MUSIC_VIDEOS)
 
-            Log().prepend(cleaned_files)
-
-            # Give a status report if any deletes occurred
-            if not summary.endswith("ed"):
+            if cleaned_files:
+                Log().prepend(cleaned_files)
                 notify(summary)
 
             # Finally clean the library to account for any deleted videos.
@@ -227,16 +225,16 @@ class Cleaner:
         # These are possible conditions that must be met before a video can be deleted
         by_playcount = {"field": "playcount", "operator": "greaterthan", "value": "0"}
         by_date_played = {"field": "lastplayed", "operator": "notinthelast", "value": "%d" % get_setting(expire_after)}
-        # TODO add GUI setting for date_added
+        # TODO: add GUI setting for date_added
         by_date_added = {"field": "dateadded", "operator": "notinthelast", "value": "7"}
         by_minimum_rating = {"field": "rating", "operator": "lessthan", "value": "%d" % get_setting(minimum_rating)}
         by_no_rating = {"field": "rating", "operator": "isnot", "value": "0"}
+        # TODO: Don't hard code 'Muse' as artist
         by_artist = {"field": "artist", "operator": "contains", "value": "Muse"}
         by_progress = {"field": "inprogress", "operator": "false", "value": ""}
 
         # link settings and filters together
         settings_and_filters = [
-            # TODO: Verify this works correctly with the new settings loading
             (get_setting(enable_expiration), by_date_played),
             (get_setting(delete_when_low_rated), by_minimum_rating),
             (get_setting(not_in_progress), by_progress)
