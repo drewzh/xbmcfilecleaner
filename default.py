@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import os
-import locale
 import time
 import re
 import json
 from ctypes import *
 
 import xbmc
+import xbmcaddon
 import xbmcvfs
 from settings import *
 from utils import *
@@ -22,7 +22,7 @@ __author__ = "Anthirian, drewzh"
 __icon__ = xbmc.translatePath(__addon__.getAddonInfo("icon")).decode("utf-8")
 
 
-class Cleaner:
+class Cleaner(object):
     """
     The Cleaner class is used in XBMC to identify and delete videos that have been watched by the user. It starts with
     XBMC and runs until XBMC shuts down. Identification of watched videos can be enhanced with additional criteria,
@@ -66,14 +66,10 @@ class Cleaner:
         MOVIES: ["file", "title", "year"],
         MUSIC_VIDEOS: ["file", "artist"]
     }
+    stacking_indicators = ["part", "pt", "cd", "dvd", "disk", "disc"]
 
     def __init__(self):
         """Create a Cleaner object that performs regular cleaning of watched videos."""
-
-        try:
-            locale.setlocale(locale.LC_ALL, "English_United Kingdom")
-        except locale.Error as le:
-            debug("Could not change locale: %r" % le, xbmc.LOGWARNING)
 
         service_sleep = 10
         ticker = 0
@@ -111,7 +107,7 @@ class Cleaner:
             return
 
         if not get_setting(delete_when_low_disk_space) or (get_setting(delete_when_low_disk_space) and
-                                                           self.disk_space_low()):
+                                                               self.disk_space_low()):
             # create stub to summarize cleaning results
             summary = "Deleted" if get_setting(delete_files) else "Moved"
             cleaned_files = []
@@ -122,7 +118,6 @@ class Cleaner:
                     count = 0
                     for abs_path, title, year in movies:
                         if xbmcvfs.exists(abs_path):
-                            cleaning_required = True
                             if not get_setting(delete_files):
                                 if get_setting(create_subdirs):
                                     new_path = os.path.join(get_setting(holding_folder), "%s (%d)" % (title, year))
@@ -131,12 +126,14 @@ class Cleaner:
                                 if self.move_file(abs_path, new_path):
                                     count += 1
                                     cleaned_files.append(abs_path)
-                                    self.delete_empty_folders(os.path.dirname(abs_path))
+                                    self.clean_related_files(abs_path, new_path)
+                                    self.delete_empty_folders(abs_path)
                             else:
                                 if self.delete_file(abs_path):
                                     count += 1
                                     cleaned_files.append(abs_path)
-                                    self.delete_empty_folders(os.path.dirname(abs_path))
+                                    self.clean_related_files(abs_path)
+                                    self.delete_empty_folders(abs_path)
                         else:
                             debug("XBMC could not find the file at %r" % abs_path, xbmc.LOGWARNING)
                     if count > 0:
@@ -150,20 +147,21 @@ class Cleaner:
                         if xbmcvfs.exists(abs_path):
                             if not get_setting(delete_files):
                                 if get_setting(create_subdirs):
-                                    new_path = os.path.join(get_setting(holding_folder), show_name, "Season %d" % season_number)
+                                    new_path = os.path.join(get_setting(holding_folder), show_name,
+                                                            "Season %d" % season_number)
                                 else:
                                     new_path = get_setting(holding_folder)
                                 if self.move_file(abs_path, new_path):
-                                    cleaning_required = True
                                     count += 1
                                     cleaned_files.append(abs_path)
-                                    self.delete_empty_folders(os.path.dirname(abs_path))
+                                    self.clean_related_files(abs_path, new_path)
+                                    self.delete_empty_folders(abs_path)
                             else:
                                 if self.delete_file(abs_path):
-                                    cleaning_required = True
                                     count += 1
                                     cleaned_files.append(abs_path)
-                                    self.delete_empty_folders(os.path.dirname(abs_path))
+                                    self.clean_related_files(abs_path)
+                                    self.delete_empty_folders(abs_path)
                         else:
                             debug("XBMC could not find the file at %r" % abs_path, xbmc.LOGWARNING)
                     if count > 0:
@@ -185,17 +183,20 @@ class Cleaner:
                                 if self.move_file(abs_path, new_path):
                                     count += 1
                                     cleaned_files.append(abs_path)
+                                    self.clean_related_files(abs_path, new_path)
                                     self.delete_empty_folders(os.path.dirname(abs_path))
                             else:
                                 if self.delete_file(abs_path):
                                     count += 1
                                     cleaned_files.append(abs_path)
+                                    self.clean_related_files(abs_path)
                                     self.delete_empty_folders(os.path.dirname(abs_path))
                         else:
                             debug("XBMC could not find the file at %r" % abs_path, xbmc.LOGWARNING)
                     if count > 0:
                         summary += " %d %s" % (count, self.MUSIC_VIDEOS)
 
+            # Give a status report if any deletes occurred
             if cleaned_files:
                 Log().prepend(cleaned_files)
                 notify(summary)
@@ -213,12 +214,14 @@ class Cleaner:
 
     def get_expired_videos(self, option):
         """
-        Find videos in the XBMC library that have been watched and satisfy any other conditions enabled in the settings.
+        Find videos in the XBMC library that have been watched.
+
+        Respects any other conditions user enables in the addon's settings.
 
         :type option: str
         :param option: The type of videos to find (one of the globals MOVIES, MUSIC_VIDEOS or TVSHOWS).
         :rtype: list
-        :return: A list of expired videos that satisfy the conditions specified.
+        :return: A list of expired videos, along with a number of extra attributes specific to the video type.
         """
 
         # A non-exhaustive list of pre-defined filters to use during JSON-RPC requests
@@ -270,7 +273,8 @@ class Cleaner:
 
         try:
             error = result["error"]
-            return self.handle_json_error(error)
+            debug("An error occurred. %r" % error)
+            return None
         except KeyError as ke:
             if "error" in ke:
                 pass  # no error
@@ -306,7 +310,7 @@ class Cleaner:
         :type full_path: str
         :param full_path: the path to the file that should be checked for exclusion
         :rtype: bool
-        :return: True if the path matches an excluded path, False otherwise.
+        :return: True if the path matches a user-set excluded path, False otherwise.
         """
         if not get_setting(exclusion_enabled):
             debug("Path exclusion is disabled.")
@@ -370,9 +374,9 @@ class Cleaner:
         """Determine the percentage of free disk space.
 
         :type path: str
-        :param path: the path to the drive to check (this can be any path of any depth on the desired drive). If the
-        path doesn't exist, this function returns 100, in order to prevent files from being deleted accidentally
-        :rtype : float
+        :param path: The path to the drive to check. This can be any path of any depth on the desired drive.
+        :rtype: float
+        :return: The percentage of free space on the disk; 100% if errors occur.
         """
         percentage = float(100)
         debug("Checking for disk space on path: %r" % path)
@@ -416,13 +420,13 @@ class Cleaner:
                 try:
                     percentage = float(bytes_free.value) / float(bytes_total.value) * 100
                     debug("Hard disk check results:")
-                    debug("Bytes free: %s" % locale.format("%d", bytes_free.value, grouping=True))
-                    debug("Bytes total: %s" % locale.format("%d", bytes_total.value, grouping=True))
+                    debug("Bytes free: %s" % bytes_free.value)
+                    debug("Bytes total: %s" % bytes_total.value)
                 except ZeroDivisionError:
                     notify(translate(32511), 15000, level=xbmc.LOGERROR)
             else:
                 debug("We are checking disk space from a non-Windows file system")
-                debug("Stripping " + path + " of all redundant stuff.")
+                debug("Stripping %r of all redundant stuff." % path)
                 path = os.path.normpath(path)
                 debug("The path now is " + path)
 
@@ -430,8 +434,8 @@ class Cleaner:
                     diskstats = os.statvfs(path)
                     percentage = float(diskstats.f_bfree) / float(diskstats.f_blocks) * 100
                     debug("Hard disk check results:")
-                    debug("Bytes free: %s" % locale.format("%d", diskstats.f_bfree, grouping=True))
-                    debug("Bytes total: %s" % locale.format("%d", diskstats.f_blocks, grouping=True))
+                    debug("Bytes free: %r" % diskstats.f_bfree)
+                    debug("Bytes total: %r" % diskstats.f_blocks)
                 except OSError as ose:
                     notify(translate(32512), 15000, level=xbmc.LOGERROR)
                     debug("Error accessing %r: %r" % (path, ose))
@@ -444,71 +448,100 @@ class Cleaner:
         return percentage
 
     def disk_space_low(self):
-        """
-        Check if the disk is running low on free space.
+        """Check whether the disk is running low on free space.
 
         :rtype: bool
-        :return: True if the disk space is below the user-specified threshold, False otherwise.
+        :return: True if disk space is below threshold (set through addon settings), False otherwise.
         """
         return self.get_free_disk_space(get_setting(disk_space_check_path)) <= get_setting(disk_space_threshold)
 
-    def delete_file(self, location):
+    def unstack(self, path):
+        """Unstack path if it is a stacked movie. See http://wiki.xbmc.org/index.php?title=File_stacking for more info.
+
+        :type path: str
+        :param path: The path that should be unstacked.
+        :rtype: list
+        :return: A list of paths that are part of the stack. If it is no stacked movie, a one-element list is returned.
         """
-        Delete a file from the file system.
+        if path.startswith("stack://"):
+            debug("Unstacking %r." % path)
+            return path.replace("stack://", "").split(" , ")
+        else:
+            debug("Unstacking %r is not needed." % path)
+            return [path]
+
+    def get_stack_bare_title(self, filenames):
+        """Find the common title of files part of a stack, minus the volume and file extension.
 
         Example:
-         - success = delete_file(location)
+            ["Movie_Title_part1.ext", "Movie_Title_part2.ext"] yields "Movie_Title"
+
+        :type filenames: list
+        :param filenames: a list of file names that are part of a stack. Use unstack() to find these file names.
+        :rtype: str
+        :return: common title of file names part of a stack
+        """
+        title = os.path.basename(os.path.commonprefix(filenames))
+        for e in self.stacking_indicators:
+            if title.endswith(e):
+                title = title[:-len(e)].rstrip("._-")
+                break
+        return title
+
+    def delete_file(self, location):
+        """
+        Delete a file from the file system. Also supports stacked movie files.
+
+        Example:
+            success = delete_file(location)
 
         :type location: str
-        :param location: the path to the file you wish to delete
+        :param location: the path to the file you wish to delete.
         :rtype: bool
-        :return: True if the file was deleted succesfully, False otherwise.
+        :return: True if (at least one) file was deleted successfully, False otherwise.
         """
-        debug("Deleting file at %r" % location)
-        if self.is_excluded(location):
-            debug("This file is found on an excluded path and will not be deleted.")
+        debug("Attempting to delete %r" % location)
+
+        paths = self.unstack(location)
+        success = []
+
+        if self.is_excluded(paths[0]):
+            debug("Detected a file on an excluded path. Aborting.")
             return False
 
-        if xbmcvfs.exists(location):
-            if get_setting(delete_related):
-                path, name = os.path.split(location)
-                name, _ = os.path.splitext(name)
+        for p in paths:
+            if xbmcvfs.exists(p):
+                success.append(bool(xbmcvfs.delete(p)))
+            else:
+                debug("File %r no longer exists." % p, xbmc.LOGERROR)
+                success.append(False)
 
-                for extra_file in xbmcvfs.listdir(path)[1]:
-                    if extra_file.startswith(name):
-                        extra_file_path = os.path.join(path, extra_file)
-                        if extra_file_path != location:
-                            debug('Deleting %r' % extra_file_path)
-                            xbmcvfs.delete(extra_file_path)
+        debug("Return statuses: %r" % success)
+        return any(success)
 
-            return xbmcvfs.delete(location)
-        else:
-            debug("XBMC could not find the file at %r" % location, xbmc.LOGERROR)
-            return False
-
-    def delete_empty_folders(self, folder):
+    def delete_empty_folders(self, location):
         """
-        Delete the folder if it is empty.
-
-        Presence of custom file extensions can be ignored while scanning.
+        Delete the folder if it is empty. Presence of custom file extensions can be ignored while scanning.
 
         To achieve this, edit the ignored file types setting in the addon settings.
 
         Example:
-         - success = delete_empty_folders(path)
+            success = delete_empty_folders(path)
 
-        :type folder: str
-        :param folder: The folder to be deleted.
+        :type location: str
+        :param location: The path to the folder to be deleted.
         :rtype: bool
-        :return: True if the folder was deleted succesfully, False otherwise.
+        :return: True if the folder was deleted successfully, False otherwise.
         """
         if not get_setting(delete_folders):
             debug("Deleting of folders is disabled.")
             return False
 
+        folder = os.path.dirname(self.unstack(location)[0])  # Stacked paths should have the same parent, use any
         debug("Checking if %r is empty" % folder)
         ignored_file_types = [file_ext.strip() for file_ext in get_setting(ignore_extensions).split(",")]
         debug("Ignoring file types %r" % ignored_file_types)
+
         subfolders, files = xbmcvfs.listdir(folder)
         debug("Contents of %r:\nSubfolders: %r\nFiles: %r" % (folder, subfolders, files))
 
@@ -548,71 +581,104 @@ class Cleaner:
             debug("Directory is not empty and will not be removed")
             return False
 
+    def clean_related_files(self, source, dest_folder=None):
+        """Clean files related to another file based on the user's preferences.
+
+        Related files are files that only differ by extension, or that share a prefix in case of stacked movies.
+
+        Examples of related files include NFO files, thumbnails, subtitles, fanart, etc.
+
+        :type source: str
+        :param source: Location of the file whose related files should be cleaned.
+        :type dest_folder: str
+        :param dest_folder: (Optional) The folder where related files should be moved to. Not needed when deleting.
+        """
+        if settings.get_setting(delete_related):
+            debug("Cleaning related files.")
+
+            path_list = self.unstack(source)
+            path, name = os.path.split(path_list[0])  # Because stacked movies are in the same folder, only check one
+            if source.startswith("stack://"):
+                name = self.get_stack_bare_title(path_list)
+            else:
+                name, ext = os.path.splitext(name)
+
+            debug("Attempting to match related files in %r with prefix %r" % (path, name))
+            for extra_file in xbmcvfs.listdir(path)[1]:
+                if extra_file.startswith(name):
+                    debug("%r starts with %r." % (extra_file, name))
+                    extra_file_path = os.path.join(path, extra_file)
+                    if settings.get_setting(delete_files):
+                        if extra_file_path not in path_list:
+                            debug("Deleting %r." % extra_file_path)
+                            xbmcvfs.delete(extra_file_path)
+                    else:
+                        new_extra_path = os.path.join(dest_folder, os.path.basename(extra_file))
+                        if new_extra_path not in path_list:
+                            debug("Moving %r to %r." % (extra_file_path, new_extra_path))
+                            xbmcvfs.rename(extra_file_path, new_extra_path)
+            debug("Finished searching for related files.")
+        else:
+            debug("Cleaning of related files is disabled.")
+
     def move_file(self, source, dest_folder):
-        """Move a file to a new destination. Returns True if the move succeeded, False otherwise.
-        Will create destination if it does not exist.
+        """Move a file to a new destination. Will create destination if it does not exist.
 
         Example:
             success = move_file(a, b)
 
-        :type source: str
+        :type source: str # TODO: Check p.
         :param source: the source path (absolute)
         :type dest_folder: str
         :param dest_folder: the destination path (absolute)
-        :rtype : bool
+        :rtype: bool
+        :return: True if (at least one) file was moved successfully, False otherwise.
         """
-        if self.is_excluded(source):
-            debug("This file is found on an excluded path and will not be moved.")
-            return False
         if isinstance(source, unicode):
             source = source.encode("utf-8")
+
+        paths = self.unstack(source)
+        success = []
         dest_folder = xbmc.makeLegalFilename(dest_folder)
-        debug("Moving %r to %r" % (os.path.basename(source), dest_folder))
-        if xbmcvfs.exists(source):
-            if not xbmcvfs.exists(dest_folder):
-                debug("Destination %r does not exist yet." % dest_folder)
-                debug("Creating destination %r." % dest_folder)
-                if xbmcvfs.mkdirs(dest_folder):
-                    debug("Successfully created %r." % dest_folder)
-                else:
-                    debug("Destination %r could not be created." % dest_folder, xbmc.LOGERROR)
-                    return False
 
-            new_path = os.path.join(dest_folder, os.path.basename(source))
-
-            if xbmcvfs.exists(new_path):
-                debug("A file with the same name already exists in the holding folder. Checking file sizes.")
-                existing_file = xbmcvfs.File(new_path)
-                file_to_move = xbmcvfs.File(source)
-                if file_to_move.size() > existing_file.size():
-                    debug("This file is larger than the existing file. Replacing the existing file with this one.")
-                    existing_file.close()
-                    file_to_move.close()
-                    return xbmcvfs.delete(new_path) and xbmcvfs.rename(source, new_path)
-                else:
-                    debug("This file is smaller than the existing file. Deleting this file instead of moving.")
-                    existing_file.close()
-                    file_to_move.close()
-                    return self.delete_file(source)
-            else:
-                debug("Moving %r to %r." % (source, new_path))
-                if get_setting(delete_related):
-                    path, name = os.path.split(source)
-                    name, ext = os.path.splitext(name)
-
-                    for extra_file in xbmcvfs.listdir(path)[1]:
-                        if extra_file.startswith(name):
-                            extra_file_path = os.path.join(path, extra_file)
-                            new_extra_path = os.path.join(dest_folder, os.path.basename(extra_file))
-
-                            if new_extra_path != new_path:
-                                debug("Renaming %r to %r." % (extra_file_path, new_extra_path))
-                                xbmcvfs.rename(extra_file_path, new_extra_path)
-
-                return xbmcvfs.rename(source, new_path)
-        else:
-            debug("XBMC could not find the file at %r" % source, xbmc.LOGWARNING)
+        if self.is_excluded(paths[0]):
+            debug("Detected a file on an excluded path. Aborting.")
             return False
+
+        for p in paths:
+            debug("Attempting to move %r to %r." % (p, dest_folder))
+            if xbmcvfs.exists(p):
+                if not xbmcvfs.exists(dest_folder):
+                    if xbmcvfs.mkdirs(dest_folder):
+                        debug("Created destination %r." % dest_folder)
+                    else:
+                        debug("Destination %r could not be created." % dest_folder, xbmc.LOGERROR)
+                        return False
+
+                new_path = os.path.join(dest_folder, os.path.basename(p))
+
+                if xbmcvfs.exists(new_path):
+                    debug("A file with the same name already exists in the holding folder. Checking file sizes.")
+                    existing_file = xbmcvfs.File(new_path)
+                    file_to_move = xbmcvfs.File(p)
+                    if file_to_move.size() > existing_file.size():
+                        debug("This file is larger than the existing file. Replacing it with this one.")
+                        existing_file.close()
+                        file_to_move.close()
+                        success.append(bool(xbmcvfs.delete(new_path) and xbmcvfs.rename(p, new_path)))
+                    else:
+                        debug("This file isn't larger than the existing file. Deleting it instead of moving.")
+                        existing_file.close()
+                        file_to_move.close()
+                        success.append(bool(xbmcvfs.delete(p)))
+                else:
+                    debug("Moving %r to %r." % (p, new_path))
+                    success.append(bool(xbmcvfs.rename(p, new_path)))
+            else:
+                debug("File %r no longer exists." % p, xbmc.LOGWARNING)
+                success.append(False)
+
+        return any(success)
 
 
 run = Cleaner()
