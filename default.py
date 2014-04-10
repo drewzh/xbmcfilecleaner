@@ -106,8 +106,8 @@ class Cleaner(object):
             debug("A video is currently playing. No cleaning will be performed this interval.", xbmc.LOGWARNING)
             return
 
-        if not get_setting(delete_when_low_disk_space) or (get_setting(delete_when_low_disk_space) and
-                                                               self.disk_space_low()):
+        if not get_setting(delete_when_low_disk_space) or (get_setting(delete_when_low_disk_space)
+                                                           and self.disk_space_low()):
             # create stub to summarize cleaning results
             summary = "Deleted" if get_setting(delete_files) else "Moved"
             cleaned_files = []
@@ -117,7 +117,8 @@ class Cleaner(object):
                 if movies:
                     count = 0
                     for abs_path, title, year in movies:
-                        if xbmcvfs.exists(abs_path):
+                        unstacked_path = self.unstack(abs_path)
+                        if xbmcvfs.exists(unstacked_path[0]):
                             if not get_setting(delete_files):
                                 if get_setting(create_subdirs):
                                     new_path = os.path.join(get_setting(holding_folder), "%s (%d)" % (title, year))
@@ -125,13 +126,19 @@ class Cleaner(object):
                                     new_path = get_setting(holding_folder)
                                 if self.move_file(abs_path, new_path):
                                     count += 1
-                                    cleaned_files.append(abs_path)
+                                    if len(unstacked_path) > 1:
+                                        cleaned_files.extend(unstacked_path)
+                                    else:
+                                        cleaned_files.append(abs_path)
                                     self.clean_related_files(abs_path, new_path)
                                     self.delete_empty_folders(abs_path)
                             else:
                                 if self.delete_file(abs_path):
                                     count += 1
-                                    cleaned_files.append(abs_path)
+                                    if len(unstacked_path) > 1:
+                                        cleaned_files.extend(unstacked_path)
+                                    else:
+                                        cleaned_files.append(abs_path)
                                     self.clean_related_files(abs_path)
                                     self.delete_empty_folders(abs_path)
                         else:
