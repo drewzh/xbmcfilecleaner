@@ -10,7 +10,7 @@ __addonID__ = "script.filecleaner"
 __addon__ = Addon(__addonID__)
 
 # Exhaustive list of constants as used by the addon's settings
-cleaner_enabled = "cleaner_enabled"
+service_enabled = "service_enabled"
 delete_folders = "delete_folders"
 ignore_extensions = "ignore_extensions"
 
@@ -50,7 +50,7 @@ exclusion1 = "exclusion1"
 exclusion2 = "exclusion2"
 exclusion3 = "exclusion3"
 
-bools = [cleaner_enabled, delete_folders, delete_related, notifications_enabled, notify_when_idle, debugging_enabled,
+bools = [service_enabled, delete_folders, delete_related, notifications_enabled, notify_when_idle, debugging_enabled,
          clean_xbmc_library, delete_movies, delete_tv_shows, delete_music_videos, delete_when_idle, enable_expiration,
          delete_when_low_rated, ignore_no_rating, delete_when_low_disk_space, delete_files, create_subdirs,
          not_in_progress, exclusion_enabled]

@@ -5,7 +5,8 @@
         <import addon="xbmc.json" version="6.0.0" />
         <import addon="xbmc.gui" version="4.0.0" />
     </requires>
-    <extension point="xbmc.service" library="default.py" start="login" />
+    <extension point="xbmc.python.script" library="default.py" />
+    <extension point="xbmc.service" library="service.py" start="login" />
     <extension point="xbmc.addon.metadata">
         <summary lang="en">Regularly deletes old movies, TV show episodes and music videos</summary>
         <description lang="en">[B][I]READ BEFORE PROCEEDING[/I][/B]

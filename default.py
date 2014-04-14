@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-import time
 import re
 import json
 from ctypes import *
@@ -71,29 +70,9 @@ class Cleaner(object):
     def __init__(self):
         """Create a Cleaner object that performs regular cleaning of watched videos."""
 
-        service_sleep = 10
-        ticker = 0
-        delayed_completed = False
+        debug("Cleaner created.")
 
-        while not xbmc.abortRequested:
-            scan_interval_ticker = get_setting(scan_interval) * 60 / service_sleep
-            delayed_start_ticker = get_setting(delayed_start) * 60 / service_sleep
-
-            if not get_setting(cleaner_enabled):
-                continue
-            else:
-                if delayed_completed and ticker >= scan_interval_ticker:
-                    self.cleanup()
-                    ticker = 0
-                elif not delayed_completed and ticker >= delayed_start_ticker:
-                    delayed_completed = True
-                    self.cleanup()
-                    ticker = 0
-
-                time.sleep(service_sleep)
-                ticker += 1
-
-        debug("Abort requested. Terminating.")
+        # TODO: Do something more useful when the cleaner is created.
 
     def cleanup(self):
         """
@@ -101,7 +80,7 @@ class Cleaner(object):
 
         The videos to be deleted are subject to a number of criteria as can be specified in the addon's settings.
         """
-        debug("Starting cleaning routine")
+        debug("Starting cleaning routine.")
         if get_setting(delete_when_idle) and xbmc.Player().isPlayingVideo():
             debug("A video is currently playing. No cleaning will be performed this interval.", xbmc.LOGWARNING)
             return
@@ -687,5 +666,7 @@ class Cleaner(object):
 
         return any(success)
 
-
-run = Cleaner()
+if __name__ == "__main__":
+    cleaner = Cleaner()
+    cleaner.cleanup()
+    # TODO: Ask user to view log

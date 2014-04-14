@@ -38,8 +38,8 @@ msgid "[B]Which videos do you want to delete?[/B]"
 msgstr "[B]Welke video's wil je opschonen?[/B]"
 
 msgctxt "#32102"
-msgid "[B]Enable File Cleaner[/B]"
-msgstr "[B]Activeer File Cleaner[/B]"
+msgid "Run as a service"
+msgstr "Draai als service"
 
 msgctxt "#32103"
 msgid "Delete videos [I]permanently [/I]"

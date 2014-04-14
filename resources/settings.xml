@@ -6,7 +6,8 @@
         <setting label="32101" type="lsep" />
         <setting type="sep" />
 
-        <setting label="32102" id="cleaner_enabled" type="bool" default="false" visible="true" />
+        <!-- TODO: Misschien verhuizen naar Timing Section? -->
+        <setting label="32102" id="service_enabled" type="bool" default="false" visible="true" />
 
         <setting label="32103" id="delete_files" type="bool" default="true" visible="true" />
         <setting label="32104" id="holding_info" type="lsep" subsetting="true" visible="eq(-1,false)" />
