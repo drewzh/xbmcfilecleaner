@@ -36,7 +36,7 @@ msgid "Actions"
 msgstr ""
 
 msgctxt "#32101"
-msgid "[B]Which videos do you want to delete?[/B]"
+msgid "[B]Which videos do you want to clean?[/B]"
 msgstr ""
 
 msgctxt "#32102"
@@ -60,15 +60,15 @@ msgid "Create subdirectories (i.e. [B]../Artist[/B], [B]../Movie (Year)[/B] and 
 msgstr ""
 
 msgctxt "#32107"
-msgid "Delete movies"
+msgid "Clean movies"
 msgstr ""
 
 msgctxt "#32108"
-msgid "Delete TV shows"
+msgid "Clean TV shows"
 msgstr ""
 
 msgctxt "#32109"
-msgid "Delete music videos"
+msgid "Clean music videos"
 msgstr ""
 
 msgctxt "#32110"
@@ -84,7 +84,7 @@ msgid "Ignore files with the following extensions (separate with commas)"
 msgstr ""
 
 msgctxt "#32113"
-msgid "Also delete related files with similar names (e.g. subtitles)"
+msgid "Also clean related files with similar names (e.g. subtitles)"
 msgstr ""
 
 #Frequency section
@@ -95,7 +95,7 @@ msgid "Frequency"
 msgstr ""
 
 msgctxt "#32201"
-msgid "[B]When should watched videos be deleted?[/B]"
+msgid "[B]When should watched videos be cleaned?[/B]"
 msgstr ""
 
 msgctxt "#32202"
@@ -122,11 +122,11 @@ msgid "Conditions"
 msgstr ""
 
 msgctxt "#32301"
-msgid "[B]Which conditions must be met before a watched video is deleted?[/B]"
+msgid "[B]Which conditions must be met before a watched video is cleaned?[/B]"
 msgstr ""
 
 msgctxt "#32302"
-msgid "Wait a certain number of days after watching before deleting"
+msgid "Wait a certain number of days after watching before cleaning"
 msgstr ""
 
 msgctxt "#32303"
@@ -150,7 +150,7 @@ msgid "Ignore videos without rating"
 msgstr ""
 
 msgctxt "#32308"
-msgid "Only delete videos if low on disk space"
+msgid "Only clean videos if low on disk space"
 msgstr ""
 
 msgctxt "#32309"
@@ -162,7 +162,7 @@ msgid "Path to check for free disk space"
 msgstr ""
 
 msgctxt "#32311"
-msgid "Do not delete videos that are still in progress"
+msgid "Do not clean videos that are still in progress"
 msgstr ""
 
 msgctxt "#32312"

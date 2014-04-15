@@ -34,7 +34,7 @@ msgid "Actions"
 msgstr "Acties"
 
 msgctxt "#32101"
-msgid "[B]Which videos do you want to delete?[/B]"
+msgid "[B]Which videos do you want to clean?[/B]"
 msgstr "[B]Welke video's wil je opschonen?[/B]"
 
 msgctxt "#32102"
@@ -58,15 +58,15 @@ msgid "Create subdirectories (i.e. [B]../Artist[/B], [B]../Movie (Year)[/B] and 
 msgstr "Maak submappen aan (bv. [B]../Artiest[/B], [B]../Film (Jaar)[/B] en [B]../Serie/Seizoen xx[/B])"
 
 msgctxt "#32107"
-msgid "Delete movies"
+msgid "Clean movies"
 msgstr "Schoon films op"
 
 msgctxt "#32108"
-msgid "Delete TV shows"
+msgid "Clean TV shows"
 msgstr "Schoon TV series op"
 
 msgctxt "#32109"
-msgid "Delete music videos"
+msgid "Clean music videos"
 msgstr "Schoon videoclips op"
 
 msgctxt "#32110"
@@ -82,7 +82,7 @@ msgid "Ignore files with the following extensions (separate with commas)"
 msgstr "Negeer bestanden met de volgende extensies (scheiden met komma's)"
 
 msgctxt "#32113"
-msgid "Also delete related files with similar names (e.g. subtitles)"
+msgid "Also clean related files with similar names (e.g. subtitles)"
 msgstr "Schoon tevens bestanden op met vergelijkbare namen (bv. ondertitels)"
 
 msgctxt "#32200"
@@ -90,7 +90,7 @@ msgid "Frequency"
 msgstr "Frequentie"
 
 msgctxt "#32201"
-msgid "[B]When should watched videos be deleted?[/B]"
+msgid "[B]When should watched videos be cleaned?[/B]"
 msgstr "[B]Wanneer moeten bekeken videos opgeschoond worden?[/B]"
 
 msgctxt "#32202"
@@ -114,11 +114,11 @@ msgid "Conditions"
 msgstr "Voorwaarden"
 
 msgctxt "#32301"
-msgid "[B]Which conditions must be met before a watched video is deleted?[/B]"
-msgstr "[B]Aan welke voorwaarden moet een bekeken video voldoen voor hij verwijderd wordt?[/B]"
+msgid "[B]Which conditions must be met before a watched video is cleaned?[/B]"
+msgstr "[B]Aan welke voorwaarden moet een bekeken video voldoen voor hij opgeschoond wordt?[/B]"
 
 msgctxt "#32302"
-msgid "Wait a certain number of days after watching before deleting"
+msgid "Wait a certain number of days after watching before cleaning"
 msgstr "Schoon video's pas een aantal dagen na bekijken op"
 
 msgctxt "#32303"
@@ -126,7 +126,7 @@ msgid "Days after which a video is considerd to have expired"
 msgstr "Aantal dagen waarna een bestand als verlopen wordt beschouwd"
 
 msgctxt "#32304"
-msgid "Only delete videos with low ratings"
+msgid "Only clean videos with low ratings"
 msgstr "Schoon alleen video's op met een laag cijfer"
 
 msgctxt "#32305"
@@ -134,7 +134,7 @@ msgid "[I]Note that music videos do not have ratings and ignore these settings [
 msgstr "[I]Let op: videoclips hebben geen cijfers en negeren deze instellingen [/I]"
 
 msgctxt "#32306"
-msgid "Delete a video with a rating lower than"
+msgid "Clean a video with a rating lower than"
 msgstr "Schoon video's op met een cijfer lager dan"
 
 msgctxt "#32307"
@@ -142,7 +142,7 @@ msgid "Ignore videos without rating"
 msgstr "Negeer video's zonder cijfer"
 
 msgctxt "#32308"
-msgid "Only delete videos if low on disk space"
+msgid "Only clean videos if low on disk space"
 msgstr "Schoon video's pas op bij te weinig vrije schrijfruimte"
 
 msgctxt "#32309"
@@ -154,7 +154,7 @@ msgid "Path to check for free disk space"
 msgstr "Locatie om te controleren op vrije schijfruimte"
 
 msgctxt "#32311"
-msgid "Do not delete videos that are still in progress"
+msgid "Do not clean videos that are still in progress"
 msgstr "Schoon geen video's op die halverwege gestopt zijn"
 
 msgctxt "#32312"

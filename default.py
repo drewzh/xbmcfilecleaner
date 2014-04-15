@@ -69,10 +69,8 @@ class Cleaner(object):
 
     def __init__(self):
         """Create a Cleaner object that performs regular cleaning of watched videos."""
-
-        debug("Cleaner created.")
-
-        # TODO: Do something more useful when the cleaner is created.
+        debug("%s version %s loaded." % (__addon__.getAddonInfo("name").decode("utf-8"),
+                                         __addon__.getAddonInfo("version").decode("utf-8")))
 
     def cleanup(self):
         """
@@ -81,16 +79,16 @@ class Cleaner(object):
         The videos to be deleted are subject to a number of criteria as can be specified in the addon's settings.
         """
         debug("Starting cleaning routine.")
-        if get_setting(delete_when_idle) and xbmc.Player().isPlayingVideo():
+        if get_setting(clean_when_idle) and xbmc.Player().isPlayingVideo():
             debug("A video is currently playing. Skipping cleaning.", xbmc.LOGWARNING)
             return
 
-        if not get_setting(delete_when_low_disk_space) or (get_setting(delete_when_low_disk_space)
+        if not get_setting(clean_when_low_disk_space) or (get_setting(clean_when_low_disk_space)
                                                            and self.disk_space_low()):
             # create stub to summarize cleaning results
             summary = "Deleted" if get_setting(delete_files) else "Moved"
             cleaned_files = []
-            if get_setting(delete_movies):
+            if get_setting(clean_movies):
                 movies = self.get_expired_videos(self.MOVIES)
                 if movies:
                     count = 0
@@ -124,7 +122,7 @@ class Cleaner(object):
                     if count > 0:
                         summary += " %d %s" % (count, self.MOVIES)
 
-            if get_setting(delete_tv_shows):
+            if get_setting(clean_tv_shows):
                 episodes = self.get_expired_videos(self.TVSHOWS)
                 if episodes:
                     count = 0
@@ -152,7 +150,7 @@ class Cleaner(object):
                     if count > 0:
                         summary += " %d %s" % (count, self.TVSHOWS)
 
-            if get_setting(delete_music_videos):
+            if get_setting(clean_music_videos):
                 musicvideos = self.get_expired_videos(self.MUSIC_VIDEOS)
                 if musicvideos:
                     count = 0
@@ -187,12 +185,14 @@ class Cleaner(object):
 
             # Finally clean the library to account for any deleted videos.
             if get_setting(clean_xbmc_library) and cleaned_files:
-                time.sleep(10)
+                xbmc.sleep(5000)  # Sleep 5 seconds until file I/O is done.
 
                 if xbmc.getCondVisibility("Library.IsScanningVideo"):
                     debug("The video library is being updated. Skipping library cleanup.", xbmc.LOGWARNING)
                 else:
                     xbmc.executebuiltin("XBMC.CleanLibrary(video)")
+
+            return summary
 
     def get_expired_videos(self, option):
         """
@@ -221,12 +221,12 @@ class Cleaner(object):
         # link settings and filters together
         settings_and_filters = [
             (get_setting(enable_expiration), by_date_played),
-            (get_setting(delete_when_low_rated), by_minimum_rating),
+            (get_setting(clean_when_low_rated), by_minimum_rating),
             (get_setting(not_in_progress), by_progress)
         ]
 
         # Only check not rated videos if checking for video ratings at all
-        if get_setting(delete_when_low_rated):
+        if get_setting(clean_when_low_rated):
             settings_and_filters.append((get_setting(ignore_no_rating), by_no_rating))
 
         enabled_filters = [by_playcount]
@@ -575,7 +575,7 @@ class Cleaner(object):
         :type dest_folder: str
         :param dest_folder: (Optional) The folder where related files should be moved to. Not needed when deleting.
         """
-        if settings.get_setting(delete_related):
+        if settings.get_setting(clean_related):
             debug("Cleaning related files.")
 
             path_list = self.unstack(source)
