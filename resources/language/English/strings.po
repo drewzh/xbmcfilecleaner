@@ -230,6 +230,37 @@ msgctxt "#32513"
 msgid "Could not check disk space. Path does not exist."
 msgstr ""
 
+msgctxt "#32514"
+msgid "Cleaning results"
+msgstr ""
+
+msgctxt "#32515"
+msgid "movie(s)"
+msgstr ""
+
+msgctxt "#32516"
+msgid "episode(s)"
+msgstr ""
+
+msgctxt "#32517"
+msgid "music video(s)"
+msgstr ""
+
+#Suffix for cleaning results. Do not remove the single leading whitespace! The notification system depends on it.
+msgctxt "#32518"
+msgid " were cleaned"
+msgstr ""
+
+msgctxt "#32519"
+msgid "Would you like to view the cleaning log?"
+msgstr ""
+
+msgctxt "#32520"
+msgid "No cleaning required"
+msgstr ""
+
+
+
 #Log section
 #empty strings from id 32514 to 32599
 

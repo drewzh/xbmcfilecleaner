@@ -8,6 +8,7 @@ from ctypes import *
 
 import xbmc
 import xbmcaddon
+import xbmcgui
 import xbmcvfs
 from settings import *
 from utils import *
@@ -77,6 +78,8 @@ class Cleaner(object):
         Delete any watched videos from the XBMC video database.
 
         The videos to be deleted are subject to a number of criteria as can be specified in the addon's settings.
+        :rtype: str
+        :return: A comma separated summary of the cleaning results.
         """
         debug("Starting cleaning routine.")
         if get_setting(clean_when_idle) and xbmc.Player().isPlayingVideo():
@@ -86,7 +89,7 @@ class Cleaner(object):
         if not get_setting(clean_when_low_disk_space) or (get_setting(clean_when_low_disk_space)
                                                            and self.disk_space_low()):
             # create stub to summarize cleaning results
-            summary = "Deleted" if get_setting(delete_files) else "Moved"
+            summary = dict()
             cleaned_files = []
             if get_setting(clean_movies):
                 movies = self.get_expired_videos(self.MOVIES)
@@ -120,7 +123,7 @@ class Cleaner(object):
                         else:
                             debug("XBMC could not find %r" % abs_path, xbmc.LOGWARNING)
                     if count > 0:
-                        summary += " %d %s" % (count, self.MOVIES)
+                        summary[self.MOVIES] = count
 
             if get_setting(clean_tv_shows):
                 episodes = self.get_expired_videos(self.TVSHOWS)
@@ -148,7 +151,7 @@ class Cleaner(object):
                         else:
                             debug("XBMC could not find %r" % abs_path, xbmc.LOGWARNING)
                     if count > 0:
-                        summary += " %d %s" % (count, self.TVSHOWS)
+                        summary[self.TVSHOWS] = count
 
             if get_setting(clean_music_videos):
                 musicvideos = self.get_expired_videos(self.MUSIC_VIDEOS)
@@ -166,22 +169,21 @@ class Cleaner(object):
                                     count += 1
                                     cleaned_files.append(abs_path)
                                     self.clean_related_files(abs_path, new_path)
-                                    self.delete_empty_folders(os.path.dirname(abs_path))
+                                    self.delete_empty_folders(abs_path)
                             else:
                                 if self.delete_file(abs_path):
                                     count += 1
                                     cleaned_files.append(abs_path)
                                     self.clean_related_files(abs_path)
-                                    self.delete_empty_folders(os.path.dirname(abs_path))
+                                    self.delete_empty_folders(abs_path)
                         else:
                             debug("XBMC could not find %r" % abs_path, xbmc.LOGWARNING)
                     if count > 0:
-                        summary += " %d %s" % (count, self.MUSIC_VIDEOS)
+                        summary[self.MUSIC_VIDEOS] = count
 
             # Give a status report if any deletes occurred
             if cleaned_files:
                 Log().prepend(cleaned_files)
-                notify(summary)
 
             # Finally clean the library to account for any deleted videos.
             if get_setting(clean_xbmc_library) and cleaned_files:
@@ -192,7 +194,36 @@ class Cleaner(object):
                 else:
                     xbmc.executebuiltin("XBMC.CleanLibrary(video)")
 
-            return summary
+            return self.summarize(summary)
+
+    def summarize(self, details):
+        """
+        Create a summary from the cleaning results.
+
+        :type details: dict
+        :rtype: str
+        :return: A comma separated summary of the cleaning results.
+        """
+        summary = ""
+
+        # Localize video types
+        for vid_type, amount in details.items():
+            if vid_type is self.MOVIES:
+                video_type = utils.translate(32515)
+            elif vid_type is self.TVSHOWS:
+                video_type = utils.translate(32516)
+            elif vid_type is self.MUSIC_VIDEOS:
+                video_type = utils.translate(32517)
+            else:
+                video_type = ""
+
+            summary += "%d %s, " % (amount, video_type)
+
+        debug("Summary: %r" % summary)
+        # strip the comma and space from the last iteration
+        summary = "%s%s" % (summary.rstrip(", "), utils.translate(32518))
+        debug("Returning summary: %r" % summary)
+        return summary
 
     def get_expired_videos(self, option):
         """
@@ -664,5 +695,11 @@ class Cleaner(object):
 
 if __name__ == "__main__":
     cleaner = Cleaner()
-    cleaner.cleanup()
-    # TODO: Ask user to view log
+    results = cleaner.cleanup()
+    debug("%r" % results)
+    if not results.startswith(utils.translate(32518)):
+        if xbmcgui.Dialog().yesno(utils.translate(32514), results, utils.translate(32519)):
+            xbmc.executescript("special://home/addons/script.filecleaner/viewer.py")
+    else:
+        notify(utils.translate(32520))
+

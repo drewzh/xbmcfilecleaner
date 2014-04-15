@@ -213,6 +213,35 @@ msgctxt "#32513"
 msgid "Could not check disk space. Path does not exist."
 msgstr "Schijfruimte kon niet worden gecontroleerd. Het opgegeven pad bestaat niet."
 
+msgctxt "#32514"
+msgid "Cleaning results"
+msgstr "Schoonmaakresultaten"
+
+msgctxt "#32515"
+msgid "movie(s)"
+msgstr "film(s)"
+
+msgctxt "#32516"
+msgid "episode(s)"
+msgstr "aflevering(en)"
+
+msgctxt "#32517"
+msgid "music video(s)"
+msgstr "videoclip(s)"
+
+#Laatste deel van schoonmaakresultaten. Verwijder niet de eerste spatie! Het notificatiesysteem is hiervan afhankelijk.
+msgctxt "#32518"
+msgid " were cleaned"
+msgstr " zijn opgeschoond"
+
+msgctxt "#32519"
+msgid "Would you like to view the cleaning log?"
+msgstr "Wil je de schoonmaakgeschiedenis bekijken?"
+
+msgctxt "#32520"
+msgid "No cleaning required"
+msgstr "Schoonmaken is niet nodig"
+
 msgctxt "#32600"
 msgid "History"
 msgstr "Geschiedenis"
@@ -227,7 +256,7 @@ msgstr "Bekijk schoonmaakgeschiedenis"
 
 msgctxt "#32603"
 msgid "[B]Cleaning Log[/B]"
-msgstr "[B]Schoonmaakgeschiedenis[/B]"
+msgstr "[B]Schoonmaaklogboek[/B]"
 
 msgctxt "#32604"
 msgid "Are you sure?"
