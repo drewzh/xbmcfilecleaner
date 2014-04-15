@@ -29,8 +29,9 @@ msgctxt "Addon Disclaimer"
 msgid "It is recommended to not delete videos permanently until you are familiar with all of the settings."
 msgstr ""
 
-#Options Sections
 
+# Actions section
+# =======================
 msgctxt "#32100"
 msgid "Actions"
 msgstr ""
@@ -40,56 +41,53 @@ msgid "[B]Which videos do you want to clean?[/B]"
 msgstr ""
 
 msgctxt "#32102"
-msgid "Run as a service"
-msgstr ""
-
-msgctxt "#32103"
 msgid "Delete videos [I]permanently [/I]"
 msgstr ""
 
-msgctxt "#32104"
+msgctxt "#32103"
 msgid "[I]Please specify where to store watched videos [/I]"
 msgstr ""
 
-msgctxt "#32105"
+msgctxt "#32104"
 msgid "Holding folder location"
 msgstr ""
 
-msgctxt "#32106"
+msgctxt "#32105"
 msgid "Create subdirectories (i.e. [B]../Artist[/B], [B]../Movie (Year)[/B] and [B]../Show/Season xx[/B])"
 msgstr ""
 
-msgctxt "#32107"
+msgctxt "#32106"
 msgid "Clean movies"
 msgstr ""
 
-msgctxt "#32108"
+msgctxt "#32107"
 msgid "Clean TV shows"
 msgstr ""
 
-msgctxt "#32109"
+msgctxt "#32108"
 msgid "Clean music videos"
 msgstr ""
 
-msgctxt "#32110"
+msgctxt "#32109"
 msgid "Clean XBMC video library afterwards"
 msgstr ""
 
-msgctxt "#32111"
+msgctxt "#32110"
 msgid "Also delete empty folders"
 msgstr ""
 
-msgctxt "#32112"
+msgctxt "#32111"
 msgid "Ignore files with the following extensions (separate with commas)"
 msgstr ""
 
-msgctxt "#32113"
+msgctxt "#32112"
 msgid "Also clean related files with similar names (e.g. subtitles)"
 msgstr ""
 
-#Frequency section
-#empty strings from id 32114 to 32199
 
+
+# Frequency section
+# =======================
 msgctxt "#32200"
 msgid "Frequency"
 msgstr ""
@@ -99,24 +97,28 @@ msgid "[B]When should watched videos be cleaned?[/B]"
 msgstr ""
 
 msgctxt "#32202"
-msgid "Delayed start (in minutes)"
+msgid "Run as a service"
 msgstr ""
 
 msgctxt "#32203"
-msgid "Scan interval (in minutes)"
+msgid "Delayed start (in minutes)"
 msgstr ""
 
 msgctxt "#32204"
-msgid "Do not clean during video playback"
+msgid "Scan interval (in minutes)"
 msgstr ""
 
 msgctxt "#32205"
+msgid "Do not clean during video playback"
+msgstr ""
+
+msgctxt "#32206"
 msgid "Start cleaning right after playback stops"
 msgstr ""
 
-#Conditions section
-#empty strings from id 32206 to 32299
 
+# Conditions section
+# =======================
 msgctxt "#32300"
 msgid "Conditions"
 msgstr ""
@@ -169,9 +171,9 @@ msgctxt "#32312"
 msgid "[I]Note that music videos cannot be partially played and will ignore this [/I]"
 msgstr ""
 
-#Exclusions section
-#empty strings from id 32313 to 32399
 
+# Exclusions section
+# ==================
 msgctxt "#32400"
 msgid "Exclusions"
 msgstr ""
@@ -192,9 +194,8 @@ msgctxt "#32404"
 msgid "Path to exclude"
 msgstr ""
 
-#Notifications section
-#empty strings from id 32405 to 32499
-
+# Notifications section
+# =======================
 msgctxt "#32500"
 msgid "Notifications"
 msgstr ""
@@ -215,9 +216,10 @@ msgctxt "#32504"
 msgid "Enable debug messages"
 msgstr ""
 
-#Localization strings for XBMC notifications
-#empty strings from id 32505 to 32510
 
+# Localization strings
+# for XBMC notifications
+# =======================
 msgctxt "#32511"
 msgid "Error reading hard disk. Please check your settings."
 msgstr ""
@@ -260,15 +262,12 @@ msgid "No cleaning required"
 msgstr ""
 
 
-
-#Log section
-#empty strings from id 32514 to 32599
+# Log section
+# =======================
 
 msgctxt "#32600"
 msgid "History"
 msgstr ""
-
-#Actions section
 
 msgctxt "#32601"
 msgid "[B]See which files have been cleaned recently.[/B]"

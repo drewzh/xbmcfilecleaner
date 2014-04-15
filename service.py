@@ -25,13 +25,13 @@ def autostart():
 
             if delayed_completed and ticker >= scan_interval_ticker:
                 results = cleaner.cleanup()
-                if not results.startswith(utils.translate(32518)):
+                if results and not results.startswith(utils.translate(32518)):
                     notify(results)
                 ticker = 0
             elif not delayed_completed and ticker >= delayed_start_ticker:
                 delayed_completed = True
                 results = cleaner.cleanup()
-                if not results.startswith(utils.translate(32518)):
+                if results and not results.startswith(utils.translate(32518)):
                     notify(results)
                 ticker = 0
 

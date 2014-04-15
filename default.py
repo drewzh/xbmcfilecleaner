@@ -24,11 +24,15 @@ __icon__ = xbmc.translatePath(__addon__.getAddonInfo("icon")).decode("utf-8")
 
 class Cleaner(object):
     """
-    The Cleaner class is used in XBMC to identify and delete videos that have been watched by the user. It starts with
-    XBMC and runs until XBMC shuts down. Identification of watched videos can be enhanced with additional criteria,
-    such as recently watched, low rated and based on free disk space. Deleting of videos can be enabled for movies,
-    music videos or tv shows, or any combination of these. Almost all of the methods in this class will be called
-    through the cleanup method.
+    The Cleaner class allows users to clean up their movie, TV show and music video collection by removing watched
+    items. The user can apply a number of conditions to cleaning, such as limiting cleaning to files with a given
+    rating, excluding a particular folder or only cleaning when a particular disk is low on disk space.
+
+    The main method to call is the ``cleanup()`` method. This method will invoke the subsequent checks and (re)move
+    your videos. Upon completion, you will receive a short summary of the cleaning results.
+
+    *Example*
+      ``summary = Cleaner().cleanup()``
     """
 
     # Constants to ensure correct (Frodo-compatible) JSON-RPC requests for XBMC
@@ -69,13 +73,12 @@ class Cleaner(object):
     stacking_indicators = ["part", "pt", "cd", "dvd", "disk", "disc"]
 
     def __init__(self):
-        """Create a Cleaner object that performs regular cleaning of watched videos."""
         debug("%s version %s loaded." % (__addon__.getAddonInfo("name").decode("utf-8"),
                                          __addon__.getAddonInfo("version").decode("utf-8")))
 
     def cleanup(self):
         """
-        Delete any watched videos from the XBMC video database.
+        Delete watched videos from the XBMC video database.
 
         The videos to be deleted are subject to a number of criteria as can be specified in the addon's settings.
         :rtype: str
@@ -219,11 +222,8 @@ class Cleaner(object):
 
             summary += "%d %s, " % (amount, video_type)
 
-        debug("Summary: %r" % summary)
-        # strip the comma and space from the last iteration
-        summary = "%s%s" % (summary.rstrip(", "), utils.translate(32518))
-        debug("Returning summary: %r" % summary)
-        return summary
+        # strip the comma and space from the last iteration and add the localized suffix
+        return "%s%s" % (summary.rstrip(", "), utils.translate(32518))
 
     def get_expired_videos(self, option):
         """

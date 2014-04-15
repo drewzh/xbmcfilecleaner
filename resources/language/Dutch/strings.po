@@ -29,6 +29,9 @@ msgctxt "Addon Disclaimer"
 msgid "It is recommended to not delete videos permanently until you are familiar with all of the settings."
 msgstr "Het is verstandig om videos pas permanent te verwijderen als je bekend bent met alle instellingen."
 
+
+# Actiestabblad
+# =======================
 msgctxt "#32100"
 msgid "Actions"
 msgstr "Acties"
@@ -38,53 +41,52 @@ msgid "[B]Which videos do you want to clean?[/B]"
 msgstr "[B]Welke video's wil je opschonen?[/B]"
 
 msgctxt "#32102"
-msgid "Run as a service"
-msgstr "Draai als service"
-
-msgctxt "#32103"
 msgid "Delete videos [I]permanently [/I]"
 msgstr "Verwijder video's [I]permanent [/I]"
 
-msgctxt "#32104"
+msgctxt "#32103"
 msgid "[I]Please specify where to store watched videos [/I]"
 msgstr "[I]Selecteer een map waar bekeken video's bewaard worden[/I]"
 
-msgctxt "#32105"
+msgctxt "#32104"
 msgid "Holding folder location"
 msgstr "Locatie bewaarmap"
 
-msgctxt "#32106"
+msgctxt "#32105"
 msgid "Create subdirectories (i.e. [B]../Artist[/B], [B]../Movie (Year)[/B] and [B]../Show/Season xx[/B])"
 msgstr "Maak submappen aan (bv. [B]../Artiest[/B], [B]../Film (Jaar)[/B] en [B]../Serie/Seizoen xx[/B])"
 
-msgctxt "#32107"
+msgctxt "#32106"
 msgid "Clean movies"
 msgstr "Schoon films op"
 
-msgctxt "#32108"
+msgctxt "#32107"
 msgid "Clean TV shows"
 msgstr "Schoon TV series op"
 
-msgctxt "#32109"
+msgctxt "#32108"
 msgid "Clean music videos"
 msgstr "Schoon videoclips op"
 
-msgctxt "#32110"
+msgctxt "#32109"
 msgid "Clean XBMC video library afterwards"
 msgstr "XBMC videobibliotheek opschonen na afloop"
 
-msgctxt "#32111"
+msgctxt "#32110"
 msgid "Also delete empty folders"
 msgstr "Verwijder tevens lege mappen"
 
-msgctxt "#32112"
+msgctxt "#32111"
 msgid "Ignore files with the following extensions (separate with commas)"
 msgstr "Negeer bestanden met de volgende extensies (scheiden met komma's)"
 
-msgctxt "#32113"
+msgctxt "#32112"
 msgid "Also clean related files with similar names (e.g. subtitles)"
 msgstr "Schoon tevens bestanden op met vergelijkbare namen (bv. ondertitels)"
 
+
+# Frequentietabblad
+# =======================
 msgctxt "#32200"
 msgid "Frequency"
 msgstr "Frequentie"
@@ -94,21 +96,28 @@ msgid "[B]When should watched videos be cleaned?[/B]"
 msgstr "[B]Wanneer moeten bekeken videos opgeschoond worden?[/B]"
 
 msgctxt "#32202"
+msgid "Run as a service"
+msgstr "Draai als service"
+
+msgctxt "#32203"
 msgid "Delayed start (in minutes)"
 msgstr "Wachttijd bij opstarten (in minuten)"
 
-msgctxt "#32203"
+msgctxt "#32204"
 msgid "Scan interval (in minutes)"
 msgstr "Scan-interval (in minuten)"
 
-msgctxt "#32204"
+msgctxt "#32205"
 msgid "Do not clean during video playback"
 msgstr "Schoon niet op als er een video afgespeeld wordt"
 
-msgctxt "#32205"
+msgctxt "#32206"
 msgid "Start cleaning right after playback stops"
 msgstr "Start opschonen zodra afspelen stopt"
 
+
+# Voorwaardentabblad
+# =======================
 msgctxt "#32300"
 msgid "Conditions"
 msgstr "Voorwaarden"
@@ -161,6 +170,9 @@ msgctxt "#32312"
 msgid "[I]Note that music videos cannot be partially played and will ignore this [/I]"
 msgstr "[I]Videoclips onthouden niet tot hoever ze afgespeeld zijn en negeren dit [/I]"
 
+
+# Uitzonderingentabblad
+# =======================
 msgctxt "#32400"
 msgid "Exclusions"
 msgstr "Uitzonderingen"
@@ -181,6 +193,9 @@ msgctxt "#32404"
 msgid "Path to exclude"
 msgstr "Locatie van uitzondering"
 
+
+# Meldingentabblad
+# =======================
 msgctxt "#32500"
 msgid "Notifications"
 msgstr "Meldingen"
@@ -242,6 +257,8 @@ msgctxt "#32520"
 msgid "No cleaning required"
 msgstr "Schoonmaken is niet nodig"
 
+# Logtabblad
+# =======================
 msgctxt "#32600"
 msgid "History"
 msgstr "Geschiedenis"

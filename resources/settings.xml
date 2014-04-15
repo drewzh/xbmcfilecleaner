@@ -27,12 +27,12 @@
         <setting label="32201" type="lsep" />
         <setting type="sep" />
 
-        <setting label="32102" id="service_enabled" type="bool" default="false" visible="true" />
+        <setting label="32202" id="service_enabled" type="bool" default="false" visible="true" />
 
-        <setting label="32202" id="delayed_start" type="slider" default="0" range="0,10,120" option="int" visible="eq(-1,true)" />
-        <setting label="32203" id="scan_interval" type="slider" default="30" range="15,15,1440" option="int" visible="eq(-2,true)" />
+        <setting label="32203" id="delayed_start" type="slider" default="0" range="0,10,120" option="int" visible="eq(-1,true)" />
+        <setting label="32204" id="scan_interval" type="slider" default="30" range="15,15,1440" option="int" visible="eq(-2,true)" />
 
-        <setting label="32204" id="clean_when_idle" type="bool" default="false" visible="true" />
+        <setting label="32205" id="clean_when_idle" type="bool" default="false" visible="true" />
     </category>
 
     <!-- Conditions section -->
