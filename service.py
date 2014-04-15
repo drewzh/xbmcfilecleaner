@@ -5,7 +5,7 @@ import xbmc
 
 from default import Cleaner
 from settings import *
-from utils import debug
+from utils import debug, notify
 
 
 def autostart():
@@ -24,11 +24,15 @@ def autostart():
             delayed_start_ticker = get_setting(delayed_start) * 60 / service_sleep
 
             if delayed_completed and ticker >= scan_interval_ticker:
-                cleaner.cleanup()
+                results = cleaner.cleanup()
+                if not results.startswith(utils.translate(32518)):
+                    notify(results)
                 ticker = 0
             elif not delayed_completed and ticker >= delayed_start_ticker:
                 delayed_completed = True
-                cleaner.cleanup()
+                results = cleaner.cleanup()
+                if not results.startswith(utils.translate(32518)):
+                    notify(results)
                 ticker = 0
 
             xbmc.sleep(service_sleep * 1000)
