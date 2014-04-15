@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import time
 import xbmc
 
 from default import Cleaner
@@ -11,16 +10,16 @@ from utils import debug
 
 def autostart():
     """
-    Starts the cleaning service based on the user's settings.
+    Starts the cleaning service.
     """
-    if get_setting(service_enabled):  # TODO: Make this into a while to account for enabling of service
-        cleaner = Cleaner()
+    cleaner = Cleaner()
 
-        service_sleep = 10
-        ticker = 0
-        delayed_completed = False
+    service_sleep = 10
+    ticker = 0
+    delayed_completed = False
 
-        while not xbmc.abortRequested:
+    while not xbmc.abortRequested:
+        if get_setting(service_enabled):
             scan_interval_ticker = get_setting(scan_interval) * 60 / service_sleep
             delayed_start_ticker = get_setting(delayed_start) * 60 / service_sleep
 
@@ -32,12 +31,13 @@ def autostart():
                 cleaner.cleanup()
                 ticker = 0
 
-            time.sleep(service_sleep)
+            xbmc.sleep(service_sleep * 1000)
             ticker += 1
+        else:
+            xbmc.sleep(service_sleep * 1000)
 
-        debug("Abort requested. Terminating.")
-    else:
-        debug("Service not enabled.")
+    debug("Abort requested. Terminating.")
+    return
 
 
 if __name__ == "__main__":

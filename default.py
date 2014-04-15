@@ -30,7 +30,7 @@ class Cleaner(object):
     through the cleanup method.
     """
 
-    # Constants to ensure correct JSON-RPC requests for XBMC
+    # Constants to ensure correct (Frodo-compatible) JSON-RPC requests for XBMC
     MOVIES = "movies"
     MUSIC_VIDEOS = "musicvideos"
     TVSHOWS = "episodes"
@@ -82,7 +82,7 @@ class Cleaner(object):
         """
         debug("Starting cleaning routine.")
         if get_setting(delete_when_idle) and xbmc.Player().isPlayingVideo():
-            debug("A video is currently playing. No cleaning will be performed this interval.", xbmc.LOGWARNING)
+            debug("A video is currently playing. Skipping cleaning.", xbmc.LOGWARNING)
             return
 
         if not get_setting(delete_when_low_disk_space) or (get_setting(delete_when_low_disk_space)
@@ -90,7 +90,6 @@ class Cleaner(object):
             # create stub to summarize cleaning results
             summary = "Deleted" if get_setting(delete_files) else "Moved"
             cleaned_files = []
-            cleaning_required = False
             if get_setting(delete_movies):
                 movies = self.get_expired_videos(self.MOVIES)
                 if movies:
@@ -121,7 +120,7 @@ class Cleaner(object):
                                     self.clean_related_files(abs_path)
                                     self.delete_empty_folders(abs_path)
                         else:
-                            debug("XBMC could not find the file at %r" % abs_path, xbmc.LOGWARNING)
+                            debug("XBMC could not find %r" % abs_path, xbmc.LOGWARNING)
                     if count > 0:
                         summary += " %d %s" % (count, self.MOVIES)
 
@@ -149,7 +148,7 @@ class Cleaner(object):
                                     self.clean_related_files(abs_path)
                                     self.delete_empty_folders(abs_path)
                         else:
-                            debug("XBMC could not find the file at %r" % abs_path, xbmc.LOGWARNING)
+                            debug("XBMC could not find %r" % abs_path, xbmc.LOGWARNING)
                     if count > 0:
                         summary += " %d %s" % (count, self.TVSHOWS)
 
@@ -159,7 +158,6 @@ class Cleaner(object):
                     count = 0
                     for abs_path, artists in musicvideos:
                         if xbmcvfs.exists(abs_path):
-                            cleaning_required = True
                             if not get_setting(delete_files):
                                 if get_setting(create_subdirs):
                                     artist = ", ".join(str(a) for a in artists)
@@ -178,7 +176,7 @@ class Cleaner(object):
                                     self.clean_related_files(abs_path)
                                     self.delete_empty_folders(os.path.dirname(abs_path))
                         else:
-                            debug("XBMC could not find the file at %r" % abs_path, xbmc.LOGWARNING)
+                            debug("XBMC could not find %r" % abs_path, xbmc.LOGWARNING)
                     if count > 0:
                         summary += " %d %s" % (count, self.MUSIC_VIDEOS)
 
@@ -188,11 +186,9 @@ class Cleaner(object):
                 notify(summary)
 
             # Finally clean the library to account for any deleted videos.
-            if get_setting(clean_xbmc_library) and cleaning_required:
-                # Wait 10 seconds for deletions to finish before cleaning.
+            if get_setting(clean_xbmc_library) and cleaned_files:
                 time.sleep(10)
 
-                # Check if the library is being updated before cleaning up
                 if xbmc.getCondVisibility("Library.IsScanningVideo"):
                     debug("The video library is being updated. Skipping library cleanup.", xbmc.LOGWARNING)
                 else:
