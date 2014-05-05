@@ -68,7 +68,6 @@
             <onright>301</onright>
         </control>
         <control type="button" id="301">
-            <id>301</id>
             <description>Trim Button</description>
             <posx>320</posx>
             <posy>65r</posy>
@@ -85,7 +84,6 @@
             <ondown>203</ondown>
         </control>
         <control type="button" id="302">
-            <id>302</id>
             <description>Clear Button</description>
             <posx>580r</posx>
             <posy>65r</posy>
@@ -99,6 +97,16 @@
             <onleft>301</onleft>
             <onup>203</onup>
             <ondown>203</ondown>
+        </control>
+        <control type="button" id="303">
+            <description>Close Window Button</description>
+            <posx>1190</posx>
+            <posy>10</posy>
+            <width>64</width>
+            <height>32</height>
+            <visible>System.GetBool(input.enablemouse)</visible>
+            <texturenofocus border="5">DialogCloseButton.png</texturenofocus>
+            <texturefocus border="5">DialogCloseButton-focus.png</texturefocus>
         </control>
     </controls>
 </window>

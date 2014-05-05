@@ -19,6 +19,7 @@ class LogViewerDialog(xbmcgui.WindowXMLDialog):
     TEXTBOXID = 202
     TRIMBUTTONID = 301
     CLEARBUTTONID = 302
+    CLOSEBUTTONID = 303
 
     def __init__(self, xml_filename, script_path, default_skin="Default", default_res="720p", *args, **kwargs):
         self.log = utils.Log()
@@ -36,6 +37,8 @@ class LogViewerDialog(xbmcgui.WindowXMLDialog):
         elif control_id == self.CLEARBUTTONID:
             if xbmcgui.Dialog().yesno(utils.translate(32604), utils.translate(32606), utils.translate(32607)):
                 self.getControl(self.TEXTBOXID).setText(self.log.clear())
+        elif control_id == self.CLOSEBUTTONID:
+            self.close()
         else:
             utils.debug("Unknown button pressed", xbmc.LOGERROR)
 
