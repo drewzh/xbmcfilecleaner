@@ -1,7 +1,7 @@
 # XBMC Media Center language file
 # Addon Name: XBMC File Cleaner
 # Addon id: script.filecleaner
-# Addon version: 3.2.1
+# Addon version: 4.0.0
 # Addon Provider: Anthirian, drewzh
 msgid ""
 msgstr ""
@@ -22,103 +22,120 @@ msgid "Regularly deletes old movies, TV show episodes and music videos"
 msgstr "Verwijdert regelmatig oude films, afleveringen van TV-series en videoclips"
 
 msgctxt "Addon Description"
-msgid "[B][I]READ BEFORE PROCEEDING[/I][/B]\nThis addon has the potential to wipe your entire video collection! Please make sure you understand exactly what this addon is designed to do before enabling cleaning in the settings. I will not be held responsible for loss of data due to user error.\n\n[B][I]DESCRIPTION[/I][/B]\nThis addon will automatically scan your library for watched movies, TV show episodes and music videos, and delete them from the file system based on numerous critia such as age, rating, free disk space, etc. All these options and more can be configured via the addon's settings. Also make sure you set the correct path to the disk you wish to check for free space, especially when you store your videos on a secondary drive or a network share.\n\nOriginal developer: drewzh (xbmcfilecleaner@drewzh.com)\n        "
-msgstr "[B][I]LEES DIT VOOR JE VERDER GAAT[/I][/B]\nDeze addon kan in een keer je hele videocollectie verwijderen! Zorg dat je precies weet wat deze addon doet voor je het opschonen activeert in de opties. Ik ben niet verantwoordelijk voor verlies van gegevens door handelen van de gebruiker.\n\n[B][I]BESCHRIJVING[/I][/B]\nDeze addon zal automatisch de videobibliotheek scannen op zoek naar bekeken films, afleveringen van TV-series en videoclips, en deze van de harde schijf verwijderen met inachtneming van verscheidene criteria, zoals leeftijd, cijfer, vrije harde schijfruimte, etc. Al deze opties, en andere, zijn in te stellen via het optiesmenu van de addon. Let er daarbij ook op dat je het juiste pad instelt naar de schijf die je wil gebruiken voor het controleren van de vrije schijfruimte, met name als je videocollectie op een andere harde schijf staat of op een netwerkshare.\n\nOorspronkelijke ontwikkelaar: drewzh (xbmcfilecleaner@drewzh.com)\n        "
+msgid "This addon will automatically scan your library for watched movies, TV show episodes and music videos, and delete them from the file system based on numerous critia such as age, rating, free disk space, etc. All these options and more can be configured via the addon's settings. Also make sure you set the correct path to the disk you wish to check for free space, especially when you store your videos on a secondary drive or a network share. Through the settings you can view which videos have been cleaned.\n\nBeware!\nThis addon has the potential to erase your entire video collection! Please make sure you understand exactly what this addon is designed to do before enabling any type of cleaning in the settings. I will not be held responsible for loss of data due to user error.\n\nOriginally developed by Andrew 'drewzh' Higginson (xbmcfilecleaner@drewzh.com)"
+msgstr "Deze addon zal automatisch de videobibliotheek scannen op zoek naar bekeken films, afleveringen van TV-series en videoclips, en deze van de harde schijf verwijderen en daarbij letten op verscheidene criteria, zoals leeftijd, cijfer, vrije harde schijfruimte, etc. Al deze opties, en andere, zijn in te stellen via het optiesmenu van de addon. Let er daarbij ook op dat je het juiste pad instelt naar de schijf die je wil gebruiken voor het controleren van de vrije schijfruimte, met name als je videocollectie op een andere harde schijf staat of op een netwerkshare. Via de instellingen kun je tevens bekijken welke video's er opgeschoond zijn.\n\nWaarschuwing!\nDeze addon kan in een keer je hele videocollectie verwijderen! Zorg dat je precies weet wat deze addon doet voor je voor een type video's het opschonen activeert in de opties. Ik ben niet verantwoordelijk voor verlies van gegevens door handelen van de gebruiker.\n\nOorspronkelijk ontwikkeld door Andrew 'drewzh' Higginson (xbmcfilecleaner@drewzh.com)"
 
 msgctxt "Addon Disclaimer"
 msgid "It is recommended to not delete videos permanently until you are familiar with all of the settings."
 msgstr "Het is verstandig om videos pas permanent te verwijderen als je bekend bent met alle instellingen."
 
+
+# Actiestabblad
+# =======================
 msgctxt "#32100"
 msgid "Actions"
 msgstr "Acties"
 
 msgctxt "#32101"
-msgid "[B]Which videos do you want to delete?[/B]"
+msgid "[B]Which videos do you want to clean?[/B]"
 msgstr "[B]Welke video's wil je opschonen?[/B]"
 
 msgctxt "#32102"
-msgid "[B]Enable File Cleaner[/B]"
-msgstr "[B]Activeer File Cleaner[/B]"
+msgid "Cleaning type"
+msgstr "Schoonmaaktype"
 
 msgctxt "#32103"
-msgid "Delete videos [I]permanently [/I]"
-msgstr "Verwijder video's [I]permanent [/I]"
+msgid "Move elsewhere"
+msgstr "Verplaats naar elders"
 
 msgctxt "#32104"
+msgid "Delete permanently"
+msgstr "Verwijder permanent"
+
+msgctxt "#32105"
 msgid "[I]Please specify where to store watched videos [/I]"
 msgstr "[I]Selecteer een map waar bekeken video's bewaard worden[/I]"
 
-msgctxt "#32105"
+msgctxt "#32106"
 msgid "Holding folder location"
 msgstr "Locatie bewaarmap"
 
-msgctxt "#32106"
+msgctxt "#32107"
 msgid "Create subdirectories (i.e. [B]../Artist[/B], [B]../Movie (Year)[/B] and [B]../Show/Season xx[/B])"
 msgstr "Maak submappen aan (bv. [B]../Artiest[/B], [B]../Film (Jaar)[/B] en [B]../Serie/Seizoen xx[/B])"
 
-msgctxt "#32107"
-msgid "Delete movies"
+msgctxt "#32108"
+msgid "Clean movies"
 msgstr "Schoon films op"
 
-msgctxt "#32108"
-msgid "Delete TV shows"
+msgctxt "#32109"
+msgid "Clean TV shows"
 msgstr "Schoon TV series op"
 
-msgctxt "#32109"
-msgid "Delete music videos"
+msgctxt "#32110"
+msgid "Clean music videos"
 msgstr "Schoon videoclips op"
 
-msgctxt "#32110"
+msgctxt "#32111"
 msgid "Clean XBMC video library afterwards"
 msgstr "XBMC videobibliotheek opschonen na afloop"
 
-msgctxt "#32111"
+msgctxt "#32112"
 msgid "Also delete empty folders"
 msgstr "Verwijder tevens lege mappen"
 
-msgctxt "#32112"
+msgctxt "#32113"
 msgid "Ignore files with the following extensions (separate with commas)"
 msgstr "Negeer bestanden met de volgende extensies (scheiden met komma's)"
 
-msgctxt "#32113"
-msgid "Also delete related files with similar names (e.g. subtitles)"
+msgctxt "#32114"
+msgid "Also clean related files with similar names (e.g. subtitles)"
 msgstr "Schoon tevens bestanden op met vergelijkbare namen (bv. ondertitels)"
 
+
+# Frequentietabblad
+# =======================
 msgctxt "#32200"
 msgid "Frequency"
 msgstr "Frequentie"
 
 msgctxt "#32201"
-msgid "[B]When should watched videos be deleted?[/B]"
+msgid "[B]When should watched videos be cleaned?[/B]"
 msgstr "[B]Wanneer moeten bekeken videos opgeschoond worden?[/B]"
 
 msgctxt "#32202"
+msgid "Run as a service"
+msgstr "Draai als service"
+
+msgctxt "#32203"
 msgid "Delayed start (in minutes)"
 msgstr "Wachttijd bij opstarten (in minuten)"
 
-msgctxt "#32203"
+msgctxt "#32204"
 msgid "Scan interval (in minutes)"
 msgstr "Scan-interval (in minuten)"
 
-msgctxt "#32204"
+msgctxt "#32205"
 msgid "Do not clean during video playback"
 msgstr "Schoon niet op als er een video afgespeeld wordt"
 
-msgctxt "#32205"
+msgctxt "#32206"
 msgid "Start cleaning right after playback stops"
 msgstr "Start opschonen zodra afspelen stopt"
 
+
+# Voorwaardentabblad
+# =======================
 msgctxt "#32300"
 msgid "Conditions"
 msgstr "Voorwaarden"
 
 msgctxt "#32301"
-msgid "[B]Which conditions must be met before a watched video is deleted?[/B]"
-msgstr "[B]Aan welke voorwaarden moet een bekeken video voldoen voor hij verwijderd wordt?[/B]"
+msgid "[B]Which conditions must be met before a watched video is cleaned?[/B]"
+msgstr "[B]Aan welke voorwaarden moet een bekeken video voldoen voor hij opgeschoond wordt?[/B]"
 
 msgctxt "#32302"
-msgid "Wait a certain number of days after watching before deleting"
+msgid "Wait a certain number of days after watching before cleaning"
 msgstr "Schoon video's pas een aantal dagen na bekijken op"
 
 msgctxt "#32303"
@@ -126,7 +143,7 @@ msgid "Days after which a video is considerd to have expired"
 msgstr "Aantal dagen waarna een bestand als verlopen wordt beschouwd"
 
 msgctxt "#32304"
-msgid "Only delete videos with low ratings"
+msgid "Only clean videos with low ratings"
 msgstr "Schoon alleen video's op met een laag cijfer"
 
 msgctxt "#32305"
@@ -134,7 +151,7 @@ msgid "[I]Note that music videos do not have ratings and ignore these settings [
 msgstr "[I]Let op: videoclips hebben geen cijfers en negeren deze instellingen [/I]"
 
 msgctxt "#32306"
-msgid "Delete a video with a rating lower than"
+msgid "Clean a video with a rating lower than"
 msgstr "Schoon video's op met een cijfer lager dan"
 
 msgctxt "#32307"
@@ -142,7 +159,7 @@ msgid "Ignore videos without rating"
 msgstr "Negeer video's zonder cijfer"
 
 msgctxt "#32308"
-msgid "Only delete videos if low on disk space"
+msgid "Only clean videos if low on disk space"
 msgstr "Schoon video's pas op bij te weinig vrije schrijfruimte"
 
 msgctxt "#32309"
@@ -154,13 +171,16 @@ msgid "Path to check for free disk space"
 msgstr "Locatie om te controleren op vrije schijfruimte"
 
 msgctxt "#32311"
-msgid "Do not delete videos that are still in progress"
+msgid "Do not clean videos that are still in progress"
 msgstr "Schoon geen video's op die halverwege gestopt zijn"
 
 msgctxt "#32312"
 msgid "[I]Note that music videos cannot be partially played and will ignore this [/I]"
 msgstr "[I]Videoclips onthouden niet tot hoever ze afgespeeld zijn en negeren dit [/I]"
 
+
+# Uitzonderingentabblad
+# =======================
 msgctxt "#32400"
 msgid "Exclusions"
 msgstr "Uitzonderingen"
@@ -181,6 +201,9 @@ msgctxt "#32404"
 msgid "Path to exclude"
 msgstr "Locatie van uitzondering"
 
+
+# Meldingentabblad
+# =======================
 msgctxt "#32500"
 msgid "Notifications"
 msgstr "Meldingen"
@@ -213,6 +236,50 @@ msgctxt "#32513"
 msgid "Could not check disk space. Path does not exist."
 msgstr "Schijfruimte kon niet worden gecontroleerd. Het opgegeven pad bestaat niet."
 
+msgctxt "#32514"
+msgid "Cleaning results"
+msgstr "Schoonmaakresultaten"
+
+msgctxt "#32515"
+msgid "movie(s)"
+msgstr "film(s)"
+
+msgctxt "#32516"
+msgid "episode(s)"
+msgstr "aflevering(en)"
+
+msgctxt "#32517"
+msgid "music video(s)"
+msgstr "videoclip(s)"
+
+#Laatste deel van schoonmaakresultaten. Verwijder niet de eerste spatie!
+msgctxt "#32518"
+msgid " were cleaned"
+msgstr " zijn opgeschoond"
+
+msgctxt "#32519"
+msgid "Would you like to view the cleaning log?"
+msgstr "Wil je de schoonmaakgeschiedenis bekijken?"
+
+msgctxt "#32520"
+msgid "No cleaning required"
+msgstr "Schoonmaken is niet nodig"
+
+msgctxt "#32521"
+msgid "The destination folder is not set up."
+msgstr "De doelmap is niet ingesteld."
+
+msgctxt "#32522"
+msgid "You must first select a holding folder."
+msgstr "Je moet eerst een bewaarmap kiezen."
+
+msgctxt "#32523"
+msgid "Would you like to do this now?"
+msgstr "Wil je dit nu doen?"
+
+
+# Logtabblad
+# =======================
 msgctxt "#32600"
 msgid "History"
 msgstr "Geschiedenis"
@@ -227,7 +294,7 @@ msgstr "Bekijk schoonmaakgeschiedenis"
 
 msgctxt "#32603"
 msgid "[B]Cleaning Log[/B]"
-msgstr "[B]Schoonmaakgeschiedenis[/B]"
+msgstr "[B]Schoonmaaklogboek[/B]"
 
 msgctxt "#32604"
 msgid "Are you sure?"

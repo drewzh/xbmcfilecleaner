@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import os
-import time
 import re
 import json
 from ctypes import *
 
 import xbmc
 import xbmcaddon
+import xbmcgui
 import xbmcvfs
 from settings import *
 from utils import *
@@ -24,17 +24,23 @@ __icon__ = xbmc.translatePath(__addon__.getAddonInfo("icon")).decode("utf-8")
 
 class Cleaner(object):
     """
-    The Cleaner class is used in XBMC to identify and delete videos that have been watched by the user. It starts with
-    XBMC and runs until XBMC shuts down. Identification of watched videos can be enhanced with additional criteria,
-    such as recently watched, low rated and based on free disk space. Deleting of videos can be enabled for movies,
-    music videos or tv shows, or any combination of these. Almost all of the methods in this class will be called
-    through the cleanup method.
+    The Cleaner class allows users to clean up their movie, TV show and music video collection by removing watched
+    items. The user can apply a number of conditions to cleaning, such as limiting cleaning to files with a given
+    rating, excluding a particular folder or only cleaning when a particular disk is low on disk space.
+
+    The main method to call is the ``cleanup()`` method. This method will invoke the subsequent checks and (re)move
+    your videos. Upon completion, you will receive a short summary of the cleaning results.
+
+    *Example*
+      ``summary = Cleaner().cleanup()``
     """
 
-    # Constants to ensure correct JSON-RPC requests for XBMC
+    # Constants to ensure correct (Frodo-compatible) JSON-RPC requests for XBMC
     MOVIES = "movies"
     MUSIC_VIDEOS = "musicvideos"
     TVSHOWS = "episodes"
+    CLEANING_TYPE_MOVE = "0"
+    CLEANING_TYPE_DELETE = "1"
 
     movie_filter_fields = ["title", "plot", "plotoutline", "tagline", "votes", "rating", "time", "writers",
                            "playcount", "lastplayed", "inprogress", "genre", "country", "year", "director",
@@ -69,57 +75,44 @@ class Cleaner(object):
     stacking_indicators = ["part", "pt", "cd", "dvd", "disk", "disc"]
 
     def __init__(self):
-        """Create a Cleaner object that performs regular cleaning of watched videos."""
-
-        service_sleep = 10
-        ticker = 0
-        delayed_completed = False
-
-        while not xbmc.abortRequested:
-            scan_interval_ticker = get_setting(scan_interval) * 60 / service_sleep
-            delayed_start_ticker = get_setting(delayed_start) * 60 / service_sleep
-
-            if not get_setting(cleaner_enabled):
-                continue
-            else:
-                if delayed_completed and ticker >= scan_interval_ticker:
-                    self.cleanup()
-                    ticker = 0
-                elif not delayed_completed and ticker >= delayed_start_ticker:
-                    delayed_completed = True
-                    self.cleanup()
-                    ticker = 0
-
-                time.sleep(service_sleep)
-                ticker += 1
-
-        debug("Abort requested. Terminating.")
+        debug("%s version %s loaded." % (__addon__.getAddonInfo("name").decode("utf-8"),
+                                         __addon__.getAddonInfo("version").decode("utf-8")))
 
     def cleanup(self):
         """
-        Delete any watched videos from the XBMC video database.
+        Delete watched videos from the XBMC video database.
 
         The videos to be deleted are subject to a number of criteria as can be specified in the addon's settings.
+        :rtype: str
+        :return: A comma separated summary of the cleaning results.
         """
-        debug("Starting cleaning routine")
-        if get_setting(delete_when_idle) and xbmc.Player().isPlayingVideo():
-            debug("A video is currently playing. No cleaning will be performed this interval.", xbmc.LOGWARNING)
-            return
+        debug("Starting cleaning routine.")
+        return_code = 0
 
-        if not get_setting(delete_when_low_disk_space) or (get_setting(delete_when_low_disk_space)
-                                                           and self.disk_space_low()):
-            # create stub to summarize cleaning results
-            summary = "Deleted" if get_setting(delete_files) else "Moved"
+        if get_setting(clean_when_idle) and xbmc.Player().isPlayingVideo():
+            debug("A video is currently playing. Skipping cleaning.", xbmc.LOGWARNING)
+            return None, return_code
+
+        if not get_setting(clean_when_low_disk_space) or (get_setting(clean_when_low_disk_space)
+                                                          and self.disk_space_low()):
+            summary = dict()
             cleaned_files = []
-            cleaning_required = False
-            if get_setting(delete_movies):
+            if get_setting(clean_movies):
                 movies = self.get_expired_videos(self.MOVIES)
                 if movies:
                     count = 0
                     for abs_path, title, year in movies:
                         unstacked_path = self.unstack(abs_path)
                         if xbmcvfs.exists(unstacked_path[0]):
-                            if not get_setting(delete_files):
+                            if get_setting(cleaning_type) == self.CLEANING_TYPE_MOVE:
+                                if get_setting(holding_folder) == "":
+                                    # No destination set, prompt user to set one now
+                                    if xbmcgui.Dialog().yesno(__title__, translate(32521), translate(32522),
+                                                              translate(32523)):
+                                        xbmc.executebuiltin("Addon.OpenSettings(%s)" % __addonID__)
+                                    # Set return code to 1 to indicate failure
+                                    return_code = 1
+                                    return None, return_code
                                 if get_setting(create_subdirs):
                                     new_path = os.path.join(get_setting(holding_folder), "%s (%d)" % (title, year))
                                 else:
@@ -132,7 +125,7 @@ class Cleaner(object):
                                         cleaned_files.append(abs_path)
                                     self.clean_related_files(abs_path, new_path)
                                     self.delete_empty_folders(abs_path)
-                            else:
+                            elif get_setting(cleaning_type) == self.CLEANING_TYPE_DELETE:
                                 if self.delete_file(abs_path):
                                     count += 1
                                     if len(unstacked_path) > 1:
@@ -141,18 +134,30 @@ class Cleaner(object):
                                         cleaned_files.append(abs_path)
                                     self.clean_related_files(abs_path)
                                     self.delete_empty_folders(abs_path)
+                            else:
+                                debug("Unable to figure out what to do with expired videos. Aborting.", xbmc.LOGERROR)
+                                return_code = 1
+                                return None, return_code
                         else:
-                            debug("XBMC could not find the file at %r" % abs_path, xbmc.LOGWARNING)
+                            debug("XBMC could not find %r" % abs_path, xbmc.LOGWARNING)
                     if count > 0:
-                        summary += " %d %s" % (count, self.MOVIES)
+                        summary[self.MOVIES] = count
 
-            if get_setting(delete_tv_shows):
+            if get_setting(clean_tv_shows):
                 episodes = self.get_expired_videos(self.TVSHOWS)
                 if episodes:
                     count = 0
                     for abs_path, show_name, season_number in episodes:
                         if xbmcvfs.exists(abs_path):
-                            if not get_setting(delete_files):
+                            if get_setting(cleaning_type) == self.CLEANING_TYPE_MOVE:
+                                if get_setting(holding_folder) == "":
+                                    # No destination set, prompt user to set one now
+                                    if xbmcgui.Dialog().yesno(__title__, translate(32521), translate(32522),
+                                                              translate(32523)):
+                                        xbmc.executebuiltin("Addon.OpenSettings(%s)" % __addonID__)
+                                    # Set return code to 1 to indicate failure
+                                    return_code = 1
+                                    return None, return_code
                                 if get_setting(create_subdirs):
                                     new_path = os.path.join(get_setting(holding_folder), show_name,
                                                             "Season %d" % season_number)
@@ -163,25 +168,36 @@ class Cleaner(object):
                                     cleaned_files.append(abs_path)
                                     self.clean_related_files(abs_path, new_path)
                                     self.delete_empty_folders(abs_path)
-                            else:
+                            elif get_setting(cleaning_type) == self.CLEANING_TYPE_DELETE:
                                 if self.delete_file(abs_path):
                                     count += 1
                                     cleaned_files.append(abs_path)
                                     self.clean_related_files(abs_path)
                                     self.delete_empty_folders(abs_path)
+                            else:
+                                debug("Unable to figure out what to do with expired videos. Aborting.", xbmc.LOGERROR)
+                                return_code = 1
+                                return None, return_code
                         else:
-                            debug("XBMC could not find the file at %r" % abs_path, xbmc.LOGWARNING)
+                            debug("XBMC could not find %r" % abs_path, xbmc.LOGWARNING)
                     if count > 0:
-                        summary += " %d %s" % (count, self.TVSHOWS)
+                        summary[self.TVSHOWS] = count
 
-            if get_setting(delete_music_videos):
+            if get_setting(clean_music_videos):
                 musicvideos = self.get_expired_videos(self.MUSIC_VIDEOS)
                 if musicvideos:
                     count = 0
                     for abs_path, artists in musicvideos:
                         if xbmcvfs.exists(abs_path):
-                            cleaning_required = True
-                            if not get_setting(delete_files):
+                            if get_setting(cleaning_type) == self.CLEANING_TYPE_MOVE:
+                                if get_setting(holding_folder) == "":
+                                    # No destination set, prompt user to set one now
+                                    if xbmcgui.Dialog().yesno(__title__, translate(32521), translate(32522),
+                                                              translate(32523)):
+                                        xbmc.executebuiltin("Addon.OpenSettings(%s)" % __addonID__)
+                                    # Set return code to 1 to indicate failure
+                                    return_code = 1
+                                    return None, return_code
                                 if get_setting(create_subdirs):
                                     artist = ", ".join(str(a) for a in artists)
                                     new_path = os.path.join(get_setting(holding_folder), artist)
@@ -191,33 +207,65 @@ class Cleaner(object):
                                     count += 1
                                     cleaned_files.append(abs_path)
                                     self.clean_related_files(abs_path, new_path)
-                                    self.delete_empty_folders(os.path.dirname(abs_path))
-                            else:
+                                    self.delete_empty_folders(abs_path)
+                            elif get_setting(cleaning_type) == self.CLEANING_TYPE_DELETE:
                                 if self.delete_file(abs_path):
                                     count += 1
                                     cleaned_files.append(abs_path)
                                     self.clean_related_files(abs_path)
-                                    self.delete_empty_folders(os.path.dirname(abs_path))
+                                    self.delete_empty_folders(abs_path)
+                            else:
+                                debug("Unable to figure out what to do with expired videos. Aborting.", xbmc.LOGERROR)
+                                return_code = 1
+                                return None, return_code
                         else:
-                            debug("XBMC could not find the file at %r" % abs_path, xbmc.LOGWARNING)
+                            debug("XBMC could not find %r" % abs_path, xbmc.LOGWARNING)
                     if count > 0:
-                        summary += " %d %s" % (count, self.MUSIC_VIDEOS)
+                        summary[self.MUSIC_VIDEOS] = count
 
             # Give a status report if any deletes occurred
             if cleaned_files:
                 Log().prepend(cleaned_files)
-                notify(summary)
 
             # Finally clean the library to account for any deleted videos.
-            if get_setting(clean_xbmc_library) and cleaning_required:
-                # Wait 10 seconds for deletions to finish before cleaning.
-                time.sleep(10)
+            if get_setting(clean_xbmc_library) and cleaned_files:
+                xbmc.sleep(5000)  # Sleep 5 seconds until file I/O is done.
 
-                # Check if the library is being updated before cleaning up
                 if xbmc.getCondVisibility("Library.IsScanningVideo"):
                     debug("The video library is being updated. Skipping library cleanup.", xbmc.LOGWARNING)
                 else:
                     xbmc.executebuiltin("XBMC.CleanLibrary(video)")
+
+            return self.summarize(summary), return_code
+
+    def summarize(self, details):
+        """
+        Create a summary from the cleaning results.
+
+        :type details: dict
+        :rtype: str
+        :return: A comma separated summary of the cleaning results.
+        """
+        summary = ""
+
+        # Localize video types
+        for vid_type, amount in details.items():
+            if vid_type is self.MOVIES:
+                video_type = utils.translate(32515)
+            elif vid_type is self.TVSHOWS:
+                video_type = utils.translate(32516)
+            elif vid_type is self.MUSIC_VIDEOS:
+                video_type = utils.translate(32517)
+            else:
+                video_type = ""
+
+            summary += "%d %s, " % (amount, video_type)
+
+        # strip the comma and space from the last iteration and add the localized suffix
+        if summary:
+            return "%s%s" % (summary.rstrip(", "), utils.translate(32518))
+        else:
+            return ""
 
     def get_expired_videos(self, option):
         """
@@ -246,12 +294,12 @@ class Cleaner(object):
         # link settings and filters together
         settings_and_filters = [
             (get_setting(enable_expiration), by_date_played),
-            (get_setting(delete_when_low_rated), by_minimum_rating),
+            (get_setting(clean_when_low_rated), by_minimum_rating),
             (get_setting(not_in_progress), by_progress)
         ]
 
         # Only check not rated videos if checking for video ratings at all
-        if get_setting(delete_when_low_rated):
+        if get_setting(clean_when_low_rated):
             settings_and_filters.append((get_setting(ignore_no_rating), by_no_rating))
 
         enabled_filters = [by_playcount]
@@ -600,7 +648,7 @@ class Cleaner(object):
         :type dest_folder: str
         :param dest_folder: (Optional) The folder where related files should be moved to. Not needed when deleting.
         """
-        if settings.get_setting(delete_related):
+        if settings.get_setting(clean_related):
             debug("Cleaning related files.")
 
             path_list = self.unstack(source)
@@ -612,6 +660,10 @@ class Cleaner(object):
 
             debug("Attempting to match related files in %r with prefix %r" % (path, name))
             for extra_file in xbmcvfs.listdir(path)[1]:
+                if isinstance(extra_file, unicode):
+                    # TODO: Possible fix for UnicodeDecodeError: ordinal not in range(128). Needs testing.
+                    # TODO: Not sure if extra_file causes the issue or name does.
+                    extra_file = extra_file.encode("utf-8")
                 if extra_file.startswith(name):
                     debug("%r starts with %r." % (extra_file, name))
                     extra_file_path = os.path.join(path, extra_file)
@@ -687,5 +739,16 @@ class Cleaner(object):
 
         return any(success)
 
+if __name__ == "__main__":
+    cleaner = Cleaner()
+    results, exit_status = cleaner.cleanup()
+    if results:
+        # Videos were cleaned. Ask the user to view the log file.
+        if xbmcgui.Dialog().yesno(utils.translate(32514), results, utils.translate(32519)):
+            xbmc.executescript("special://home/addons/script.filecleaner/viewer.py")
+    elif exit_status == 0:
+        # Everything went well, but no videos needed cleaning. Show a notification.
+        notify(utils.translate(32520))
+    else:
+        debug("Cleaning finished with exit status %d" % exit_status, xbmc.LOGERROR)
 
-run = Cleaner()

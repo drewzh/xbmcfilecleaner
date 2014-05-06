@@ -1,7 +1,7 @@
 # XBMC Media Center language file
 # Addon Name: XBMC File Cleaner
 # Addon id: script.filecleaner
-# Addon version: 3.2.1
+# Addon version: 4.0.0
 # Addon Provider: Anthirian, drewzh
 msgid ""
 msgstr ""
@@ -22,111 +22,121 @@ msgid "Regularly deletes old movies, TV show episodes and music videos"
 msgstr ""
 
 msgctxt "Addon Description"
-msgid "[B][I]READ BEFORE PROCEEDING[/I][/B]\nThis addon has the potential to wipe your entire video collection! Please make sure you understand exactly what this addon is designed to do before enabling cleaning in the settings. I will not be held responsible for loss of data due to user error.\n\n[B][I]DESCRIPTION[/I][/B]\nThis addon will automatically scan your library for watched movies, TV show episodes and music videos, and delete them from the file system based on numerous critia such as age, rating, free disk space, etc. All these options and more can be configured via the addon's settings. Also make sure you set the correct path to the disk you wish to check for free space, especially when you store your videos on a secondary drive or a network share.\n\nOriginal developer: drewzh (xbmcfilecleaner@drewzh.com)\n        "
+msgid "This addon will automatically scan your library for watched movies, TV show episodes and music videos, and delete them from the file system based on numerous critia such as age, rating, free disk space, etc. All these options and more can be configured via the addon's settings. Also make sure you set the correct path to the disk you wish to check for free space, especially when you store your videos on a secondary drive or a network share. Through the settings you can view which videos have been cleaned.\n\nBeware!\nThis addon has the potential to erase your entire video collection! Please make sure you understand exactly what this addon is designed to do before enabling any type of cleaning in the settings. I will not be held responsible for loss of data due to user error.\n\nOriginally developed by Andrew 'drewzh' Higginson (xbmcfilecleaner@drewzh.com)"
 msgstr ""
 
 msgctxt "Addon Disclaimer"
 msgid "It is recommended to not delete videos permanently until you are familiar with all of the settings."
 msgstr ""
 
-#Options Sections
 
+# Actions section
+# =======================
 msgctxt "#32100"
 msgid "Actions"
 msgstr ""
 
 msgctxt "#32101"
-msgid "[B]Which videos do you want to delete?[/B]"
+msgid "[B]Which videos do you want to clean?[/B]"
 msgstr ""
 
 msgctxt "#32102"
-msgid "[B]Enable File Cleaner[/B]"
+msgid "Cleaning type"
 msgstr ""
 
 msgctxt "#32103"
-msgid "Delete videos [I]permanently [/I]"
+msgid "Move elsewhere"
 msgstr ""
 
 msgctxt "#32104"
-msgid "[I]Please specify where to store watched videos [/I]"
+msgid "Delete permanently"
 msgstr ""
 
 msgctxt "#32105"
-msgid "Holding folder location"
+msgid "[I]Please specify where to store watched videos [/I]"
 msgstr ""
 
 msgctxt "#32106"
-msgid "Create subdirectories (i.e. [B]../Artist[/B], [B]../Movie (Year)[/B] and [B]../Show/Season xx[/B])"
+msgid "Holding folder location"
 msgstr ""
 
 msgctxt "#32107"
-msgid "Delete movies"
+msgid "Create subdirectories (i.e. [B]../Artist[/B], [B]../Movie (Year)[/B] and [B]../Show/Season xx[/B])"
 msgstr ""
 
 msgctxt "#32108"
-msgid "Delete TV shows"
+msgid "Clean movies"
 msgstr ""
 
 msgctxt "#32109"
-msgid "Delete music videos"
+msgid "Clean TV shows"
 msgstr ""
 
 msgctxt "#32110"
-msgid "Clean XBMC video library afterwards"
+msgid "Clean music videos"
 msgstr ""
 
 msgctxt "#32111"
-msgid "Also delete empty folders"
+msgid "Clean XBMC video library afterwards"
 msgstr ""
 
 msgctxt "#32112"
-msgid "Ignore files with the following extensions (separate with commas)"
+msgid "Also delete empty folders"
 msgstr ""
 
 msgctxt "#32113"
-msgid "Also delete related files with similar names (e.g. subtitles)"
+msgid "Ignore files with the following extensions (separate with commas)"
 msgstr ""
 
-#Frequency section
-#empty strings from id 32114 to 32199
+msgctxt "#32114"
+msgid "Also clean related files with similar names (e.g. subtitles)"
+msgstr ""
 
+
+
+# Frequency section
+# =======================
 msgctxt "#32200"
 msgid "Frequency"
 msgstr ""
 
 msgctxt "#32201"
-msgid "[B]When should watched videos be deleted?[/B]"
+msgid "[B]When should watched videos be cleaned?[/B]"
 msgstr ""
 
 msgctxt "#32202"
-msgid "Delayed start (in minutes)"
+msgid "Run as a service"
 msgstr ""
 
 msgctxt "#32203"
-msgid "Scan interval (in minutes)"
+msgid "Delayed start (in minutes)"
 msgstr ""
 
 msgctxt "#32204"
-msgid "Do not clean during video playback"
+msgid "Scan interval (in minutes)"
 msgstr ""
 
 msgctxt "#32205"
+msgid "Do not clean during video playback"
+msgstr ""
+
+msgctxt "#32206"
 msgid "Start cleaning right after playback stops"
 msgstr ""
 
-#Conditions section
-#empty strings from id 32206 to 32299
 
+# Conditions section
+# =======================
 msgctxt "#32300"
 msgid "Conditions"
 msgstr ""
 
 msgctxt "#32301"
-msgid "[B]Which conditions must be met before a watched video is deleted?[/B]"
+msgid "[B]Which conditions must be met before a watched video is cleaned?[/B]"
 msgstr ""
 
 msgctxt "#32302"
-msgid "Wait a certain number of days after watching before deleting"
+msgid "Wait a certain number of days after watching before cleaning"
 msgstr ""
 
 msgctxt "#32303"
@@ -150,7 +160,7 @@ msgid "Ignore videos without rating"
 msgstr ""
 
 msgctxt "#32308"
-msgid "Only delete videos if low on disk space"
+msgid "Only clean videos if low on disk space"
 msgstr ""
 
 msgctxt "#32309"
@@ -162,16 +172,16 @@ msgid "Path to check for free disk space"
 msgstr ""
 
 msgctxt "#32311"
-msgid "Do not delete videos that are still in progress"
+msgid "Do not clean videos that are still in progress"
 msgstr ""
 
 msgctxt "#32312"
 msgid "[I]Note that music videos cannot be partially played and will ignore this [/I]"
 msgstr ""
 
-#Exclusions section
-#empty strings from id 32313 to 32399
 
+# Exclusions section
+# ==================
 msgctxt "#32400"
 msgid "Exclusions"
 msgstr ""
@@ -192,9 +202,8 @@ msgctxt "#32404"
 msgid "Path to exclude"
 msgstr ""
 
-#Notifications section
-#empty strings from id 32405 to 32499
-
+# Notifications section
+# =======================
 msgctxt "#32500"
 msgid "Notifications"
 msgstr ""
@@ -215,9 +224,10 @@ msgctxt "#32504"
 msgid "Enable debug messages"
 msgstr ""
 
-#Localization strings for XBMC notifications
-#empty strings from id 32505 to 32510
 
+# Localization strings
+# for XBMC notifications
+# =======================
 msgctxt "#32511"
 msgid "Error reading hard disk. Please check your settings."
 msgstr ""
@@ -230,14 +240,54 @@ msgctxt "#32513"
 msgid "Could not check disk space. Path does not exist."
 msgstr ""
 
-#Log section
-#empty strings from id 32514 to 32599
+msgctxt "#32514"
+msgid "Cleaning results"
+msgstr ""
+
+msgctxt "#32515"
+msgid "movie(s)"
+msgstr ""
+
+msgctxt "#32516"
+msgid "episode(s)"
+msgstr ""
+
+msgctxt "#32517"
+msgid "music video(s)"
+msgstr ""
+
+#Suffix for cleaning results. Do not remove the single leading whitespace!
+msgctxt "#32518"
+msgid " were cleaned"
+msgstr ""
+
+msgctxt "#32519"
+msgid "Would you like to view the cleaning log?"
+msgstr ""
+
+msgctxt "#32520"
+msgid "No cleaning required"
+msgstr ""
+
+msgctxt "#32521"
+msgid "The destination folder is not set up."
+msgstr ""
+
+msgctxt "#32522"
+msgid "You must first select a holding folder."
+msgstr ""
+
+msgctxt "#32523"
+msgid "Would you like to do this now?"
+msgstr ""
+
+
+# Log section
+# =======================
 
 msgctxt "#32600"
 msgid "History"
 msgstr ""
-
-#Actions section
 
 msgctxt "#32601"
 msgid "[B]See which files have been cleaned recently.[/B]"

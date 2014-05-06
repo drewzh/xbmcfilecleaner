@@ -24,7 +24,7 @@ class LogViewerDialog(xbmcgui.WindowXMLDialog):
     def __init__(self, xml_filename, script_path, default_skin="Default", default_res="720p", *args, **kwargs):
         self.log = utils.Log()
         self.caption = utils.translate(32603)
-        xbmcgui.WindowXMLDialog.__init__(self)
+        xbmcgui.WindowXMLDialog.__init__(self, xml_filename, script_path)
 
     def onInit(self):
         self.getControl(self.CAPTIONID).setLabel(self.caption)
