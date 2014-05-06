@@ -1,7 +1,7 @@
 # XBMC Media Center language file
 # Addon Name: XBMC File Cleaner
 # Addon id: script.filecleaner
-# Addon version: 3.2.1
+# Addon version: 4.0.0
 # Addon Provider: Anthirian, drewzh
 msgid ""
 msgstr ""
@@ -22,7 +22,7 @@ msgid "Regularly deletes old movies, TV show episodes and music videos"
 msgstr ""
 
 msgctxt "Addon Description"
-msgid "[B][I]READ BEFORE PROCEEDING[/I][/B]\nThis addon has the potential to wipe your entire video collection! Please make sure you understand exactly what this addon is designed to do before enabling cleaning in the settings. I will not be held responsible for loss of data due to user error.\n\n[B][I]DESCRIPTION[/I][/B]\nThis addon will automatically scan your library for watched movies, TV show episodes and music videos, and delete them from the file system based on numerous critia such as age, rating, free disk space, etc. All these options and more can be configured via the addon's settings. Also make sure you set the correct path to the disk you wish to check for free space, especially when you store your videos on a secondary drive or a network share.\n\nOriginal developer: drewzh (xbmcfilecleaner@drewzh.com)\n        "
+msgid "This addon will automatically scan your library for watched movies, TV show episodes and music videos, and delete them from the file system based on numerous critia such as age, rating, free disk space, etc. All these options and more can be configured via the addon's settings. Also make sure you set the correct path to the disk you wish to check for free space, especially when you store your videos on a secondary drive or a network share. Through the settings you can view which videos have been cleaned.\n\nBeware!\nThis addon has the potential to erase your entire video collection! Please make sure you understand exactly what this addon is designed to do before enabling any type of cleaning in the settings. I will not be held responsible for loss of data due to user error.\n\nOriginally developed by Andrew 'drewzh' Higginson (xbmcfilecleaner@drewzh.com)"
 msgstr ""
 
 msgctxt "Addon Disclaimer"
@@ -41,46 +41,54 @@ msgid "[B]Which videos do you want to clean?[/B]"
 msgstr ""
 
 msgctxt "#32102"
-msgid "Delete videos [I]permanently [/I]"
+msgid "Cleaning type"
 msgstr ""
 
 msgctxt "#32103"
-msgid "[I]Please specify where to store watched videos [/I]"
+msgid "Move elsewhere"
 msgstr ""
 
 msgctxt "#32104"
-msgid "Holding folder location"
+msgid "Delete permanently"
 msgstr ""
 
 msgctxt "#32105"
-msgid "Create subdirectories (i.e. [B]../Artist[/B], [B]../Movie (Year)[/B] and [B]../Show/Season xx[/B])"
+msgid "[I]Please specify where to store watched videos [/I]"
 msgstr ""
 
 msgctxt "#32106"
-msgid "Clean movies"
+msgid "Holding folder location"
 msgstr ""
 
 msgctxt "#32107"
-msgid "Clean TV shows"
+msgid "Create subdirectories (i.e. [B]../Artist[/B], [B]../Movie (Year)[/B] and [B]../Show/Season xx[/B])"
 msgstr ""
 
 msgctxt "#32108"
-msgid "Clean music videos"
+msgid "Clean movies"
 msgstr ""
 
 msgctxt "#32109"
-msgid "Clean XBMC video library afterwards"
+msgid "Clean TV shows"
 msgstr ""
 
 msgctxt "#32110"
-msgid "Also delete empty folders"
+msgid "Clean music videos"
 msgstr ""
 
 msgctxt "#32111"
-msgid "Ignore files with the following extensions (separate with commas)"
+msgid "Clean XBMC video library afterwards"
 msgstr ""
 
 msgctxt "#32112"
+msgid "Also delete empty folders"
+msgstr ""
+
+msgctxt "#32113"
+msgid "Ignore files with the following extensions (separate with commas)"
+msgstr ""
+
+msgctxt "#32114"
 msgid "Also clean related files with similar names (e.g. subtitles)"
 msgstr ""
 
@@ -248,7 +256,7 @@ msgctxt "#32517"
 msgid "music video(s)"
 msgstr ""
 
-#Suffix for cleaning results. Do not remove the single leading whitespace! The notification system depends on it.
+#Suffix for cleaning results. Do not remove the single leading whitespace!
 msgctxt "#32518"
 msgid " were cleaned"
 msgstr ""
@@ -259,6 +267,18 @@ msgstr ""
 
 msgctxt "#32520"
 msgid "No cleaning required"
+msgstr ""
+
+msgctxt "#32521"
+msgid "The destination folder is not set up."
+msgstr ""
+
+msgctxt "#32522"
+msgid "You must first select a holding folder."
+msgstr ""
+
+msgctxt "#32523"
+msgid "Would you like to do this now?"
 msgstr ""
 
 
