@@ -137,7 +137,7 @@ def get_free_disk_space(path):
     percentage = float(100)
     debug("Checking for disk space on path: %r" % path)
     dirs, files = xbmcvfs.listdir(path)
-    if dirs or files:  # Workaround for xbmcvfs.exists("C:\")
+    if dirs or files:  # Workaround for xbmcvfs.exists("C:\") TODO: No longer needed?
         if xbmc.getCondVisibility("System.Platform.Windows"):
             debug("We are checking disk space from a Windows file system")
             debug("The path to check is %r" % path)
@@ -193,7 +193,9 @@ def get_free_disk_space(path):
                 debug("Bytes free: %r" % diskstats.f_bfree)
                 debug("Bytes total: %r" % diskstats.f_blocks)
             except OSError as ose:
-                notify(translate(32512), 15000, level=xbmc.LOGERROR)
+                # TODO: Linux cannot check remote share disk space yet
+                # notify(translate(32512), 15000, level=xbmc.LOGERROR)
+                notify(translate(32524), 15000, level=xbmc.LOGERROR)
                 debug("Error accessing %r: %r" % (path, ose))
             except ZeroDivisionError:
                 notify(translate(32511), 15000, level=xbmc.LOGERROR)

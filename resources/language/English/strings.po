@@ -281,6 +281,10 @@ msgctxt "#32523"
 msgid "Would you like to do this now?"
 msgstr ""
 
+# Temporary, until Linux remote share disk space checks are supported
+msgctxt "#32524"
+msgid "Remote disk space checking is not supported for your OS yet"
+msgstr ""
 
 # Log section
 # =======================

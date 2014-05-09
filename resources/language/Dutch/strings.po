@@ -277,6 +277,11 @@ msgctxt "#32523"
 msgid "Would you like to do this now?"
 msgstr "Wil je dit nu doen?"
 
+# Tijdelijk, totdat Linux schijfruimtechecks werken
+msgctxt "#32524"
+msgid "Remote disk space checking is not supported for your OS yet"
+msgstr "Schijfruimtecontrole van netwerkschijven is nog niet ondersteund voor dit besturingssysteem"
+
 
 # Logtabblad
 # =======================
