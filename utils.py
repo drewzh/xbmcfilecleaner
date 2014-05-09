@@ -43,7 +43,7 @@ class Log(object):
                 if data:
                     f.write("[B][%s][/B]\n" % time.strftime("%d/%m/%Y\t-\t%H:%M:%S"))
                     for line in data:
-                        f.write("\t-\t%s\n" % line)
+                        f.write("\t-\t%s\n" % line.encode("utf-8"))
                     f.write("\n")
                     debug("New data written to log file.")
                 else:
@@ -152,7 +152,8 @@ def notify(message, duration=5000, image=__icon__, level=xbmc.LOGNOTICE):
     """
     debug(message, level)
     if settings.get_setting(settings.notifications_enabled) and not (settings.get_setting(settings.notify_when_idle) and
-                                                                     xbmc.Player().isPlayingVideo()):
+                                                                     xbmc.Player().isPlaying()):
+        # TODO: Update to new xbmc.Dialog().notification() method
         xbmc.executebuiltin("XBMC.Notification(%s, %s, %s, %s)" % (__title__, message, duration, image))
 
 
