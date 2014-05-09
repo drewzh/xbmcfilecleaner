@@ -46,7 +46,9 @@ class Log(object):
                 if data:
                     f.write("[B][%s][/B]\n" % time.strftime("%d/%m/%Y\t-\t%H:%M:%S"))
                     for line in data:
-                        f.write("\t-\t%s\n" % line.encode("utf-8"))
+                        if isinstance(line, unicode):
+                            line = line.encode("utf-8")
+                        f.write("\t-\t%s\n" % line)
                     f.write("\n")
                     debug("New data written to log file.")
                 else:

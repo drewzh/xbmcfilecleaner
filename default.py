@@ -368,6 +368,8 @@ class Cleaner(object):
         :rtype: list
         :return: A list of paths that are part of the stack. If it is no stacked movie, a one-element list is returned.
         """
+        if isinstance(path, unicode):
+            path = path.encode("utf-8")
         if path.startswith("stack://"):
             debug("Unstacking %r." % path)
             return path.replace("stack://", "").split(" , ")
@@ -510,10 +512,13 @@ class Cleaner(object):
 
             debug("Attempting to match related files in %r with prefix %r" % (path, name))
             for extra_file in xbmcvfs.listdir(path)[1]:
+                if isinstance(path, unicode):
+                    path = path.encode("utf-8")
                 if isinstance(extra_file, unicode):
-                    # TODO: Possible fix for UnicodeDecodeError: ordinal not in range(128). Needs testing.
-                    # TODO: Not sure if extra_file causes the issue or name does.
                     extra_file = extra_file.encode("utf-8")
+                if isinstance(name, unicode):
+                    name = name.encode("utf-8")
+
                 if extra_file.startswith(name):
                     debug("%r starts with %r." % (extra_file, name))
                     extra_file_path = os.path.join(path, extra_file)
