@@ -4,7 +4,6 @@
 import os
 import re
 import json
-from ctypes import *
 
 import xbmc
 import xbmcaddon
@@ -151,7 +150,8 @@ class Cleaner(object):
 
         summary = {}
         cleaning_results, cleaned_files = [], []
-        if not get_setting(clean_when_low_disk_space) or (get_setting(clean_when_low_disk_space) and self.disk_space_low()):
+        if not get_setting(clean_when_low_disk_space) or (get_setting(clean_when_low_disk_space)
+                                                          and utils.disk_space_low()):
             for video_type in [self.MOVIES, self. MUSIC_VIDEOS, self.TVSHOWS]:
                 cleaned_files, count = self.clean(video_type)
                 if count > 0:
@@ -359,93 +359,6 @@ class Cleaner(object):
 
             debug("No match was found with an excluded path.")
             return False
-
-    # TODO: Move to utils
-    def get_free_disk_space(self, path):
-        """Determine the percentage of free disk space.
-
-        :type path: str
-        :param path: The path to the drive to check. This can be any path of any depth on the desired drive.
-        :rtype: float
-        :return: The percentage of free space on the disk; 100% if errors occur.
-        """
-        percentage = float(100)
-        debug("Checking for disk space on path: %r" % path)
-        dirs, files = xbmcvfs.listdir(path)
-        if dirs or files:  # Workaround for xbmcvfs.exists("C:\")
-            if xbmc.getCondVisibility("System.Platform.Windows"):
-                debug("We are checking disk space from a Windows file system")
-                debug("The path to check is %r" % path)
-
-                if r"://" in path:
-                    debug("We are dealing with network paths")
-                    debug("Extracting information from share %r" % path)
-
-                    regex = "(?P<type>smb|nfs|afp)://(?:(?P<user>.+):(?P<pass>.+)@)?(?P<host>.+?)/(?P<share>.+?).*$"
-                    pattern = re.compile(regex, flags=re.I | re.U)
-                    match = pattern.match(path)
-                    try:
-                        share = match.groupdict()
-                        debug("Protocol: %r, User: %r, Password: %r, Host: %r, Share: %r" %
-                              (share["type"], share["user"], share["pass"], share["host"], share["share"]))
-                    except AttributeError as ae:
-                        debug("%r\nCould not extract required data from %r" % (ae, path), xbmc.LOGERROR)
-                        return percentage
-
-                    debug("Creating UNC paths so Windows understands the shares")
-                    path = os.path.normcase(r"\\" + share["host"] + os.sep + share["share"])
-                    debug("UNC path: %r" % path)
-                    debug("If checks fail because you need credentials, please mount the share first")
-                else:
-                    debug("We are dealing with local paths")
-
-                if not isinstance(path, unicode):
-                    debug("Converting path to unicode for disk space checks")
-                    path = path.decode("mbcs")
-                    debug("New path: %r" % path)
-
-                bytes_total = c_ulonglong(0)
-                bytes_free = c_ulonglong(0)
-                windll.kernel32.GetDiskFreeSpaceExW(c_wchar_p(path), byref(bytes_free), byref(bytes_total), None)
-
-                try:
-                    percentage = float(bytes_free.value) / float(bytes_total.value) * 100
-                    debug("Hard disk check results:")
-                    debug("Bytes free: %s" % bytes_free.value)
-                    debug("Bytes total: %s" % bytes_total.value)
-                except ZeroDivisionError:
-                    notify(translate(32511), 15000, level=xbmc.LOGERROR)
-            else:
-                debug("We are checking disk space from a non-Windows file system")
-                debug("Stripping %r of all redundant stuff." % path)
-                path = os.path.normpath(path)
-                debug("The path now is " + path)
-
-                try:
-                    diskstats = os.statvfs(path)
-                    percentage = float(diskstats.f_bfree) / float(diskstats.f_blocks) * 100
-                    debug("Hard disk check results:")
-                    debug("Bytes free: %r" % diskstats.f_bfree)
-                    debug("Bytes total: %r" % diskstats.f_blocks)
-                except OSError as ose:
-                    notify(translate(32512), 15000, level=xbmc.LOGERROR)
-                    debug("Error accessing %r: %r" % (path, ose))
-                except ZeroDivisionError:
-                    notify(translate(32511), 15000, level=xbmc.LOGERROR)
-        else:
-            notify(translate(32513), 15000, level=xbmc.LOGERROR)
-
-        debug("Free space: %0.2f%%" % percentage)
-        return percentage
-
-    # TODO: Move to utils
-    def disk_space_low(self):
-        """Check whether the disk is running low on free space.
-
-        :rtype: bool
-        :return: True if disk space is below threshold (set through addon settings), False otherwise.
-        """
-        return self.get_free_disk_space(get_setting(disk_space_check_path)) <= get_setting(disk_space_threshold)
 
     def unstack(self, path):
         """Unstack path if it is a stacked movie. See http://wiki.xbmc.org/index.php?title=File_stacking for more info.

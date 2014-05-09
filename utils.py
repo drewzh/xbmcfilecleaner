@@ -2,7 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import os
+import re
 import time
+from ctypes import *
+
 import xbmc
 from xbmcaddon import Addon
 import settings  # TODO: No idea why I can't use "from settings import *" here.
@@ -123,6 +126,94 @@ class Log(object):
             return contents
 
 
+def get_free_disk_space(path):
+    """Determine the percentage of free disk space.
+
+    :type path: str
+    :param path: The path to the drive to check. This can be any path of any depth on the desired drive.
+    :rtype: float
+    :return: The percentage of free space on the disk; 100% if errors occur.
+    """
+    percentage = float(100)
+    debug("Checking for disk space on path: %r" % path)
+    dirs, files = xbmcvfs.listdir(path)
+    if dirs or files:  # Workaround for xbmcvfs.exists("C:\")
+        if xbmc.getCondVisibility("System.Platform.Windows"):
+            debug("We are checking disk space from a Windows file system")
+            debug("The path to check is %r" % path)
+
+            if r"://" in path:
+                debug("We are dealing with network paths")
+                debug("Extracting information from share %r" % path)
+
+                regex = "(?P<type>smb|nfs|afp)://(?:(?P<user>.+):(?P<pass>.+)@)?(?P<host>.+?)/(?P<share>.+?).*$"
+                pattern = re.compile(regex, flags=re.I | re.U)
+                match = pattern.match(path)
+                try:
+                    share = match.groupdict()
+                    debug("Protocol: %r, User: %r, Password: %r, Host: %r, Share: %r" %
+                          (share["type"], share["user"], share["pass"], share["host"], share["share"]))
+                except AttributeError as ae:
+                    debug("%r\nCould not extract required data from %r" % (ae, path), xbmc.LOGERROR)
+                    return percentage
+
+                debug("Creating UNC paths so Windows understands the shares")
+                path = os.path.normcase(r"\\" + share["host"] + os.sep + share["share"])
+                debug("UNC path: %r" % path)
+                debug("If checks fail because you need credentials, please mount the share first")
+            else:
+                debug("We are dealing with local paths")
+
+            if not isinstance(path, unicode):
+                debug("Converting path to unicode for disk space checks")
+                path = path.decode("mbcs")
+                debug("New path: %r" % path)
+
+            bytes_total = c_ulonglong(0)
+            bytes_free = c_ulonglong(0)
+            windll.kernel32.GetDiskFreeSpaceExW(c_wchar_p(path), byref(bytes_free), byref(bytes_total), None)
+
+            try:
+                percentage = float(bytes_free.value) / float(bytes_total.value) * 100
+                debug("Hard disk check results:")
+                debug("Bytes free: %s" % bytes_free.value)
+                debug("Bytes total: %s" % bytes_total.value)
+            except ZeroDivisionError:
+                notify(translate(32511), 15000, level=xbmc.LOGERROR)
+        else:
+            debug("We are checking disk space from a non-Windows file system")
+            debug("Stripping %r of all redundant stuff." % path)
+            path = os.path.normpath(path)
+            debug("The path now is " + path)
+
+            try:
+                diskstats = os.statvfs(path)
+                percentage = float(diskstats.f_bfree) / float(diskstats.f_blocks) * 100
+                debug("Hard disk check results:")
+                debug("Bytes free: %r" % diskstats.f_bfree)
+                debug("Bytes total: %r" % diskstats.f_blocks)
+            except OSError as ose:
+                notify(translate(32512), 15000, level=xbmc.LOGERROR)
+                debug("Error accessing %r: %r" % (path, ose))
+            except ZeroDivisionError:
+                notify(translate(32511), 15000, level=xbmc.LOGERROR)
+    else:
+        notify(translate(32513), 15000, level=xbmc.LOGERROR)
+
+    debug("Free space: %0.2f%%" % percentage)
+    return percentage
+
+
+def disk_space_low():
+    """Check whether the disk is running low on free space.
+
+    :rtype: bool
+    :return: True if disk space is below threshold (set through addon settings), False otherwise.
+    """
+    return get_free_disk_space(settings.get_setting(settings.disk_space_check_path)) <= settings.get_setting(
+        settings.disk_space_threshold)
+
+
 def translate(msg_id):
     """
     Retrieve a localized string by id.
@@ -152,7 +243,7 @@ def notify(message, duration=5000, image=__icon__, level=xbmc.LOGNOTICE):
     """
     debug(message, level)
     if settings.get_setting(settings.notifications_enabled) and not (settings.get_setting(settings.notify_when_idle) and
-                                                                     xbmc.Player().isPlaying()):
+                                                                         xbmc.Player().isPlaying()):
         # TODO: Update to new xbmc.Dialog().notification() method
         xbmc.executebuiltin("XBMC.Notification(%s, %s, %s, %s)" % (__title__, message, duration, image))
 
