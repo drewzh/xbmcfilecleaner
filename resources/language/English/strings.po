@@ -61,7 +61,7 @@ msgid "Holding folder location"
 msgstr ""
 
 msgctxt "#32107"
-msgid "Create subdirectories (i.e. [B]../Artist[/B], [B]../Movie (Year)[/B] and [B]../Show/Season xx[/B])"
+msgid "Create subdirectories (i.e. [B]../Artist[/B], [B]../Movie[/B] and [B]../Show[/B])"
 msgstr ""
 
 msgctxt "#32108"

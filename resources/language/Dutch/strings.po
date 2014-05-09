@@ -61,8 +61,8 @@ msgid "Holding folder location"
 msgstr "Locatie bewaarmap"
 
 msgctxt "#32107"
-msgid "Create subdirectories (i.e. [B]../Artist[/B], [B]../Movie (Year)[/B] and [B]../Show/Season xx[/B])"
-msgstr "Maak submappen aan (bv. [B]../Artiest[/B], [B]../Film (Jaar)[/B] en [B]../Serie/Seizoen xx[/B])"
+msgid "Create subdirectories (i.e. [B]../Artist[/B], [B]../Movie[/B] and [B]../Show[/B])"
+msgstr "Maak submappen aan (bv. [B]../Artiest[/B], [B]../Film[/B] en [B]../Serie[/B])"
 
 msgctxt "#32108"
 msgid "Clean movies"
