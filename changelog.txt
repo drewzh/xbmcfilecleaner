@@ -5,6 +5,7 @@ Version 4.0.0
 - [NEW] Allow disabling the service
 - [NEW] Log file viewer (accessible from settings)
 - [NEW] Support for stacked movies (does not include DVD folder structures, e.g. VIDEO_TS)
+- [NEW] Polish translation (thanks struart)
 
 - [FIX] Subtitles with language codes were not cleaned
 - [FIX] Changed localizations to use the new PO structure

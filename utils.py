@@ -7,6 +7,7 @@ import time
 from ctypes import *
 
 import xbmc
+import xbmcgui
 from xbmcaddon import Addon
 import settings  # TODO: No idea why I can't use "from settings import *" here.
 
@@ -138,8 +139,7 @@ def get_free_disk_space(path):
     """
     percentage = float(100)
     debug("Checking for disk space on path: %r" % path)
-    dirs, files = xbmcvfs.listdir(path)
-    if dirs or files:  # Workaround for xbmcvfs.exists("C:\") TODO: No longer needed?
+    if xbmcvfs.exists(path):
         if xbmc.getCondVisibility("System.Platform.Windows"):
             debug("We are checking disk space from a Windows file system")
             debug("The path to check is %r" % path)
@@ -233,29 +233,33 @@ def translate(msg_id):
         return ""
 
 
-def notify(message, duration=5000, image=__icon__, level=xbmc.LOGNOTICE):
-    """Display an XBMC notification and log the message.
+def notify(message, duration=5000, image=__icon__, level=xbmc.LOGNOTICE, sound=None):
+    """
+    Display an XBMC notification and log the message.
 
     :type message: str
-    :param message: the message to be displayed (and logged). You may also use the id (int) for localization.
+    :param message: the message to be displayed (and logged).
     :type duration: int
-    :param duration: the duration the notification is displayed in milliseconds (default 5000)
+    :param duration: the duration the notification is displayed in milliseconds (defaults to 5000)
     :type image: str
-    :param image: the path to the image to be displayed on the notification (default "icon.png")
+    :param image: the path to the image to be displayed on the notification (defaults to ``icon.png``)
     :type level: int
     :param level: (Optional) the log level (supported values are found at xbmc.LOG...)
+    :type sound: bool
+    :param sound: (Optional) Whether or not to play a sound with the notification. (defaults to ``True``)
     """
     debug(message, level)
     if settings.get_setting(settings.notifications_enabled) and not (settings.get_setting(settings.notify_when_idle) and
-                                                                         xbmc.Player().isPlaying()):
-        # TODO: Update to new xbmc.Dialog().notification() method
-        xbmc.executebuiltin("XBMC.Notification(%s, %s, %s, %s)" % (__title__, message, duration, image))
+                                                                     xbmc.Player().isPlaying()):
+        xbmcgui.Dialog().notification(__title__, message, image, duration, sound)
+        # xbmc.executebuiltin("XBMC.Notification(%s, %s, %s, %s)" % (__title__, message, duration, image))
 
 
 def debug(message, level=xbmc.LOGNOTICE):
-    """Write a debug message to xbmc.log
+    """
+    Write a debug message to xbmc.log
 
-    :type message: basestring
+    :type message: str
     :param message: the message to log
     :type level: int
     :param level: (Optional) the log level (supported values are found at xbmc.LOG...)
