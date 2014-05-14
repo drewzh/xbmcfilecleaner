@@ -316,3 +316,11 @@ msgstr "Ta akcja wyczyści cały dziennik."
 msgctxt "#32607"
 msgid "This action is irreversible. Do you wish to continue?"
 msgstr "Ta akcja jest nieodwracalna. Chcesz kontynuować?"
+
+msgctxt "#32608"
+msgid "Trim"
+msgstr "Trymować"
+
+msgctxt "#32609"
+msgid "Clear"
+msgstr "Oczyścić"
