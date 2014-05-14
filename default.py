@@ -212,12 +212,8 @@ class Cleaner(object):
         # These are possible conditions that must be met before a video can be deleted
         by_playcount = {"field": "playcount", "operator": "greaterthan", "value": "0"}
         by_date_played = {"field": "lastplayed", "operator": "notinthelast", "value": "%d" % get_setting(expire_after)}
-        # TODO: add GUI setting for date_added
-        by_date_added = {"field": "dateadded", "operator": "notinthelast", "value": "7"}
         by_minimum_rating = {"field": "rating", "operator": "lessthan", "value": "%d" % get_setting(minimum_rating)}
         by_no_rating = {"field": "rating", "operator": "isnot", "value": "0"}
-        # TODO: Don't hard code 'Muse' as artist
-        by_artist = {"field": "artist", "operator": "contains", "value": "Muse"}
         by_progress = {"field": "inprogress", "operator": "false", "value": ""}
 
         # link settings and filters together
@@ -535,7 +531,7 @@ class Cleaner(object):
         Example:
             success = move_file(a, b)
 
-        :type source: str # TODO: Check p.
+        :type source: str
         :param source: the source path (absolute)
         :type dest_folder: str
         :param dest_folder: the destination path (absolute)

@@ -3,7 +3,7 @@ Version 4.0.0
 - [NEW] Gotham compatibility
 - [NEW] Start addon manually
 - [NEW] Allow disabling the service
-- [NEW] Log file viewer (accessible from settings)
+- [NEW] Log file viewer (accessible from settings) (created with Confluence artwork)
 - [NEW] Support for stacked movies (does not include DVD folder structures, e.g. VIDEO_TS)
 - [NEW] Polish translation (thanks struart)
 
