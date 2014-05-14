@@ -320,3 +320,11 @@ msgstr ""
 msgctxt "#32607"
 msgid "This action is irreversible. Do you wish to continue?"
 msgstr ""
+
+msgctxt "#32608"
+msgid "Trim"
+msgstr ""
+
+msgctxt "#32609"
+msgid "Clear"
+msgstr ""

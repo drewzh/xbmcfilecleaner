@@ -316,3 +316,11 @@ msgstr "Hiermee verwijder je de gehele inhoud van het logbestand."
 msgctxt "#32607"
 msgid "This action is irreversible. Do you wish to continue?"
 msgstr "Deze actie is permanent. Wil je doorgaan?"
+
+msgctxt "#32608"
+msgid "Trim"
+msgstr "Inkorten"
+
+msgctxt "#32609"
+msgid "Clear"
+msgstr "Wissen"
