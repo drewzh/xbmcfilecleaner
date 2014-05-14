@@ -54,8 +54,6 @@ strings = [ignore_extensions, cleaning_type]
 numbers = [delayed_start, scan_interval, expire_after, minimum_rating, disk_space_threshold]
 paths = [disk_space_check_path, holding_folder, create_subdirs, exclusion1, exclusion2, exclusion3]
 
-available_settings = bools + strings + numbers + paths
-
 
 def get_setting(setting):
     """

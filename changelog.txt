@@ -3,7 +3,7 @@ Version 4.0.0
 - [NEW] Gotham compatibility
 - [NEW] Start addon manually
 - [NEW] Allow disabling the service
-- [NEW] Log file viewer (accessible from settings) (created with Confluence artwork)
+- [NEW] Log file viewer (accessible from settings)
 - [NEW] Support for stacked movies (does not include DVD folder structures, e.g. VIDEO_TS)
 - [NEW] Polish translation (thanks struart)
 
@@ -11,6 +11,7 @@ Version 4.0.0
 - [FIX] Changed localizations to use the new PO structure
 - [FIX] Increased the maximum allowed scan interval
 - [FIX] Videos are now moved by default instead of deleted, to prevent loss of data
+- [FIX] Improved support for unicode filenames
 
 Version 3.2.1
 ==============
