@@ -24,14 +24,14 @@ def autostart():
             delayed_start_ticker = get_setting(delayed_start) * 60 / service_sleep
 
             if delayed_completed and ticker >= scan_interval_ticker:
-                results, exit_status = cleaner.cleanup()
-                if results and exit_status == 0:
+                results = cleaner.clean_all()
+                if results:
                     notify(results)
                 ticker = 0
             elif not delayed_completed and ticker >= delayed_start_ticker:
                 delayed_completed = True
-                results, exit_status = cleaner.cleanup()
-                if results and exit_status == 0:
+                results = cleaner.clean_all()
+                if results:
                     notify(results)
                 ticker = 0
 

@@ -61,7 +61,7 @@ msgid "Holding folder location"
 msgstr ""
 
 msgctxt "#32107"
-msgid "Create subdirectories (i.e. [B]../Artist[/B], [B]../Movie (Year)[/B] and [B]../Show/Season xx[/B])"
+msgid "Create subdirectories (i.e. [B]../Artist[/B], [B]../Movie[/B] and [B]../Show[/B])"
 msgstr ""
 
 msgctxt "#32108"
@@ -281,6 +281,10 @@ msgctxt "#32523"
 msgid "Would you like to do this now?"
 msgstr ""
 
+# Temporary, until Linux remote share disk space checks are supported
+msgctxt "#32524"
+msgid "Remote disk space checking is not supported for your OS yet"
+msgstr ""
 
 # Log section
 # =======================
@@ -315,4 +319,12 @@ msgstr ""
 
 msgctxt "#32607"
 msgid "This action is irreversible. Do you wish to continue?"
+msgstr ""
+
+msgctxt "#32608"
+msgid "Trim"
+msgstr ""
+
+msgctxt "#32609"
+msgid "Clear"
 msgstr ""

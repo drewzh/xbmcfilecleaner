@@ -61,8 +61,8 @@ msgid "Holding folder location"
 msgstr "Locatie bewaarmap"
 
 msgctxt "#32107"
-msgid "Create subdirectories (i.e. [B]../Artist[/B], [B]../Movie (Year)[/B] and [B]../Show/Season xx[/B])"
-msgstr "Maak submappen aan (bv. [B]../Artiest[/B], [B]../Film (Jaar)[/B] en [B]../Serie/Seizoen xx[/B])"
+msgid "Create subdirectories (i.e. [B]../Artist[/B], [B]../Movie[/B] and [B]../Show[/B])"
+msgstr "Maak submappen aan (bv. [B]../Artiest[/B], [B]../Film[/B] en [B]../Serie[/B])"
 
 msgctxt "#32108"
 msgid "Clean movies"
@@ -277,6 +277,11 @@ msgctxt "#32523"
 msgid "Would you like to do this now?"
 msgstr "Wil je dit nu doen?"
 
+# Tijdelijk, totdat Linux schijfruimtechecks werken
+msgctxt "#32524"
+msgid "Remote disk space checking is not supported for your OS yet"
+msgstr "Schijfruimtecontrole van netwerkschijven is nog niet ondersteund voor dit besturingssysteem"
+
 
 # Logtabblad
 # =======================
@@ -311,3 +316,11 @@ msgstr "Hiermee verwijder je de gehele inhoud van het logbestand."
 msgctxt "#32607"
 msgid "This action is irreversible. Do you wish to continue?"
 msgstr "Deze actie is permanent. Wil je doorgaan?"
+
+msgctxt "#32608"
+msgid "Trim"
+msgstr "Inkorten"
+
+msgctxt "#32609"
+msgid "Clear"
+msgstr "Wissen"

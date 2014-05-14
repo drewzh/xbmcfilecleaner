@@ -36,7 +36,6 @@ clean_when_low_disk_space = "clean_when_low_disk_space"
 disk_space_threshold = "disk_space_threshold"
 disk_space_check_path = "disk_space_check_path"
 
-delete_files = "delete_files"
 holding_folder = "holding_folder"
 create_subdirs = "create_subdirs"
 
@@ -49,7 +48,7 @@ exclusion3 = "exclusion3"
 
 bools = [service_enabled, delete_folders, clean_related, notifications_enabled, notify_when_idle, debugging_enabled,
          clean_xbmc_library, clean_movies, clean_tv_shows, clean_music_videos, clean_when_idle, enable_expiration,
-         clean_when_low_rated, ignore_no_rating, clean_when_low_disk_space, delete_files, create_subdirs,
+         clean_when_low_rated, ignore_no_rating, clean_when_low_disk_space, create_subdirs,
          not_in_progress, exclusion_enabled]
 strings = [ignore_extensions, cleaning_type]
 numbers = [delayed_start, scan_interval, expire_after, minimum_rating, disk_space_threshold]

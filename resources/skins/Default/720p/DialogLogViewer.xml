@@ -74,7 +74,7 @@
             <width>250</width>
             <height>40</height>
             <align>center</align>
-            <label>Trim</label>
+            <label>$ADDON[script.filecleaner 32608]</label>
             <texturenofocus border="5">button-nofocus.png</texturenofocus>
             <texturefocus border="5">button-focus.png</texturefocus>
             <colordiffuse>FF43C6DB</colordiffuse>
@@ -90,7 +90,7 @@
             <width>250</width>
             <height>40</height>
             <align>center</align>
-            <label>Clear</label>
+            <label>$ADDON[script.filecleaner 32609]</label>
             <texturenofocus border="5">button-nofocus.png</texturenofocus>
             <texturefocus border="5">button-focus.png</texturefocus>
             <onright>203</onright>
