@@ -6,10 +6,8 @@ import re
 import time
 from ctypes import *
 
-import xbmc
 import xbmcgui
-from xbmcaddon import Addon
-import settings  # TODO: No idea why I can't use "from settings import *" here.
+from settings import *
 
 
 # Addon info
@@ -21,6 +19,13 @@ __icon__ = xbmc.translatePath(__addon__.getAddonInfo("icon")).decode("utf-8")
 
 
 class Log(object):
+    """
+    The Log class will handle the writing of cleaned files to a log file in the addon settings.
+
+    This log file will be automatically created upon first prepending data to it.
+
+    Supported operations are prepend, trim, clear and get.
+    """
     def __init__(self):
         self.logpath = os.path.join(__profile__, "cleaner.log")
 
@@ -45,11 +50,11 @@ class Log(object):
                 debug("Writing new log data.")
                 f = open(self.logpath, "w")
                 if data:
-                    f.write("[B][%s][/B]\n" % time.strftime("%d/%m/%Y\t-\t%H:%M:%S"))
+                    f.write("[B][%s][/B]\n" % time.strftime("%d/%m/%Y  -  %H:%M:%S"))
                     for line in data:
                         if isinstance(line, unicode):
                             line = line.encode("utf-8")
-                        f.write("\t-\t%s\n" % line)
+                        f.write(" - %s\n" % line)
                     f.write("\n")
                     debug("New data written to log file.")
                 else:
@@ -214,8 +219,7 @@ def disk_space_low():
     :rtype: bool
     :return: True if disk space is below threshold (set through addon settings), False otherwise.
     """
-    return get_free_disk_space(settings.get_setting(settings.disk_space_check_path)) <= settings.get_setting(
-        settings.disk_space_threshold)
+    return get_free_disk_space(get_setting(disk_space_check_path)) <= get_setting(disk_space_threshold)
 
 
 def translate(msg_id):
@@ -233,7 +237,7 @@ def translate(msg_id):
         return ""
 
 
-def notify(message, duration=5000, image=__icon__, level=xbmc.LOGNOTICE, sound=None):
+def notify(message, duration=5000, image=__icon__, level=xbmc.LOGNOTICE, sound=True):
     """
     Display an XBMC notification and log the message.
 
@@ -249,10 +253,8 @@ def notify(message, duration=5000, image=__icon__, level=xbmc.LOGNOTICE, sound=N
     :param sound: (Optional) Whether or not to play a sound with the notification. (defaults to ``True``)
     """
     debug(message, level)
-    if settings.get_setting(settings.notifications_enabled) and not (settings.get_setting(settings.notify_when_idle) and
-                                                                     xbmc.Player().isPlaying()):
+    if get_setting(notifications_enabled) and not (get_setting(notify_when_idle) and xbmc.Player().isPlaying()):
         xbmcgui.Dialog().notification(__title__, message, image, duration, sound)
-        # xbmc.executebuiltin("XBMC.Notification(%s, %s, %s, %s)" % (__title__, message, duration, image))
 
 
 def debug(message, level=xbmc.LOGNOTICE):
@@ -264,7 +266,7 @@ def debug(message, level=xbmc.LOGNOTICE):
     :type level: int
     :param level: (Optional) the log level (supported values are found at xbmc.LOG...)
     """
-    if settings.get_setting(settings.debugging_enabled):
+    if get_setting(debugging_enabled):
         if isinstance(message, unicode):
             message = message.encode("utf-8")
         for line in message.splitlines():

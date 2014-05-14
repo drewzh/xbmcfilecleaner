@@ -15,6 +15,12 @@ __profile__ = xbmc.translatePath(__addon__.getAddonInfo("profile")).decode("utf-
 
 
 class LogViewerDialog(xbmcgui.WindowXMLDialog):
+    """
+    The LogViewerDialog class is an extension of the default windows supplied with XBMC.
+
+    It is used to display the contents of a log file, and as such uses a fullscreen window to show as much text as
+    possible. It also contains two buttons for trimming and clearing the contents of the log file.
+    """
     CAPTIONID = 201
     TEXTBOXID = 202
     TRIMBUTTONID = 301

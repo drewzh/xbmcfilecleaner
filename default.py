@@ -1,15 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import os
-import re
 import json
 
-import xbmc
-import xbmcaddon
-import xbmcgui
 import xbmcvfs
-from settings import *
 from utils import *
 
 
@@ -27,14 +21,14 @@ class Cleaner(object):
     items. The user can apply a number of conditions to cleaning, such as limiting cleaning to files with a given
     rating, excluding a particular folder or only cleaning when a particular disk is low on disk space.
 
-    The main method to call is the ``cleanup()`` method. This method will invoke the subsequent checks and (re)move
+    The main method to call is the ``clean_all()`` method. This method will invoke the subsequent checks and (re)move
     your videos. Upon completion, you will receive a short summary of the cleaning results.
 
     *Example*
-      ``summary = Cleaner().cleanup()``
+      ``summary = Cleaner().clean_all()``
     """
 
-    # Constants to ensure correct (Frodo-compatible) JSON-RPC requests for XBMC
+    # Constants to ensure correct (Gotham-compatible) JSON-RPC requests for XBMC
     MOVIES = "movies"
     MUSIC_VIDEOS = "musicvideos"
     TVSHOWS = "episodes"
