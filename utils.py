@@ -7,6 +7,7 @@ import time
 from ctypes import *
 
 import xbmcgui
+import xbmcvfs
 from settings import *
 
 

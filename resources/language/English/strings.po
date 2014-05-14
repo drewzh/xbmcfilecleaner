@@ -117,7 +117,7 @@ msgid "Scan interval (in minutes)"
 msgstr ""
 
 msgctxt "#32205"
-msgid "Do not clean during video playback"
+msgid "Do not clean during playback"
 msgstr ""
 
 msgctxt "#32206"

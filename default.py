@@ -446,7 +446,6 @@ class Cleaner(object):
         try:
             for f in files:
                 _, ext = os.path.splitext(f)
-                debug("File extension: " + ext)
                 if ext not in ignored_file_types:
                     debug("Found non-ignored file type %r" % ext)
                     empty = False
@@ -490,7 +489,7 @@ class Cleaner(object):
         :type dest_folder: str
         :param dest_folder: (Optional) The folder where related files should be moved to. Not needed when deleting.
         """
-        if settings.get_setting(clean_related):
+        if get_setting(clean_related):
             debug("Cleaning related files.")
 
             path_list = self.unstack(source)

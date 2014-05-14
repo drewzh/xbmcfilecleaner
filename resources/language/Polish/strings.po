@@ -117,8 +117,8 @@ msgid "Scan interval (in minutes)"
 msgstr "Interwał skanowania (w minutach)"
 
 msgctxt "#32205"
-msgid "Do not clean during video playback"
-msgstr "Nie czyść podczas odtwarzania wideo"
+msgid "Do not clean during playback"
+msgstr "Nie czyść podczas odtwarzania"
 
 msgctxt "#32206"
 msgid "Start cleaning right after playback stops"
