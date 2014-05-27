@@ -71,7 +71,7 @@ def get_setting(setting):
     elif setting in strings:
         return str(Addon("script.filecleaner").getSetting(setting))
     elif setting in paths:
-        return xbmc.translatePath(Addon("script.filecleaner").getSetting(setting))
+        return xbmc.translatePath(Addon("script.filecleaner").getSetting(setting).encode("utf-8"))
     else:
         utils.debug("Failed loading %r value. Type %r cannot be handled." % (setting, type(setting)), xbmc.LOGWARNING)
         return None

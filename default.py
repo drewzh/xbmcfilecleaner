@@ -102,26 +102,30 @@ class Cleaner(object):
                                 xbmc.executebuiltin("Addon.OpenSettings(%s)" % __addonID__)
                             break
                         if get_setting(create_subdirs):
+                            if isinstance(title, unicode):
+                                title = title.encode("utf-8")
                             new_path = os.path.join(get_setting(holding_folder), str(title))
                         else:
                             new_path = get_setting(holding_folder)
                         if self.move_file(filename, new_path):
+                            debug("File(s) moved successfully.")
                             count += 1
                             if len(unstacked_path) > 1:
                                 cleaned_files.extend(unstacked_path)
                             else:
                                 cleaned_files.append(filename)
                             self.clean_related_files(filename, new_path)
-                            self.delete_empty_folders(filename)
+                            self.delete_empty_folders(os.path.dirname(filename))
                     elif get_setting(cleaning_type) == self.CLEANING_TYPE_DELETE:
                         if self.delete_file(filename):
+                            debug("File(s) deleted successfully.")
                             count += 1
                             if len(unstacked_path) > 1:
                                 cleaned_files.extend(unstacked_path)
                             else:
                                 cleaned_files.append(filename)
                             self.clean_related_files(filename)
-                            self.delete_empty_folders(filename)
+                            self.delete_empty_folders(os.path.dirname(filename))
                 else:
                     debug("%r was already deleted. Skipping." % filename, xbmc.LOGWARNING)
         else:
@@ -413,7 +417,6 @@ class Cleaner(object):
                 debug("File %r no longer exists." % p, xbmc.LOGERROR)
                 success.append(False)
 
-        debug("Return statuses: %r" % success)
         return any(success)
 
     def delete_empty_folders(self, location):
@@ -431,10 +434,10 @@ class Cleaner(object):
         :return: True if the folder was deleted successfully, False otherwise.
         """
         if not get_setting(delete_folders):
-            debug("Deleting of folders is disabled.")
+            debug("Deleting of empty folders is disabled.")
             return False
 
-        folder = os.path.dirname(self.unstack(location)[0])  # Stacked paths should have the same parent, use any
+        folder = self.unstack(location)[0]  # Stacked paths should have the same parent, use any
         debug("Checking if %r is empty" % folder)
         ignored_file_types = [file_ext.strip() for file_ext in get_setting(ignore_extensions).split(",")]
         debug("Ignoring file types %r" % ignored_file_types)
@@ -446,7 +449,7 @@ class Cleaner(object):
         try:
             for f in files:
                 _, ext = os.path.splitext(f)
-                if ext not in ignored_file_types:
+                if ext and not ext in ignored_file_types:  # ensure f is not a folder and its extension is not ignored
                     debug("Found non-ignored file type %r" % ext)
                     empty = False
                     break
