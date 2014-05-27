@@ -14,7 +14,7 @@ def autostart():
     """
     cleaner = Cleaner()
 
-    service_sleep = 10
+    service_sleep = 2
     ticker = 0
     delayed_completed = False
 
@@ -40,7 +40,7 @@ def autostart():
         else:
             xbmc.sleep(service_sleep * 1000)
 
-    debug("Abort requested. Terminating.")
+    print("Abort requested. Terminating.")
     return
 
 
