@@ -156,18 +156,19 @@ class Cleaner(object):
                     cleaning_results.extend(cleaned_files)
                     summary[video_type] = count
 
-        # Write cleaned file names to the log
+        # Check if we need to perform any post-cleaning operations
         if cleaning_results:
+            # Write cleaned file names to the log
             Log().prepend(cleaning_results)
 
-        # Finally clean the library to account for any deleted videos.
-        if get_setting(clean_xbmc_library) and cleaned_files:
-            xbmc.sleep(5000)  # Sleep 5 seconds to make sure file I/O is done.
+            # Finally clean the library to account for any deleted videos.
+            if get_setting(clean_xbmc_library):
+                xbmc.sleep(2000)  # Sleep 2 seconds to make sure file I/O is done.
 
-            if xbmc.getCondVisibility("Library.IsScanningVideo"):
-                debug("The video library is being updated. Skipping library cleanup.", xbmc.LOGWARNING)
-            else:
-                xbmc.executebuiltin("XBMC.CleanLibrary(video)")
+                if xbmc.getCondVisibility("Library.IsScanningVideo"):
+                    debug("The video library is being updated. Skipping library cleanup.", xbmc.LOGWARNING)
+                else:
+                    xbmc.executebuiltin("XBMC.CleanLibrary(video)")
 
         return self.summarize(summary)
 
