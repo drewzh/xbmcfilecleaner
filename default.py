@@ -34,6 +34,8 @@ class Cleaner(object):
     TVSHOWS = "episodes"
     CLEANING_TYPE_MOVE = "0"
     CLEANING_TYPE_DELETE = "1"
+    DEFAULT_ACTION_CLEAN = "0"
+    DEFAULT_ACTION_LOG = "1"
 
     movie_filter_fields = ["title", "plot", "plotoutline", "tagline", "votes", "rating", "time", "writers",
                            "playcount", "lastplayed", "inprogress", "genre", "country", "year", "director",
@@ -589,10 +591,14 @@ class Cleaner(object):
 
 if __name__ == "__main__":
     cleaner = Cleaner()
-    results = cleaner.clean_all()
-    if results:
-        # Videos were cleaned. Ask the user to view the log file.
-        if xbmcgui.Dialog().yesno(utils.translate(32514), results, utils.translate(32519)):
-            xbmc.executescript("special://home/addons/script.filecleaner/viewer.py")
+    if get_setting(default_action) == cleaner.DEFAULT_ACTION_LOG:
+        xbmc.executescript("special://home/addons/script.filecleaner/viewer.py")
     else:
-        notify(utils.translate(32520))
+        results = cleaner.clean_all()
+        if results:
+            # Videos were cleaned. Ask the user to view the log file.
+            # TODO: Listen to OnCleanFinished notifications and wait before asking to view the log
+            if xbmcgui.Dialog().yesno(utils.translate(32514), results, utils.translate(32519)):
+                xbmc.executescript("special://home/addons/script.filecleaner/viewer.py")
+        else:
+            notify(utils.translate(32520))
