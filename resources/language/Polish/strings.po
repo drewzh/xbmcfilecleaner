@@ -42,15 +42,15 @@ msgstr "[B]Które wideo chcesz usunąć?[/B]"
 
 msgctxt "#32102"
 msgid "Default action"
-msgstr ""
+msgstr "Domyślna akcja"
 
 msgctxt "#32103"
 msgid "Clean up"
-msgstr ""
+msgstr "Wyczyść"
 
 msgctxt "#32104"
 msgid "View log"
-msgstr ""
+msgstr "Pokaż log"
 
 msgctxt "#32105"
 msgid "Cleaning type"
