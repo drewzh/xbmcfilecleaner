@@ -214,6 +214,10 @@ msgctxt "#32404"
 msgid "Path to exclude"
 msgstr ""
 
+msgctxt "#32405"
+msgid "Reset exclusions"
+msgstr ""
+
 # Notifications section
 # =======================
 msgctxt "#32500"
@@ -339,4 +343,8 @@ msgstr ""
 
 msgctxt "#32609"
 msgid "Clear"
+msgstr ""
+
+msgctxt "#32610"
+msgid "This will reset any exclusions you have set up"
 msgstr ""

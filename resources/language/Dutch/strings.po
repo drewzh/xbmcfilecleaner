@@ -213,6 +213,10 @@ msgctxt "#32404"
 msgid "Path to exclude"
 msgstr "Locatie van uitzondering"
 
+msgctxt "#32405"
+msgid "Reset exclusions"
+msgstr "Reset uitzonderingen"
+
 
 # Meldingentabblad
 # =======================
@@ -336,3 +340,7 @@ msgstr "Inkorten"
 msgctxt "#32609"
 msgid "Clear"
 msgstr "Wissen"
+
+msgctxt "#32610"
+msgid "This will reset any exclusions you have set up"
+msgstr "Hiermee reset je alle ingestelde uitzonderingen"
