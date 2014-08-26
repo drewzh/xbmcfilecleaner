@@ -214,6 +214,10 @@ msgctxt "#32404"
 msgid "Path to exclude"
 msgstr "Ścieżka do wykluczenia"
 
+msgctxt "#32405"
+msgid "Reset exclusions"
+msgstr "Reset wykluczeń"
+
 # Notifications section
 # =======================
 msgctxt "#32500"
@@ -293,6 +297,10 @@ msgctxt "#32523"
 msgid "Would you like to do this now?"
 msgstr "Czy chcesz to zrobić teraz?"
 
+# Temporary, until Linux remote share disk space checks are supported
+msgctxt "#32524"
+msgid "Remote disk space checking is not supported for your OS yet"
+msgstr "Zdalne sprawdzanie pojemności dysku nie jest obsługiwane przez Twój system operacyjny"
 
 # Log section
 # =======================
@@ -336,3 +344,7 @@ msgstr "Trymować"
 msgctxt "#32609"
 msgid "Clear"
 msgstr "Oczyścić"
+
+msgctxt "#32610"
+msgid "This will reset any exclusions you have set up"
+msgstr "Wszystkie Twoje wykluczenia zostaną zresetowane"
