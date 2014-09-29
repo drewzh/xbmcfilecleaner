@@ -302,12 +302,11 @@ class Cleaner(object):
         if not get_setting(exclusion_enabled):
             debug("Path exclusion is disabled.")
             return False
-
-        if not full_path:
+        elif not full_path:
             debug("File path is empty and cannot be checked for exclusions")
             return False
 
-        exclusions = [get_setting(exclusion1), get_setting(exclusion2), get_setting(exclusion3)]
+        exclusions = map(get_setting, [exclusion1, exclusion2, exclusion3])
 
         if r"://" in full_path:
             debug("Detected a network path")
@@ -341,9 +340,6 @@ class Cleaner(object):
                         debug("File %r matches excluded path %r." % (converted_path, ex))
                         return True
 
-                debug("No match was found with an excluded path.")
-                return False
-
             except (AttributeError, IndexError, KeyError) as err:
                 debug("Error converting %r. No files will be deleted.\n%s" % (full_path, err), xbmc.LOGWARNING)
                 return True
@@ -354,8 +350,8 @@ class Cleaner(object):
                     debug("File %r matches excluded path %r." % (full_path, ex))
                     return True
 
-            debug("No match was found with an excluded path.")
-            return False
+        debug("No match was found with an excluded path.")
+        return False
 
     def unstack(self, path):
         """Unstack path if it is a stacked movie. See http://wiki.xbmc.org/index.php?title=File_stacking for more info.
