@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import xbmc
+from xbmc import Monitor
 
 from default import Cleaner
 from settings import *
@@ -13,12 +13,13 @@ def autostart():
     Starts the cleaning service.
     """
     cleaner = Cleaner()
+    monitor = Monitor()
 
     service_sleep = 4  # Lower than 4 causes too much stress on resource limited systems such as RPi
     ticker = 0
     delayed_completed = False
 
-    while not xbmc.abortRequested:
+    while not monitor.waitForAbort():
         if get_setting(service_enabled):
             scan_interval_ticker = get_setting(scan_interval) * 60 / service_sleep
             delayed_start_ticker = get_setting(delayed_start) * 60 / service_sleep
