@@ -119,14 +119,14 @@ class Log(object):
 
     def get(self):
         """
-        Retrieve the contents of the log file.
+        Retrieve the contents of the log file. Creates a new log if none is found.
 
         :rtype: str
         :return: The contents of the log file.
         """
         try:
             debug("Retrieving log file contents.")
-            f = open(self.logpath, "r")
+            f = open(self.logpath, "a+")
         except (IOError, OSError) as err:
             debug("%s" % err, xbmc.LOGERROR)
         else:
