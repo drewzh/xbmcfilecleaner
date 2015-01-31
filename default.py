@@ -28,7 +28,7 @@ class Cleaner(object):
       ``summary = Cleaner().clean_all()``
     """
 
-    # Constants to ensure correct (Gotham-compatible) JSON-RPC requests for XBMC
+    # Constants to ensure correct (Gotham-compatible) JSON-RPC requests for Kodi
     MOVIES = "movies"
     MUSIC_VIDEOS = "musicvideos"
     TVSHOWS = "episodes"
@@ -137,7 +137,7 @@ class Cleaner(object):
 
     def clean_all(self):
         """
-        Clean up any watched videos in the XBMC library, satisfying any conditions set via the addon settings.
+        Clean up any watched videos in the Kodi library, satisfying any conditions set via the addon settings.
 
         :rtype: str
         :return: A single-line (localized) summary of the cleaning results to be used for a notification.
@@ -145,7 +145,7 @@ class Cleaner(object):
         debug("Starting cleaning routine.")
 
         if get_setting(clean_when_idle) and xbmc.Player().isPlaying():
-            debug("XBMC is currently playing a file. Skipping cleaning.", xbmc.LOGWARNING)
+            debug("Kodi is currently playing a file. Skipping cleaning.", xbmc.LOGWARNING)
             return None
 
         summary = {}
@@ -164,7 +164,7 @@ class Cleaner(object):
             Log().prepend(cleaning_results)
 
             # Finally clean the library to account for any deleted videos.
-            if get_setting(clean_xbmc_library):
+            if get_setting(clean_kodi_library):
                 xbmc.sleep(2000)  # Sleep 2 seconds to make sure file I/O is done.
 
                 if xbmc.getCondVisibility("Library.IsScanningVideo"):
@@ -205,7 +205,7 @@ class Cleaner(object):
 
     def get_expired_videos(self, option):
         """
-        Find videos in the XBMC library that have been watched.
+        Find videos in the Kodi library that have been watched.
 
         Respects any other conditions user enables in the addon's settings.
 
@@ -354,7 +354,7 @@ class Cleaner(object):
         return False
 
     def unstack(self, path):
-        """Unstack path if it is a stacked movie. See http://wiki.xbmc.org/index.php?title=File_stacking for more info.
+        """Unstack path if it is a stacked movie. See http://kodi.wiki/view/File_stacking for more info.
 
         :type path: str
         :param path: The path that should be unstacked.

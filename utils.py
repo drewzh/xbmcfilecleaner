@@ -240,7 +240,7 @@ def translate(msg_id):
 
 def notify(message, duration=5000, image=__icon__, level=xbmc.LOGNOTICE, sound=True):
     """
-    Display an XBMC notification and log the message.
+    Display a Kodi notification and log the message.
 
     :type message: str
     :param message: the message to be displayed (and logged).

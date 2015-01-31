@@ -1,5 +1,5 @@
 # XBMC Media Center language file
-# Addon Name: XBMC File Cleaner
+# Addon Name: Kodi File Cleaner
 # Addon id: script.filecleaner
 # Addon version: 4.0.0
 # Addon Provider: Anthirian, drewzh
@@ -89,8 +89,8 @@ msgid "Clean music videos"
 msgstr "Wyczyść teledyski"
 
 msgctxt "#32114"
-msgid "Clean XBMC video library afterwards"
-msgstr "Wyczyść bibliotekę wideo XBMC po zakończeniu"
+msgid "Clean Kodi video library afterwards"
+msgstr "Wyczyść bibliotekę wideo Kodi po zakończeniu"
 
 msgctxt "#32115"
 msgid "Also delete empty folders"
@@ -242,7 +242,7 @@ msgstr "Włącz wiadomości debugera"
 
 
 # Localization strings
-# for XBMC notifications
+# for Kodi notifications
 # =======================
 msgctxt "#32511"
 msgid "Error reading hard disk. Please check your settings."
