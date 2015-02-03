@@ -170,7 +170,7 @@ class Cleaner(object):
                 if xbmc.getCondVisibility("Library.IsScanningVideo"):
                     debug("The video library is being updated. Skipping library cleanup.", xbmc.LOGWARNING)
                 else:
-                    xbmc.executebuiltin("XBMC.CleanLibrary(video)")
+                    xbmc.executebuiltin("XBMC.CleanLibrary(video, false)")
 
         return self.summarize(summary)
 
