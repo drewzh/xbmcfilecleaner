@@ -19,7 +19,7 @@ def autostart():
     ticker = 0
     delayed_completed = False
 
-    while not monitor.waitForAbort():
+    while not monitor.abortRequested():
         if get_setting(service_enabled):
             scan_interval_ticker = get_setting(scan_interval) * 60 / service_sleep
             delayed_start_ticker = get_setting(delayed_start) * 60 / service_sleep
