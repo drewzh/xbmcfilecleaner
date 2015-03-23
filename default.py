@@ -562,6 +562,7 @@ class Cleaner(object):
 
                 new_path = os.path.join(dest_folder, os.path.basename(p))
 
+                # TODO: This check might not make sense after ensuring the folder exists
                 if xbmcvfs.exists(new_path):
                     debug("A file with the same name already exists in the holding folder. Checking file sizes.")
                     existing_file = xbmcvfs.File(new_path)
@@ -577,12 +578,28 @@ class Cleaner(object):
                         file_to_move.close()
                         success.append(bool(xbmcvfs.delete(p)))
                 else:
+                    # TODO: Fall back to copy and delete in case errors occur, also for related files (above)
+                    # Move fails e.g. when we don't have write permission for the folder a movie is in before cleaning
                     debug("Moving %r to %r." % (p, new_path))
-                    success.append(bool(xbmcvfs.rename(p, new_path)))
+                    move_success = bool(xbmcvfs.rename(p, new_path))
+                    copy_success, delete_success = False, False
+                    if not move_success:
+                        debug("Move failed, falling back to copy and delete.", xbmc.LOGWARNING)
+                        copy_success = bool(xbmcvfs.copy(p, new_path))
+                        if copy_success:
+                            debug("Copied successfully, attempting delete of source file.")
+                            delete_success = bool(xbmcvfs.delete(p))
+                            if not delete_success:
+                                debug("Could not remove source file. Please remove the file manually.", xbmc.LOGWARNING)
+                        else:
+                            debug("Copying failed, please make sure you have appropriate permissions.", xbmc.LOGFATAL)
+
+                    success.append(move_success or (copy_success and delete_success))
             else:
-                debug("File %r no longer exists." % p, xbmc.LOGWARNING)
+                debug("File %r is no longer available." % p, xbmc.LOGWARNING)
                 success.append(False)
 
+        # TODO: Return the amount of files moved instead of whether anything was moved
         return any(success)
 
 if __name__ == "__main__":
