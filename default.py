@@ -109,7 +109,8 @@ class Cleaner(object):
                             new_path = os.path.join(get_setting(holding_folder), str(title))
                         else:
                             new_path = get_setting(holding_folder)
-                        if self.move_file(filename, new_path):
+                        move_result = self.move_file(filename, new_path)
+                        if move_result == 1:
                             debug("File(s) moved successfully.")
                             count += 1
                             if len(unstacked_path) > 1:
@@ -118,6 +119,10 @@ class Cleaner(object):
                                 cleaned_files.append(filename)
                             self.clean_related_files(filename, new_path)
                             self.delete_empty_folders(os.path.dirname(filename))
+                        elif move_result == -1:
+                            debug("Moving errors occurred. Skipping related files and directories.", xbmc.LOGWARNING)
+                            xbmcgui.Dialog().ok("Errors occurred during move", "Not all files could be moved to the holding folder.", "Ensure you have appropriate permissions and try again.", "Please check the log file for details and move the particular files manually.")
+                            # TODO: Show GUI notification so users can move manually
                     elif get_setting(cleaning_type) == self.CLEANING_TYPE_DELETE:
                         if self.delete_file(filename):
                             debug("File(s) deleted successfully.")
@@ -530,25 +535,26 @@ class Cleaner(object):
         """Move a file to a new destination. Will create destination if it does not exist.
 
         Example:
-            success = move_file(a, b)
+            result = move_file(a, b)
 
         :type source: str
         :param source: the source path (absolute)
         :type dest_folder: str
         :param dest_folder: the destination path (absolute)
-        :rtype: bool
-        :return: True if (at least one) file was moved successfully, False otherwise.
+        :rtype: int
+        :return: 1 if (all stacked) files were moved, 0 if not, -1 if errors occurred
         """
         if isinstance(source, unicode):
             source = source.encode("utf-8")
 
         paths = self.unstack(source)
         success = []
+        files_moved_successfully = 0
         dest_folder = xbmc.makeLegalFilename(dest_folder)
 
         if self.is_excluded(paths[0]):
             debug("Detected a file on an excluded path. Aborting.")
-            return False
+            return 0
 
         for p in paths:
             debug("Attempting to move %r to %r." % (p, dest_folder))
@@ -558,7 +564,7 @@ class Cleaner(object):
                         debug("Created destination %r." % dest_folder)
                     else:
                         debug("Destination %r could not be created." % dest_folder, xbmc.LOGERROR)
-                        return False
+                        return -1
 
                 new_path = os.path.join(dest_folder, os.path.basename(p))
 
@@ -593,14 +599,15 @@ class Cleaner(object):
                                 debug("Could not remove source file. Please remove the file manually.", xbmc.LOGWARNING)
                         else:
                             debug("Copying failed, please make sure you have appropriate permissions.", xbmc.LOGFATAL)
+                            return -1
 
-                    success.append(move_success or (copy_success and delete_success))
+                    if move_success or (copy_success and delete_success):
+                        files_moved_successfully += 1
+
             else:
                 debug("File %r is no longer available." % p, xbmc.LOGWARNING)
-                success.append(False)
 
-        # TODO: Return the amount of files moved instead of whether anything was moved
-        return any(success)
+        return 1 if len(paths) == files_moved_successfully else -1
 
 if __name__ == "__main__":
     cleaner = Cleaner()
