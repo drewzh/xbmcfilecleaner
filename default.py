@@ -121,8 +121,8 @@ class Cleaner(object):
                             self.delete_empty_folders(os.path.dirname(filename))
                         elif move_result == -1:
                             debug("Moving errors occurred. Skipping related files and directories.", xbmc.LOGWARNING)
+                            # TODO: Use localized strings
                             xbmcgui.Dialog().ok("Errors occurred during move", "Not all files could be moved to the holding folder.", "Ensure you have appropriate permissions and try again.", "Please check the log file for details and move the particular files manually.")
-                            # TODO: Show GUI notification so users can move manually
                     elif get_setting(cleaning_type) == self.CLEANING_TYPE_DELETE:
                         if self.delete_file(filename):
                             debug("File(s) deleted successfully.")
@@ -577,15 +577,19 @@ class Cleaner(object):
                         debug("This file is larger than the existing file. Replacing it with this one.")
                         existing_file.close()
                         file_to_move.close()
-                        success.append(bool(xbmcvfs.delete(new_path) and xbmcvfs.rename(p, new_path)))
+                        if bool(xbmcvfs.delete(new_path) and bool(xbmcvfs.rename(p, new_path))):
+                            files_moved_successfully += 1
+                        else:
+                            return -1
                     else:
                         debug("This file isn't larger than the existing file. Deleting it instead of moving.")
                         existing_file.close()
                         file_to_move.close()
-                        success.append(bool(xbmcvfs.delete(p)))
+                        if bool(xbmcvfs.delete(p)):
+                            files_moved_successfully += 1
+                        else:
+                            return -1
                 else:
-                    # TODO: Fall back to copy and delete in case errors occur, also for related files (above)
-                    # Move fails e.g. when we don't have write permission for the folder a movie is in before cleaning
                     debug("Moving %r to %r." % (p, new_path))
                     move_success = bool(xbmcvfs.rename(p, new_path))
                     copy_success, delete_success = False, False
