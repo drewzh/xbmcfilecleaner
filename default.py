@@ -99,8 +99,7 @@ class Cleaner(object):
                     if get_setting(cleaning_type) == self.CLEANING_TYPE_MOVE:
                         if get_setting(holding_folder) == "":
                             # No destination set, prompt user to set one now
-                            if xbmcgui.Dialog().yesno(__title__, translate(32521), translate(32522),
-                                                      translate(32523)):
+                            if xbmcgui.Dialog().yesno(__title__, *map(translate, (32521, 32522, 32523))):
                                 xbmc.executebuiltin("Addon.OpenSettings(%s)" % __addonID__)
                             break
                         if get_setting(create_subdirs):
@@ -121,8 +120,7 @@ class Cleaner(object):
                             self.delete_empty_folders(os.path.dirname(filename))
                         elif move_result == -1:
                             debug("Moving errors occurred. Skipping related files and directories.", xbmc.LOGWARNING)
-                            # TODO: Use localized strings
-                            xbmcgui.Dialog().ok("Errors occurred during move", "Not all files could be moved to the holding folder.", "Ensure you have appropriate permissions and try again.", "Please check the log file for details and move the particular files manually.")
+                            xbmcgui.Dialog().ok(*map(translate, (32611, 32612, 32613, 32614)))
                     elif get_setting(cleaning_type) == self.CLEANING_TYPE_DELETE:
                         if self.delete_file(filename):
                             debug("File(s) deleted successfully.")
