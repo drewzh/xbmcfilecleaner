@@ -105,6 +105,7 @@ msgid "Also clean related files with similar names (e.g. subtitles)"
 msgstr "Schoon tevens bestanden op met vergelijkbare namen (bv. ondertitels)"
 
 
+
 # Frequentietabblad
 # =======================
 msgctxt "#32200"
@@ -217,8 +218,7 @@ msgctxt "#32405"
 msgid "Reset exclusions"
 msgstr "Reset uitzonderingen"
 
-
-# Meldingentabblad
+# Notifications section
 # =======================
 msgctxt "#32500"
 msgid "Notifications"
@@ -240,6 +240,10 @@ msgctxt "#32504"
 msgid "Enable debug messages"
 msgstr "Toon debuginformatie"
 
+
+# Vertaalde teksten
+# voor Kodi-meldingen
+# =======================
 msgctxt "#32511"
 msgid "Error reading hard disk. Please check your settings."
 msgstr "Fout bij lezen van harde schijf. Controleer de instellingen."
@@ -301,6 +305,7 @@ msgstr "Schijfruimtecontrole van netwerkschijven is nog niet ondersteund voor di
 
 # Logtabblad
 # =======================
+
 msgctxt "#32600"
 msgid "History"
 msgstr "Geschiedenis"
@@ -342,5 +347,21 @@ msgid "Clear"
 msgstr "Wissen"
 
 msgctxt "#32610"
-msgid "This will reset any exclusions you have set up"
-msgstr "Hiermee reset je alle ingestelde uitzonderingen"
+msgid "This will reset any exclusions you have set up."
+msgstr "Hiermee reset je alle ingestelde uitzonderingen."
+
+msgctxt "#32611"
+msgid "Errors occurred while moving"
+msgstr "Fouten bij het verplaatsen"
+
+msgctxt "#32612"
+msgid "Not all files could be moved to the holding folder."
+msgstr "Niet alle bestanden konden worden verplaatst naar de bewaarmap."
+
+msgctxt "#32613"
+msgid "Ensure you have appropriate permissions and try again."
+msgstr "Controleer of je de juiste rechten hebt en probeer het nogmaals."
+
+msgctxt "#32614"
+msgid "Please check the log file for details and move the particular files manually."
+msgstr "Controleer het logbestand voor meer informatie en verplaats de bestanden handmatig."

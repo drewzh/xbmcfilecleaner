@@ -346,5 +346,21 @@ msgid "Clear"
 msgstr "Oczyścić"
 
 msgctxt "#32610"
-msgid "This will reset any exclusions you have set up"
-msgstr "Wszystkie Twoje wykluczenia zostaną zresetowane"
+msgid "This will reset any exclusions you have set up."
+msgstr "Wszystkie Twoje wykluczenia zostaną zresetowane."
+
+msgctxt "#32611"
+msgid "Errors occurred while moving"
+msgstr ""
+
+msgctxt "#32612"
+msgid "Not all files could be moved to the holding folder."
+msgstr ""
+
+msgctxt "#32613"
+msgid "Ensure you have appropriate permissions and try again."
+msgstr ""
+
+msgctxt "#32614"
+msgid "Please check the log file for details and move the particular files manually."
+msgstr ""

@@ -346,7 +346,7 @@ msgid "Clear"
 msgstr ""
 
 msgctxt "#32610"
-msgid "This will reset any exclusions you have set up"
+msgid "This will reset any exclusions you have set up."
 msgstr ""
 
 msgctxt "#32611"
