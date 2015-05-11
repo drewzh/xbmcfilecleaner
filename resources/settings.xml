@@ -1,57 +1,93 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
-    <!-- General Section -->
-    <category label="31000" id="section_general">
+    <!-- Actions section -->
+    <category label="32100" id="actions_section">
         <setting type="sep" />
-        <setting label="31001" type="lsep" />
+        <setting label="32101" type="lsep" />
         <setting type="sep" />
-        
-        <setting id="service_enabled" type="bool" label="31002" default="false"/>
-        
-        <setting id="delayed_start" type="slider" label="31003" default="0" range="0,10,120" option="int" visible="eq(-1,true)" />
-        <setting id="scan_interval" type="slider" label="31004" default="30" range="5,5,120" option="int" visible="eq(-2,true)" />
-        
-        <setting id="show_notifications" type="bool" label="31005" default="true" visible="eq(-3,true)" />
-        <setting id="enable_debug" type="bool" label="31006" default="false" visible="eq(-4,true)" />
-        
-        <setting id="clean_library" type="bool" label="31007" default="true" visible="eq(-5,true)" />
-        <setting id="delete_movies" type="bool" label="31008" default="false" visible="eq(-6,true)" />
-        <setting id="delete_tvshows" type="bool" label="31009" default="false" visible="eq(-7,true)" />
-        
-        <setting id="remove_from_autoexec" type="bool" label="" default="true" visible="false" />
+        <setting label="32102" id="default_action" type="enum" visible="true" lvalues="32103|32104" />
+        <setting label="32105" id="cleaning_type" type="enum" visible="true" lvalues="32106|32107" />
+        <setting label="32108" id="holding_info" type="lsep" subsetting="true" visible="eq(-1,0)" />
+
+        <setting label="32109" id="holding_folder" type="folder" default="" option="writeable" subsetting="true" visible="eq(-2,0)" />
+        <setting label="32110" id="create_subdirs" type="bool" default="false" subsetting="true" visible="eq(-3,0)" />
+
+        <setting label="32111" id="clean_movies" type="bool" default="false" visible="true" />
+        <setting label="32112" id="clean_tv_shows" type="bool" default="false" visible="true" />
+        <setting label="32113" id="clean_music_videos" type="bool" default="false" visible="true" />
+
+        <setting label="32114" id="clean_xbmc_library" type="bool" default="true" visible="true" />
+        <setting label="32115" id="delete_folders" type="bool" default="false" visible="true" />
+        <setting label="32116" id="ignore_extensions" type="text" default=".nfo, .nfo-orig, .tbn, .srt, .ass, .srr, .sfv, .nzb, .jpg, .png, .txt" subsetting="true" visible="eq(-1,true)" />
+        <setting label="32117" id="clean_related" type="bool" default="false" visible="true" />
     </category>
-    
-    <!-- Conditions Section -->
-    <category label="32000" id="section_conditions">
+
+    <!-- Frequency section -->
+    <category label="32200" id="timing_section">
         <setting type="sep" />
-        <setting label="32001" type="lsep" />
+        <setting label="32201" type="lsep" />
         <setting type="sep" />
-        
-        <setting id="enable_expire" type="bool" label="32002" default="false" />
-        <setting id="expire_after" type="slider" label="32003" subsetting="true" default="7" range="1,1,30" option="int" visible="eq(-1,true)" />
-        
-        <setting id="delete_low_rating" type="bool" label="32004" default="false" />
-        <setting id="low_rating_figure" type="slider" label="32005" subsetting="true" default="6" range="1,1,10" option="int" visible="eq(-1,true)" />
-        <setting id="ignore_no_rating" type="bool" label="32006" subsetting="true" default="true" visible="eq(-2,true)" />
-        
-        <setting id="delete_on_low_disk" type="bool" label="32007" default="false" />
-        <setting id="low_disk_percentage" type="slider" label="32008" subsetting="true" default="0" range="5,5,80" visible="eq(-1,true)" />
-        <setting id="low_disk_path" type="folder" label="32009" subsetting="true" default="special://home" visible="eq(-2,true)" />
-        
-        <setting id="enable_holding" type="bool" label="32010" default="false" />
-        <setting id="holding_folder" type="folder" label="32011" subsetting="true" default="special://temp" visible="eq(-1,true)" />
-        <setting id="create_series_season_dirs" type="bool" label="32012" subsetting="true" default="false" visible="eq(-2,true)" />
-        <setting id="update_path_reference" type="bool" label="32013" subsetting="true" default="true" visible="eq(-3,true)" />
-        <setting id="holding_info" label="32014" type="lsep" subsetting="true" />
+
+        <setting label="32202" id="service_enabled" type="bool" default="false" visible="true" />
+
+        <setting label="32203" id="delayed_start" type="slider" default="0" range="0,10,120" option="int" visible="eq(-1,true)" />
+        <setting label="32204" id="scan_interval" type="slider" default="30" range="15,15,1440" option="int" visible="eq(-2,true)" />
+
+        <setting label="32205" id="clean_when_idle" type="bool" default="false" visible="true" />
     </category>
-    
-    <!-- FAQ Section -->
-    <category label="33000" id="section_info">
+
+    <!-- Conditions section -->
+    <category label="32300" id="conditions_section">
         <setting type="sep" />
-        <setting label="33001" type="lsep" />
+        <setting label="32301" type="lsep" />
         <setting type="sep" />
-        <setting type="lsep" label="33002" />
-        <setting type="lsep" label="33003" />
-        <setting type="lsep" label="33004" />
+
+        <setting label="32302" id="enable_expiration" type="bool" default="false" visible="true" />
+        <setting label="32303" id="expire_after" type="slider" default="7" option="int" range="1,1,30" subsetting="true" visible="eq(-1,true)" />
+
+        <setting label="32304" id="clean_when_low_rated" type="bool" default="false" visible="true" />
+        <setting label="32305" id="musicvideo_ratings_info" type="lsep" subsetting="true" visible="eq(-1,true)" />
+        <setting label="32306" id="minimum_rating" type="slider" default="6" option="int" range="1,1,10" subsetting="true" visible="eq(-2,true)" />
+        <setting label="32307" id="ignore_no_rating" type="bool" default="true" subsetting="true" visible="eq(-3,true)" />
+
+        <setting label="32308" id="clean_when_low_disk_space" type="bool" default="false" visible="true" />
+        <setting label="32309" id="disk_space_threshold" type="slider" default="0" range="5,5,80" subsetting="true" visible="eq(-1,true)" />
+        <setting label="32310" id="disk_space_check_path" type="folder" default="special://home" subsetting="true" visible="eq(-2,true)" />
+
+        <setting label="32311" id="not_in_progress" type="bool" default="true" visible="true" />
+        <setting label="32312" id="musicvideo_progress_info" type="lsep" subsetting="true" visible="eq(-1,true)" />
+    </category>
+
+    <!-- Exclusions section -->
+    <category label="32400" id="exclusions_section">
         <setting type="sep" />
+        <setting label="32401" type="lsep" />
+        <setting type="sep" />
+
+        <setting label="32402" id="exclusion_enabled" type="bool" default="false" visible="true" />
+        <setting label="32403" type="lsep" subsetting="true" visible="eq(-1,true)" />
+        <setting label="32404" id="exclusion1" type="folder" default="" subsetting="true" visible="eq(-2,true)" />
+        <setting label="32404" id="exclusion2" type="folder" default="" subsetting="true" visible="eq(-3,true)" />
+        <setting label="32404" id="exclusion3" type="folder" default="" subsetting="true" visible="eq(-4,true)" />
+        <setting label="32405" id="reset_exclusions" type="action" action="RunScript(special://home/addons/script.filecleaner/reset_exclusions.py)" subsetting="true" visible="eq(-5,true)" />
+    </category>
+
+    <!-- Notifications section -->
+    <category label="32500" id="notifications_section">
+        <setting type="sep" />
+        <setting label="32501" type="lsep" />
+        <setting type="sep" />
+
+        <setting label="32502" id="notifications_enabled" type="bool" default="true" visible="true" />
+        <setting label="32503" id="notify_when_idle" type="bool" default="true" subsetting="true" visible="eq(-1,true)" />
+
+        <setting label="32504" id="debugging_enabled" type="bool" default="false" visible="true" />
+    </category>
+
+    <category label="32600" id="log_section">
+        <setting type="sep" />
+        <setting label="32601" type="lsep" />
+        <setting type="sep" />
+        <setting label="32602" type="action" action="RunScript(special://home/addons/script.filecleaner/viewer.py)" />
     </category>
 </settings>

@@ -1,23 +1,9 @@
-__  _____ __  __  ___   ___ _ _        ___ _                       
-\ \/ / _ )  \/  |/ __| | __(_) |___   / __| |___ __ _ _ _  ___ _ _ 
- >  <| _ \ |\/| | (__  | _|| | / -_) | (__| / -_) _` | ' \/ -_) '_|
-/_/\_\___/_|  |_|\___| |_| |_|_\___|  \___|_\___\__,_|_||_\___|_|  
+This addon will automatically scan your library for watched movies, TV show episodes and music videos, and delete them from the file system based on numerous critia such as age, rating, free disk space, etc. All these options and more can be configured via the addon's settings. Also make sure you set the correct path to the disk you wish to check for free space, especially when you store your videos on a secondary drive or a network share. Through the settings you can view which videos have been cleaned.
 
-READ BEFORE PROCEEDING
-=====================================
-This addon has the potential to wipe your entire video collection! Please make sure you understand exactly what this addon is designed to do before enabling the file deletion capabilities in the settings. I will not be held responsible for loss of data due to user error.
+Beware!
+This addon has the potential to erase your entire video collection! Please make sure you understand exactly what this addon is designed to do before enabling any type of cleaning in the settings. I will not be held responsible for loss of data due to user error.
 
-DESCRIPTION
-=====================================
-This addon will automatically scan your library for watched TV shows and Movies and delete them from the file system based on numerous critia such as age, rating, free disk space, etc. All these options and more can be configured via the addon's settings. Also make sure you set the correct path to the disk you wish to check for free space, especially when you store your videos on a secondary drive or a network share.
+Originally developed by Andrew 'drewzh' Higginson (xbmcfilecleaner@drewzh.com)
 
-QUESTIONS/COMMENTS/SUGGESTIONS
-=====================================
-web: http://drewzh.com
-email: me@drewzh.com
-
-FUTURE IDEAS
-=====================================
-* Allow users to start the addon themselves using the "program addons" feature too.
-* Display one message with the number of files deleted, if more than one, instead of displaying each message individually
-* Delete files after a user-determined number of plays instead of the fixed one play
+The log viewer reuses artwork from Confluence, which is licensed under GPLv2.
+See https://raw.githubusercontent.com/xbmc/xbmc/master/LICENSE.GPL
